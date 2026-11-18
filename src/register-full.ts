@@ -4,7 +4,7 @@
 // nothing of its own. A page that links page-full.css imports it in place of register.js.
 // Adapted from spike-html-design (fe75220): modules/register-full.js.
 
-import "./profiles/color/flexoki.ts";
+import "./profiles/color/github.ts";
 import "./profiles/color/primer.ts";
 import "./profiles/color/catppuccin.ts";
 import "./profiles/color/everforest.ts";

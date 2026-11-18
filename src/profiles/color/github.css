@@ -1,0 +1,50 @@
+/*
+ * Colors from GitHub's VS Code theme (MIT, GitHub Inc.),
+ * https://github.com/primer/github-vscode-theme, at v6.3.5: GitHub Light Default in light and
+ * GitHub Dark Default in dark, the values its build resolves for them, from @primer/primitives
+ * 7.10.0 (MIT) with the theme's own overrides in src/colors.js, which set fg.default and fg.muted
+ * in both and accent.fg in dark.
+ *
+ * profiles/color/github.css, the GitHub profile of the color facet, the default: one
+ * zero-specificity block, applied by data-palette="github" on any element to its subtree and on
+ * the root with no attribute anywhere, declaring the sixteen color tokens as light-dark() pairs,
+ * Light Default / Dark Default, and nothing else. The tokens' roles and how a profile is selected
+ * are the facet's, in baseline/tokens/color.css. Each value's comment names its upstream swatch,
+ * the one name both schemes share. neutral.muted is translucent upstream, rgba(175, 184, 193, 0.2)
+ * light and rgba(110, 118, 129, 0.4) dark: --bg-2 is the opaque color each produces over
+ * canvas.default, as the surfaces rule reads a surface's luminance. The theme has no functional
+ * cyan, so --cyan is its terminal's, ansi.cyan.
+ *
+ * The package exports this file as ./profiles/color/github.css, and its registration module as
+ * ./profiles/color/github.js: together, the GitHub unit. Both entries, page.css through
+ * baseline.css and page-full.css, import this sheet into foundation.tokens.color after the facet's
+ * own file, and both registration modules, register.js and register-full.js, import the module,
+ * which registers github and loads no CSS.
+ */
+
+@layer foundation.tokens.color {
+  :where(:root, [data-palette="github"]) {
+    /* Surfaces: the base, the first elevated surface, the element surface, the border and the
+       control boundary. */
+    --bg: light-dark(#ffffff, #0d1117); /* canvas.default */
+    --bg-1: light-dark(#f6f8fa, #161b22); /* canvas.subtle */
+    --bg-2: light-dark(#eff1f3, #343941); /* neutral.muted over canvas.default */
+    --border: light-dark(#d8dee4, #21262d); /* border.muted */
+    --border-2: light-dark(#d0d7de, #30363d); /* border.default */
+
+    /* Text, from the strongest down. */
+    --fg: light-dark(#1f2328, #e6edf3); /* fg.default */
+    --fg-2: light-dark(#656d76, #7d8590); /* fg.muted */
+    --fg-3: light-dark(#6e7781, #6e7681); /* fg.subtle */
+
+    /* Hues: one token per color, named for the color, never for a meaning. */
+    --red: light-dark(#cf222e, #f85149); /* danger.fg */
+    --orange: light-dark(#bc4c00, #db6d28); /* severe.fg */
+    --yellow: light-dark(#9a6700, #d29922); /* attention.fg */
+    --green: light-dark(#1a7f37, #3fb950); /* success.fg */
+    --cyan: light-dark(#1b7c83, #39c5cf); /* ansi.cyan */
+    --blue: light-dark(#0969da, #2f81f7); /* accent.fg */
+    --purple: light-dark(#8250df, #a371f7); /* done.fg */
+    --magenta: light-dark(#bf3989, #db61a2); /* sponsors.fg */
+  }
+}

@@ -2,10 +2,14 @@
 // tooling and the package as @standards-lab/web-tooling and @standards-lab/web-foundation.
 // The tool sheets in the package's dist/ against v0.7.0's: every element of demo/tools.html
 // computes the same, at rest and hovered, and dropping any one declaration shows. The page entry's
-// layer order and default profiles are read from the same page. The full page entry's profiles
-// compute as v0.7.0's full entry's, in light and in dark, and dropping any one declaration of a
-// profile it adds shows; each entry's registration module lists exactly the profiles it defines,
-// and each built-in unit's module registers its one profile and loads no CSS.
+// layer order and default profiles are read from the same page. The full page entry's space and
+// type profiles compute as v0.7.0's full entry's, in light and in dark, and dropping any one
+// declaration of one it adds shows. The color profiles are the package's own, not v0.7.0's: every
+// comparison with v0.7.0 pins the color tokens on both pages to v0.7.0's default's values, so it
+// holds which token each declaration reads and never a palette's values; the default, github,
+// resolves to GitHub's swatches, and dropping any one declaration of a color profile shows on its
+// scope. Each entry's registration module lists exactly the profiles it defines, and each
+// built-in unit's module registers its one profile and loads no CSS.
 // demo/profiles.html switches the tools page through every profile.
 // Adapted from spike-html-packages-foundation (5dd8a58): test/browser/tools.test.js, in TypeScript.
 
@@ -77,7 +81,7 @@ const LAYER_ORDER = [
 const FACETS: Facet[] = ["color", "space", "type"];
 /** One token per facet that tells its profile apart, with its value under each profile. */
 const PROFILES: Record<Facet, Record<string, Record<string, string>>> = {
-  color: { flexoki: { "--bg": "light-dark(#fffcf0, #100f0f)" } },
+  color: { github: { "--bg": "light-dark(#ffffff, #0d1117)" } },
   space: { regular: { "--radius-base": "0.375rem" } },
   type: {
     mono: {
@@ -97,9 +101,9 @@ const ATTRIBUTES: Record<Facet, string> = {
   type: "data-type",
 };
 /** The profiles each entry ships, per facet, in the order it imports them. */
-const LEAN: Record<Facet, string[]> = { color: ["flexoki"], space: ["regular"], type: ["mono"] };
+const LEAN: Record<Facet, string[]> = { color: ["github"], space: ["regular"], type: ["mono"] };
 const FULL: Record<Facet, string[]> = {
-  color: ["flexoki", "primer", "catppuccin", "everforest"],
+  color: ["github", "primer", "catppuccin", "everforest"],
   space: ["regular", "compact"],
   type: ["mono", "sans"],
 };
@@ -110,6 +114,34 @@ const FULL_PROFILES: Profile[] = FACETS.flatMap((facet) =>
 );
 /** The profiles the full entry adds to the lean one. */
 const ADDED = FULL_PROFILES.filter(({ facet, name }) => !LEAN[facet].includes(name));
+/** The profiles held to v0.7.0's values: the space and type ones. */
+const UPSTREAM_HELD = FULL_PROFILES.filter(({ facet }) => facet !== "color");
+/** The color profiles, the package's own, each held to its own reading. */
+const COLORS = FULL_PROFILES.filter(({ facet }) => facet === "color");
+
+/** github's sixteen tokens, light / dark: GitHub Light Default's and GitHub Dark Default's
+ * swatches, from primer/github-vscode-theme v6.3.5 over @primer/primitives 7.10.0. */
+const GITHUB: Record<string, [string, string]> = {
+  "--bg": ["#ffffff", "#0d1117"],
+  "--bg-1": ["#f6f8fa", "#161b22"],
+  "--bg-2": ["#eff1f3", "#343941"],
+  "--border": ["#d8dee4", "#21262d"],
+  "--border-2": ["#d0d7de", "#30363d"],
+  "--fg": ["#1f2328", "#e6edf3"],
+  "--fg-2": ["#656d76", "#7d8590"],
+  "--fg-3": ["#6e7781", "#6e7681"],
+  "--red": ["#cf222e", "#f85149"],
+  "--orange": ["#bc4c00", "#db6d28"],
+  "--yellow": ["#9a6700", "#d29922"],
+  "--green": ["#1a7f37", "#3fb950"],
+  "--cyan": ["#1b7c83", "#39c5cf"],
+  "--blue": ["#0969da", "#2f81f7"],
+  "--purple": ["#8250df", "#a371f7"],
+  "--magenta": ["#bf3989", "#db61a2"],
+};
+/** A #rrggbb color as getComputedStyle gives it. */
+const rgb = (hex: string) =>
+  `rgb(${[1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(", ")})`;
 
 /** A file of the repository, by its path on the server, without its CSS comments. */
 const source = (path: string) =>
@@ -140,16 +172,28 @@ async function forceHover(page: Page) {
 const declared = (css: string) =>
   [...new Set([...css.matchAll(/(--[\w-]+)\s*:/g)].map((m) => m[1]))].sort();
 
+/** Each facet's default profile's sheet in v0.7.0, the one its lean entry imports. */
+const UPSTREAM_DEFAULTS = Object.fromEntries(
+  FACETS.map((facet) => {
+    const match = source(reference).match(new RegExp(`\\./layers/tokens/${facet}/[\\w-]+\\.css`));
+    assert.ok(match, `v0.7.0's lean entry imports no ${facet} profile`);
+    return [facet, source(`/test/fixtures/v0.7.0/${match[0].slice(2)}`)];
+  }),
+) as Record<Facet, string>;
+
 /**
  * Each facet's tokens, the ones its default profile declares in v0.7.0's sheet: a scoped reading
  * sets them all on the root to a sentinel, so a profile's scope shows only what it declares.
  */
 const SENTINELS = Object.fromEntries(
-  FACETS.map((facet) => [
-    facet,
-    declared(source(`/test/fixtures/v0.7.0/layers/tokens/${facet}/${LEAN[facet][0]}.css`)),
-  ]),
+  FACETS.map((facet) => [facet, declared(UPSTREAM_DEFAULTS[facet])]),
 );
+
+/**
+ * The color tokens as v0.7.0's default declares them, which every reading compared with v0.7.0
+ * pins on its root: the comparison then holds which token each declaration reads, and no palette.
+ */
+const PIN = (UPSTREAM_DEFAULTS.color.match(/--[\w-]+\s*:[^;]+;/g) ?? []).join(" ");
 
 /** The setup scope() takes for a profile in a scheme, on the root or scoped under sentinels. */
 const setup = ({ facet, name }: Profile, scheme: string, scoped: boolean) => ({
@@ -166,17 +210,21 @@ describe("foundation tools", () => {
   let server: Server;
   let browser: Browser;
 
-  /** demo/tools.html on the stack of sheets, with computed-styles.js bound as window.m. */
-  async function toolsPage(sheets: string): Promise<Page> {
+  /**
+   * demo/tools.html on the stack of sheets, with computed-styles.js bound as window.m; pinned, its
+   * color tokens are v0.7.0's default's, PIN.
+   */
+  async function toolsPage(sheets: string, pinned = false): Promise<Page> {
     const page = await browser.open(`${server.origin}/demo/tools.html`);
     await page.evaluate(`import("/test/browser/support/computed-styles.js")
       .then((m) => (window.m = m).useSheets(${JSON.stringify(sheets)}))`);
+    if (pinned) await page.evaluate(`m.pin(${JSON.stringify(PIN)})`);
     return page;
   }
 
-  /** The page's reading on the stack of sheets, at rest and hovered. */
+  /** The page's reading on the stack of sheets, pinned, at rest and hovered. */
   async function snapshot(sheets: string): Promise<{ rest: Reading; hover: Reading }> {
-    const page = await toolsPage(sheets);
+    const page = await toolsPage(sheets, true);
     const rest = await page.evaluate("m.reading()");
     await forceHover(page);
     const hover = await page.evaluate("m.reading()");
@@ -184,9 +232,10 @@ describe("foundation tools", () => {
     return { rest, hover };
   }
 
-  /** The page's reading at rest on the stack of sheets, with scope() applied first. */
-  async function scoped(sheets: string, options: object): Promise<Reading> {
-    const page = await toolsPage(sheets);
+  /** The page's reading at rest on the stack of sheets, with scope() applied first; pinned unless
+   * told otherwise. */
+  async function scoped(sheets: string, options: object, pinned = true): Promise<Reading> {
+    const page = await toolsPage(sheets, pinned);
     await page.evaluate(`m.scope(${JSON.stringify(options)})`);
     const rest = await page.evaluate("m.reading()");
     await page.close();
@@ -195,7 +244,7 @@ describe("foundation tools", () => {
 
   // v0.7.0's reading, which every comparison is against, and its lean reading in each scheme
   // forced on the root, which an added profile's must differ from, so a profile that applied
-  // nothing can't pass.
+  // nothing can't pass; each pinned.
   let upstream: { rest: Reading; hover: Reading };
   const defaults: Record<string, Reading> = {};
   before(async () => {
@@ -311,6 +360,26 @@ describe("foundation tools", () => {
     );
   });
 
+  for (const [i, scheme] of SCHEMES.entries()) {
+    test(`with no profile attribute, the page entry resolves GitHub's swatches, ${scheme}`, async () => {
+      const page = await toolsPage(entry);
+      const resolved: Record<string, string> = await page.evaluate(`(() => {
+        document.documentElement.setAttribute("data-scheme", "${scheme}");
+        const probe = document.body.appendChild(document.createElement("i"));
+        const out = {};
+        for (const token of ${JSON.stringify(Object.keys(GITHUB))}) {
+          probe.style.color = "var(" + token + ")";
+          out[token] = getComputedStyle(probe).color;
+        }
+        probe.remove();
+        return out;
+      })()`);
+      await page.close();
+      const expected = Object.entries(GITHUB).map(([token, pair]) => [token, rgb(pair[i])]);
+      assert.deepEqual(resolved, Object.fromEntries(expected));
+    });
+  }
+
   test("every tool class computes as v0.7.0's, at rest and hovered", async () => {
     assert.notEqual(differences(upstream.rest, upstream.hover).length, 0, "hover changed nothing");
     const ours = await snapshot(entry);
@@ -320,7 +389,8 @@ describe("foundation tools", () => {
     assert.deepEqual(lines, [], head(lines));
   });
 
-  // The lean entry's defaults with no profile attribute, in each scheme forced on the root.
+  // The lean entry's defaults with no profile attribute, in each scheme forced on the root,
+  // pinned.
   for (const scheme of SCHEMES) {
     test(`the page entry computes as v0.7.0's lean entry, ${scheme}`, async () => {
       const lines = differences(defaults[scheme], await scoped(entry, { scheme }));
@@ -332,9 +402,10 @@ describe("foundation tools", () => {
     assert.notEqual(differences(defaults.light, defaults.dark).length, 0, "light and dark agree");
   });
 
-  // Every profile of the full entry, named on the root, where its block follows the default's in
-  // its sub-layer, and scoped on the body under sentinels, where it shows every token it declares.
-  for (const profile of FULL_PROFILES) {
+  // Every space and type profile of the full entry, named on the root, where its block follows
+  // the default's in its sub-layer, and scoped on the body under sentinels, where it shows every
+  // token it declares; pinned.
+  for (const profile of UPSTREAM_HELD) {
     for (const scheme of SCHEMES) {
       test(`${ATTRIBUTES[profile.facet]}="${profile.name}" computes as v0.7.0's, ${scheme}`, async () => {
         const found: string[] = [];
@@ -354,14 +425,17 @@ describe("foundation tools", () => {
     }
   }
 
-  // Each added profile's declarations, dropped one at a time on its scope under sentinels: every
-  // one must show, as the scope inherits no token its profile fails to declare.
-  for (const profile of ADDED) {
+  // Each added space and type profile's declarations, and each color profile's, dropped one at a
+  // time on its scope under sentinels: every one must show, as the scope inherits no token its
+  // profile fails to declare. A space or type profile's are against v0.7.0's reading, pinned; a
+  // color profile's against its own, unpinned, so each of its tokens is its own value there.
+  for (const profile of [...ADDED.filter((added) => UPSTREAM_HELD.includes(added)), ...COLORS]) {
     const file = `/profiles/${profile.facet}/${profile.name}.css`;
+    const held = UPSTREAM_HELD.includes(profile);
     test(`dropping any one declaration of ${profile.name}.css fails the comparison`, async () => {
       const options = setup(profile, "light", true);
-      const theirs = await scoped(fullReference, options);
-      const page = await toolsPage(fullEntry);
+      const theirs = await scoped(held ? fullReference : fullEntry, options, held);
+      const page = await toolsPage(fullEntry, held);
       await page.evaluate(`m.scope(${JSON.stringify(options)})`);
       const tried: Drop[] = await page.evaluate(`m.drops(${JSON.stringify(theirs)}, ["${file}"])`);
       await page.close();
@@ -376,7 +450,7 @@ describe("foundation tools", () => {
   }
 
   test("dropping any one declaration of the three sheets fails the comparison", async () => {
-    const page = await toolsPage(entry);
+    const page = await toolsPage(entry, true);
     const rest: Drop[] = await page.evaluate(`m.drops(${JSON.stringify(upstream.rest)})`);
     await forceHover(page);
     const hover: Drop[] = await page.evaluate(`m.drops(${JSON.stringify(upstream.hover)})`);

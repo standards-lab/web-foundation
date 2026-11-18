@@ -107,13 +107,13 @@ const description: Description = {
     { name: "hooks", caption: "the color hooks", path: "demo/hooks.html" },
   ],
   facets: [
-    { flag: "palette", attribute: "data-palette", default: "flexoki" },
+    { flag: "palette", attribute: "data-palette", default: "github" },
     { flag: "space", attribute: "data-space", default: "regular" },
     { flag: "type", attribute: "data-type", default: "mono" },
   ],
   // Every color at the defaults, then the other space and the other type at the default color.
   all: [
-    ...["flexoki", "primer", "catppuccin", "everforest"].map((palette) => ({ palette })),
+    ...["github", "primer", "catppuccin", "everforest"].map((palette) => ({ palette })),
     { space: "compact" },
     { type: "sans" },
   ],

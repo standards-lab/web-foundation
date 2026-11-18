@@ -7,6 +7,7 @@
 // stays chromium's black.
 
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { after, before, describe, test } from "node:test";
 
@@ -18,7 +19,7 @@ import type { Server } from "@standards-lab/web-tooling/server.js";
 /** The repository root, which the server serves. */
 const root = join(import.meta.dirname, "../..");
 
-const PALETTES = ["flexoki", "primer", "catppuccin", "everforest"];
+const PALETTES = ["github", "primer", "catppuccin", "everforest"];
 const SCHEMES = ["light", "dark"];
 /** A transparent background, as getComputedStyle gives it. */
 const TRANSPARENT = "rgba(0, 0, 0, 0)";
@@ -122,8 +123,18 @@ describe("foundation backdrop", () => {
     }
   }
 
-  // Each profile's --bg differs, so a reading that never left one profile would show here.
-  test("each palette and scheme computes a veil of its own", () => {
-    assert.equal(veils.size, PALETTES.length * SCHEMES.length);
+  // The veils differ as the palettes' --bg values do, read from their sheets, so a reading that
+  // never left one profile would show here; two palettes that share a value share its veil.
+  test("each palette and scheme's --bg computes a veil of its own", () => {
+    const backgrounds = new Set(
+      PALETTES.flatMap((name) => {
+        const css = readFileSync(join(root, `src/profiles/color/${name}.css`), "utf8");
+        const pair = css.match(/--bg:\s*light-dark\(([^,]+),\s*([^)]+)\)/);
+        assert.ok(pair, `${name}.css declares no light-dark() --bg`);
+        return [pair[1], pair[2]];
+      }),
+    );
+    assert.ok(backgrounds.size > SCHEMES.length, "the palettes' --bg values barely differ");
+    assert.equal(veils.size, backgrounds.size);
   });
 });

@@ -34,7 +34,7 @@ const APPLIED = {
 };
 const NONE = { "data-palette": null, "data-space": null, "data-type": null, "data-scheme": null };
 const DEFAULT_STATE = {
-  "data-palette": "flexoki",
+  "data-palette": "github",
   "data-space": "regular",
   "data-type": "mono",
   "data-scheme": null,
@@ -225,6 +225,19 @@ describe("preferences: apply and storage", () => {
     assert.match(await style(page, "h1", "font-family"), /^ui-monospace/);
   });
 
+  // A palette the package no longer ships, as a choice saved before it went, or any unknown name.
+  for (const color of ["flexoki", "unknown"]) {
+    test(`a stored ${color} palette applies github and stays in storage`, async () => {
+      const choice = { ...CHOICE, color };
+      await seed(choice);
+      const page = await open(fixture("preferences.html"));
+      assert.deepEqual(await rooted(page), { ...APPLIED, "data-palette": null });
+      assert.deepEqual(await stored(page), choice);
+      // github's dark --bg, canvas.default, on the dark scheme the choice applies.
+      assert.equal(await style(page, "body", "background-color"), "rgb(13, 17, 23)");
+    });
+  }
+
   test("a saved choice applies after a reload and on another page of the origin", async () => {
     await seed(null);
     const page = await open(fixture("preferences.html"));
@@ -243,7 +256,7 @@ describe("preferences: apply and storage", () => {
     await call(page, `preferences.save({ type: "sans" })`);
     assert.deepEqual(await stored(page), {
       scheme: "system",
-      color: "flexoki",
+      color: "github",
       space: "regular",
       type: "sans",
     });
@@ -503,7 +516,7 @@ describe("preferences: the menu", () => {
       arrows: ["◀", "▶"],
     });
     assert.deepEqual(menu.rows, [
-      row("color", "Color", ["flexoki", "primer", "catppuccin", "everforest"]),
+      row("color", "Color", ["github", "primer", "catppuccin", "everforest"]),
       row("scheme", "Scheme", ["system", "light", "dark"]),
       row("space", "Space", ["regular", "compact"]),
       row("type", "Type", ["mono", "sans"]),
@@ -513,7 +526,7 @@ describe("preferences: the menu", () => {
       ["Save T", "T", "T"],
     ]);
     const { focus, root } = await state(page);
-    assert.deepEqual({ focus, root }, { focus: ["color", "flexoki"], root: NONE });
+    assert.deepEqual({ focus, root }, { focus: ["color", "github"], root: NONE });
   });
 
   test("on the lean entry, its rows list the lean registry's names", async () => {
@@ -522,7 +535,7 @@ describe("preferences: the menu", () => {
       "sl-theme-menu fieldset")].map((row) => [row.dataset.section,
       [...row.querySelectorAll("input")].map((radio) => radio.value)]))`);
     assert.deepEqual(names, {
-      color: ["flexoki"],
+      color: ["github"],
       scheme: ["system", "light", "dark"],
       space: ["regular"],
       type: ["mono"],
@@ -546,7 +559,7 @@ describe("preferences: the menu", () => {
     await press(page, "ArrowDown");
     assert.deepEqual(await state(page), {
       focus: ["scheme", "system"],
-      selection: { color: "flexoki", scheme: "system", space: "regular", type: "mono" },
+      selection: { color: "github", scheme: "system", space: "regular", type: "mono" },
       root: NONE,
       preview: DEFAULT_STATE,
     });
@@ -554,10 +567,10 @@ describe("preferences: the menu", () => {
     assert.deepEqual(await focus(), ["space", "regular"]);
     await press(page, "k");
     await press(page, "ArrowUp");
-    assert.deepEqual(await focus(), ["color", "flexoki"]);
+    assert.deepEqual(await focus(), ["color", "github"]);
     // Up from the first row stays there, and down from the last.
     await press(page, "ArrowUp");
-    assert.deepEqual(await focus(), ["color", "flexoki"]);
+    assert.deepEqual(await focus(), ["color", "github"]);
     for (let i = 0; i < 4; i++) await press(page, "j");
     assert.deepEqual(await focus(), ["type", "mono"]);
     for (let i = 0; i < 3; i++) await press(page, "k");
@@ -816,10 +829,10 @@ describe("preferences: units and extensions", () => {
     ["preferences-unit.html", "primer", "light-dark(#ffffff, #1c2128)"],
   ];
   for (const [name, color, bg] of units) {
-    test(`on ${name}, the menu lists flexoki and ${color} alone, beside the lean defaults`, async () => {
+    test(`on ${name}, the menu lists github and ${color} alone, beside the lean defaults`, async () => {
       const page = await openMenu(null, name);
       assert.deepEqual(await listed(page), {
-        color: ["flexoki", color],
+        color: ["github", color],
         scheme: ["system", "light", "dark"],
         space: ["regular"],
         type: ["mono"],
@@ -829,10 +842,10 @@ describe("preferences: units and extensions", () => {
     test(`on ${name}, data-palette="${color}" applies its tokens`, async () => {
       await seed(null);
       const page = await open(fixture(name));
-      const flexoki = await background(page);
+      const github = await background(page);
       await page.evaluate(`document.documentElement.setAttribute("data-palette", "${color}")`);
       assert.equal(await background(page), bg);
-      assert.notEqual(flexoki, bg);
+      assert.notEqual(github, bg);
     });
 
     test(`on ${name}, a stored choice of ${color} applies on load`, async () => {
@@ -877,11 +890,12 @@ describe("preferences: demo/unit.html", () => {
     await clickTheme(page);
     const colors = await page.evaluate(`[...document.querySelectorAll(
       'sl-theme-menu [data-section="color"] input')].map((radio) => radio.value)`);
-    assert.deepEqual(colors, ["flexoki", "primer"]);
+    assert.deepEqual(colors, ["github", "primer"]);
     await press(page, "l");
     await press(page, "t");
     await closed(page);
     assert.equal((await rooted(page))["data-palette"], "primer");
-    assert.equal(await style(page, "body", "background-color"), "rgb(255, 255, 255)");
+    // Primer's own --bg; its light value alone is github's too, canvas.default.
+    assert.equal((await style(page, ":root", "--bg")).trim(), "light-dark(#ffffff, #1c2128)");
   });
 });

@@ -27,7 +27,7 @@
  * The package exports this file as ./profiles/color/everforest.css, and its registration module as
  * ./profiles/color/everforest.js: together, the Everforest unit. A page that links the lean entry,
  * page.css, links this sheet after it, which layers itself into foundation.tokens.color after
- * Flexoki, and imports the module, which registers everforest and loads no CSS; data-palette then
+ * GitHub, and imports the module, which registers everforest and loads no CSS; data-palette then
  * names it, and the theme menu lists it. <base> is where the package is served from, as a jsDelivr
  * tag's dist/:
  *
@@ -37,7 +37,7 @@
  *   <script type="module" blocking="render" src="<base>/profiles/color/everforest.js"></script>
  *   <html data-palette="everforest">
  *
- * The full entry, page-full.css, imports this sheet already, after Flexoki, and register-full.js
+ * The full entry, page-full.css, imports this sheet already, after GitHub, and register-full.js
  * imports the module.
  */
 

@@ -29,7 +29,7 @@ type Results = Record<string, Record<string, Failure[]>>;
 
 /** The full entry's profiles, per facet. */
 const BUILT_IN: Names = {
-  color: ["flexoki", "primer", "catppuccin", "everforest"],
+  color: ["github", "primer", "catppuccin", "everforest"],
   space: ["regular", "compact"],
   type: ["mono", "sans"],
 };
@@ -217,8 +217,8 @@ describe("conformance", () => {
   });
 
   test("contrast compares --fg on --bg unrounded in each scheme, and names the scheme and ratio", async () => {
-    // Two profiles the page adds, each flexoki's tokens on a white light --bg with a light --fg
-    // either side of 4.5:1: #6c7b67 at 4.49999...:1, and #797488 at 4.50000...:1.
+    // Two profiles the page adds, each a passing profile's tokens on a white light --bg with a
+    // light --fg either side of 4.5:1: #6c7b67 at 4.49999...:1, and #797488 at 4.50000...:1.
     const page = await open(fixture("conformance.html"));
     await page.evaluate(`import("/dist/registry.js").then(({ register }) => {
       const profile = (name, fg) => \`:where([data-palette="\${name}"]) {
@@ -250,13 +250,13 @@ describe("conformance", () => {
   });
 
   test("a scope painted from other tokens by a consumer's rule fails paints", async () => {
-    // A consumer rule that repaints every flexoki scope breaks paints for flexoki alone.
+    // A consumer rule that repaints every github scope breaks paints for github alone.
     const page = await open(fixture("conformance.html"));
     await page.evaluate(`document.head.append(Object.assign(document.createElement("style"), {
-      textContent: '[data-palette="flexoki"] { background-color: var(--red); }',
+      textContent: '[data-palette="github"] { background-color: var(--red); }',
     }))`);
-    const results = await checked(page, { color: ["flexoki", "primer"] });
-    assert.deepEqual(rules(results), { color: { flexoki: ["paints"], primer: [] } });
+    const results = await checked(page, { color: ["github", "primer"] });
+    assert.deepEqual(rules(results), { color: { github: ["paints"], primer: [] } });
   });
 
   test("freezes the rules, and rejects an unknown facet or an empty name", async () => {
@@ -285,7 +285,7 @@ describe("conformance", () => {
     const state = `[document.querySelectorAll("*").length, document.styleSheets.length,
       performance.getEntriesByType("resource").length]`;
     const before = await page.evaluate(state);
-    await checked(page, { color: ["flexoki"], space: ["regular"], type: ["mono"] });
+    await checked(page, { color: ["github"], space: ["regular"], type: ["mono"] });
     // The module itself is the one resource the check adds.
     const [elements, sheets, resources] = await page.evaluate(state);
     assert.deepEqual([elements, sheets, resources], [before[0], before[1], before[2] + 1]);
