@@ -18,15 +18,16 @@ import type { Server } from "@standards-lab/web-tooling/server.js";
 /** The repository root, which the server serves. */
 const root = join(import.meta.dirname, "../..");
 
-const PALETTES = ["flexoki", "primer", "catppuccin", "everforest"];
+const PALETTES = ["github", "zenwritten", "everforest", "catppuccin"];
 const SCHEMES = ["light", "dark"];
 /** A transparent background, as getComputedStyle gives it. */
 const TRANSPARENT = "rgba(0, 0, 0, 0)";
 /** Chromium's own background for a fullscreen element's ::backdrop. */
 const BLACK = "rgb(0, 0, 0)";
 
-/** Each top-layer element's ::backdrop background color, and the veil the probe computes. */
+/** Each top-layer element's ::backdrop background color, the veil the probe computes, and --bg. */
 interface Backdrops {
+  bg: string;
   veil: string;
   modal: string;
   hint: string;
@@ -52,12 +53,16 @@ const READ = (palette: string, scheme: string) => `(async () => {
     popover.hidePopover();
     return color;
   };
+  const probe = document.body.appendChild(document.createElement("i"));
+  probe.style.backgroundColor = "var(--bg)";
   const out = {
+    bg: getComputedStyle(probe).backgroundColor,
     veil: getComputedStyle(document.getElementById("veil")).backgroundColor,
     hint: shown("hint"),
     auto: shown("auto"),
     manual: shown("manual"),
   };
+  probe.remove();
   const modal = document.getElementById("modal");
   modal.showModal();
   out.modal = backdrop(modal);
@@ -91,8 +96,8 @@ describe("foundation backdrop", () => {
     await server?.stop();
   });
 
-  /** Each palette and scheme's veil, so the readings are seen to differ by profile. */
-  const veils = new Set<string>();
+  /** Each palette and scheme's --bg and veil, so the readings are seen to differ by profile. */
+  const readings: { bg: string; veil: string }[] = [];
 
   for (const palette of PALETTES) {
     for (const scheme of SCHEMES) {
@@ -105,10 +110,11 @@ describe("foundation backdrop", () => {
         });
         assert.equal(exceptionDetails, undefined, exceptionDetails?.exception?.description);
         const read: Backdrops = result.value;
-        veils.add(read.veil);
+        readings.push({ bg: read.bg, veil: read.veil });
         // The veil is a color, so a backdrop left transparent can't pass for it.
         assert.notEqual(read.veil, TRANSPARENT);
         assert.deepEqual(read, {
+          bg: read.bg,
           veil: read.veil,
           modal: read.veil,
           hint: TRANSPARENT,
@@ -122,8 +128,13 @@ describe("foundation backdrop", () => {
     }
   }
 
-  // Each profile's --bg differs, so a reading that never left one profile would show here.
-  test("each palette and scheme computes a veil of its own", () => {
-    assert.equal(veils.size, PALETTES.length * SCHEMES.length);
+  // The veils differ as the computed --bg values do, so a reading that never left one profile
+  // would show here; two palettes that share a --bg share its veil.
+  test("each palette and scheme's --bg computes a veil of its own", () => {
+    const count = (values: string[]) => new Set(values).size;
+    const backgrounds = count(readings.map(({ bg }) => bg));
+    assert.ok(backgrounds > SCHEMES.length, "the palettes' --bg values barely differ");
+    assert.equal(count(readings.map(({ veil }) => veil)), backgrounds);
+    assert.equal(count(readings.map(({ bg, veil }) => `${bg} ${veil}`)), backgrounds);
   });
 });

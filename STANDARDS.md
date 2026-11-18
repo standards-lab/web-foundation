@@ -23,7 +23,9 @@ The architecture pages that apply, in the architecture repository:
 ## Design
 
 - spike-html-design v0.7.0 is the frozen visual reference: native elements keep its styling, and
-  every profile renders as it does there. Two deliberate exceptions: native `progress` takes
+  the tool classes and the space and type profiles render as they do there. Three deliberate
+  exceptions: the color profiles' values follow their upstream themes, not v0.7.0's palettes,
+  because a theme a reader recognises should look as its authors made it; native `progress` takes
   `--accent-color`, magenta by default, where v0.7.0's takes the interaction color, because
   progress reports state rather than inviting interaction; and only a modal dialog's backdrop is
   veiled, where v0.7.0 veils every top-layer backdrop, because a popover or a fullscreen element

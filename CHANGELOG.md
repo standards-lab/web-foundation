@@ -7,6 +7,29 @@ All notable changes to `@standards-lab/web-foundation` are documented here. The 
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the package adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-11-18
+
+This minor release breaks a page that relies on the default palette or names a removed profile:
+the default color profile is now GitHub, and `flexoki` and `primer` are gone.
+
+### Added
+
+- The conformance rule `contrast`: a color profile's `--fg` on its `--bg` reaches 4.5:1 in light
+  and in dark.
+- The specimen demo page, `demo/specimen.html`, which shows each color theme beside its backup.
+  The backups' sheets live in `demo/backups/`, outside the package.
+
+### Changed
+
+- The built-in color profiles are four themes, each taking its values from its upstream at a pin:
+  GitHub, the new default; Zenwritten; Everforest, its medium contrast; and Catppuccin, latte in
+  light and mocha in dark, with `--bg` now its base.
+
+### Removed
+
+- The `flexoki` and `primer` color profiles. A reader's stored `flexoki` or `primer` choice
+  applies the default, `github`.
+
 ## [0.1.0] - 2026-11-18
 
 ### Added
@@ -42,4 +65,5 @@ All notable changes to `@standards-lab/web-foundation` are documented here. The 
 - Releases by tag: each `v<version>` tag marks a pack commit whose tree is the pack, the build
   included, and whose one parent is main's merge commit; its GitHub release carries the tarball.
 
+[0.2.0]: https://github.com/standards-lab/web-foundation/releases/tag/v0.2.0
 [0.1.0]: https://github.com/standards-lab/web-foundation/releases/tag/v0.1.0

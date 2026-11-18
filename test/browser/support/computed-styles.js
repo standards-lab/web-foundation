@@ -71,8 +71,18 @@ export function scope({ attribute, name, scheme, sentinels }) {
   }
   const sheet = new CSSStyleSheet();
   sheet.replaceSync(`:root { ${sentinels.map((token) => `${token}: sentinel;`).join(" ")} }`);
-  document.adoptedStyleSheets = [sheet];
+  document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
   document.body.setAttribute(attribute, name);
+}
+
+/**
+ * Sets the declarations on the root by an unlayered adopted sheet, which beats every layer: two
+ * pages pinned alike read the same values for those tokens whatever profiles their sheets hold.
+ */
+export function pin(declarations) {
+  const sheet = new CSSStyleSheet();
+  sheet.replaceSync(`:root { ${declarations} }`);
+  document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
 }
 
 /** Every element's computed properties, each element named by its position, tag, and classes. */

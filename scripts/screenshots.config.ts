@@ -2,11 +2,12 @@
 // @standards-lab/web-tooling and its web-screenshots bin, with the registry's key renamed
 // web-foundation.registry.
 // mise run screenshots' capture description, which the tooling's web-screenshots bin runs: the
-// tools page whole, keys help open, the theme menu open wide and narrow, and the hooks page whole,
-// each with the stylesheet pointed at page-full.css, its registration module imported, and the
-// profile's attributes set on the root, as demo/profiles.html does, so no demo page changes; the
-// profiles each page then registers, from the registry. The bin's flags choose the profiles,
-// pages, schemes, and output.
+// tools page whole, keys help open, the theme menu open wide and narrow, the hooks page whole, and
+// the color specimen narrowed to the profile's color theme and its backup, each with the
+// stylesheet pointed at page-full.css, its registration module imported, and the profile's
+// attributes set on the root, as demo/profiles.html does, so no demo page changes; the profiles
+// each page then registers, from the registry. The bin's flags choose the profiles, pages,
+// schemes, and output.
 // Adapted from spike-html-apps-foundation (9c15b8d): scripts/screenshots.js, its states, profiles,
 // and open steps as a Description.
 
@@ -58,6 +59,24 @@ const REGISTRY = `(() => {
   return { palette: store.color ?? [], space: store.space ?? [], type: store.type ?? [] };
 })()`;
 
+/**
+ * Narrows demo/specimen.html to the pair the capture's profile names, the root's data-palette and
+ * its backup, in the capture's scheme, the root's data-scheme, through the page's own Theme and
+ * Scheme switches: one capture per pair per scheme, legible at the default width.
+ */
+const narrowSpecimen: Step = (page) =>
+  page.evaluate(`(() => {
+    const root = document.documentElement;
+    for (const [name, value] of [["theme", root.dataset.palette], ["scheme", root.dataset.scheme]]) {
+      const select = document.querySelector(\`select[name="\${name}"]\`);
+      if (![...select.options].some((option) => option.value === value)) {
+        throw new Error(\`the specimen has no \${name} \${value}\`);
+      }
+      select.value = value;
+      select.dispatchEvent(new Event("change"));
+    }
+  })()`);
+
 const description: Description = {
   pages: [
     // One full-page capture, the bin's default state.
@@ -105,15 +124,29 @@ const description: Description = {
     // One full-page capture; the bin focuses the page's data-focus-start range and presses Tab,
     // which reaches the field and selects its text.
     { name: "hooks", caption: "the color hooks", path: "demo/hooks.html" },
+    // One full-page capture of the profile's color theme beside its backup, in the one scheme.
+    {
+      name: "specimen",
+      caption: "the color specimen",
+      path: "demo/specimen.html",
+      states: [
+        {
+          name: "specimen",
+          caption: "the color theme and its backup",
+          full: true,
+          open: narrowSpecimen,
+        },
+      ],
+    },
   ],
   facets: [
-    { flag: "palette", attribute: "data-palette", default: "flexoki" },
+    { flag: "palette", attribute: "data-palette", default: "github" },
     { flag: "space", attribute: "data-space", default: "regular" },
     { flag: "type", attribute: "data-type", default: "mono" },
   ],
   // Every color at the defaults, then the other space and the other type at the default color.
   all: [
-    ...["flexoki", "primer", "catppuccin", "everforest"].map((palette) => ({ palette })),
+    ...["github", "zenwritten", "everforest", "catppuccin"].map((palette) => ({ palette })),
     { space: "compact" },
     { type: "sans" },
   ],

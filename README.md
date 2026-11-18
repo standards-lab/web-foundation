@@ -46,8 +46,8 @@ modules by their `.js` subpaths. The lean entry, `page.css`, carries the default
   entries `page.css` and `page-full.css`, `baseline.css`, the tool sheets (`meta.css`,
   `structure.css`, and `utilities.css`), and the menu's `theme-menu.css`.
 - `./profiles/<facet>/<name>.{css,js}`: the built-in profiles, each a unit of a sheet and a
-  registration module. Color has `flexoki` (the default), `primer`, `catppuccin`, and
-  `everforest`; space has `regular` (the default) and `compact`; type has `mono` (the default)
+  registration module. Color has `github` (the default), `zenwritten`, `everforest`, and
+  `catppuccin`; space has `regular` (the default) and `compact`; type has `mono` (the default)
   and `sans`. A page adds a unit by linking its sheet after `page.css` and importing its module
   beside `register.js`. `page-full.css` and `register-full.js` import every unit, in place of
   `page.css` and `register.js`.
@@ -81,9 +81,9 @@ with `--magenta` as its fallback, and no profile declares. Where `--interaction-
 you can act on, `--accent-color` marks what is current, active, or in progress: emphasis that
 reports state rather than inviting interaction. In the baseline, native `progress` follows it. A
 page sets it on any element in its own layer, and per palette if it wants:
-`:where([data-palette="primer"]) { --accent-color: var(--cyan); }`. The hook shares its name with
-the CSS property: `accent-color` follows `--interaction-color` on every element except `progress`,
-where it follows `--accent-color`.
+`:where([data-palette="everforest"]) { --accent-color: var(--cyan); }`. The hook shares its name
+with the CSS property: `accent-color` follows `--interaction-color` on every element except
+`progress`, where it follows `--accent-color`.
 
 A package outside the foundation adds a profile as a built-in unit does: a sheet that declares
 its facet's tokens in one `:where([data-<attribute>="<name>"])` block inside that facet's layer,
@@ -117,19 +117,22 @@ mise run currency     # report every tool, package, action pin, and tooling tag 
 ```
 
 The demo pages, in `demo/`, are `tools.html` (every tool class), `profiles.html` (the tools page
-switched through every profile), `theme.html` (the theme menu on `page-full.css`), `unit.html`
-(`page.css` with the Primer unit), `keys.html` (bindings and the help dialog), `format.html` (each
-formatter on sample values), and `hooks.html` (the two color hooks, at their fallbacks and
+switched through every profile), `specimen.html` (each color profile light and dark, beside its
+backup from `demo/backups/`), `theme.html` (the theme menu on `page-full.css`), `unit.html`
+(`page.css` with the Zenwritten unit), `keys.html` (bindings and the help dialog), `format.html`
+(each formatter on sample values), and `hooks.html` (the two color hooks, at their fallbacks and
 overridden). Page layout belongs to the consumer, so each page links `demo.css`, a `demo` layer of
 its own that lays out the column and its sections. `mise run demo` serves the repository on the
 loopback address and prints each page's URL; the pages load `dist/`, which the task builds first.
 
 `mise run screenshots` captures the tools page, the keys help open, the theme menu open at a wide
-and a narrow width, and the hooks page, each light and dark, on `page-full.css`. It runs the
-`web-screenshots` bin of [web-tooling](https://github.com/standards-lab/web-tooling), the
-devDependency the browser tier's driver and server also come from, over the capture description
-in `scripts/screenshots.config.ts`, and passes its arguments on. With none it captures the default profile; `--palette`, `--space`,
-and `--type` choose a profile, and `--all` captures every color and compact and sans.
+and a narrow width, the hooks page, and the specimen narrowed to the color profile and its backup,
+each light and dark, on `page-full.css`. It runs the `web-screenshots` bin of
+[web-tooling](https://github.com/standards-lab/web-tooling), the devDependency the browser tier's
+driver and server also come from, over the capture description in
+`scripts/screenshots.config.ts`, and passes its arguments on. With none it captures the default
+profile; `--palette`, `--space`, and `--type` choose a profile, and `--all` captures every color
+and compact and sans.
 `--output directory --dir <path>` writes the files instead of showing them in kitty;
 `mise run screenshots -- --help` lists the other flags, and web-tooling's README documents them.
 The check never runs either task.

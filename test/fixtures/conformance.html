@@ -9,6 +9,7 @@
     <!-- The fixture profiles an extension would add, each breaking one rule of its facet's
          contract, linked after the entry as a page adds a unit beyond it: each sheet self-layers
          in its facet's sub-layer, but for the unlayered ones, whose blocks are unlayered. -->
+    <link rel="stylesheet" href="conformance/color/contrast.css" />
     <link rel="stylesheet" href="conformance/color/missing.css" />
     <link rel="stylesheet" href="conformance/color/spacing.css" />
     <link rel="stylesheet" href="conformance/color/specific.css" />
@@ -35,7 +36,7 @@
 
       // Every fixture profile but each facet's unregistered one is registered.
       const fixtures = {
-        color: ["missing", "spacing", "unlayered", "specific", "unpainted", "surfaces"],
+        color: ["missing", "spacing", "unlayered", "specific", "unpainted", "surfaces", "contrast"],
         space: ["missing", "coloring", "unlayered", "specific", "flat"],
         type: ["missing", "spacing", "unlayered", "specific", "descending", "unfamilied"],
       };

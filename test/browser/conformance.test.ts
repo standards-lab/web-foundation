@@ -29,7 +29,7 @@ type Results = Record<string, Record<string, Failure[]>>;
 
 /** The full entry's profiles, per facet. */
 const BUILT_IN: Names = {
-  color: ["flexoki", "primer", "catppuccin", "everforest"],
+  color: ["github", "zenwritten", "everforest", "catppuccin"],
   space: ["regular", "compact"],
   type: ["mono", "sans"],
 };
@@ -43,6 +43,7 @@ const BROKEN: Record<string, Record<string, string>> = {
     specific: "specificity",
     unpainted: "paints",
     surfaces: "surfaces",
+    contrast: "contrast",
     unregistered: "registered",
   },
   space: {
@@ -128,7 +129,7 @@ const rules = (results: Results) =>
 
 describe("conformance", () => {
   for (const scheme of ["light", "dark"]) {
-    test(`the eight built-in profiles conform on the full entry, with the system in ${scheme}`, async () => {
+    test(`the built-in profiles conform on the full entry, with the system in ${scheme}`, async () => {
       const page = await open(fixture("conformance.html"));
       await page.cdp("Emulation.setEmulatedMedia", {
         features: [{ name: "prefers-color-scheme", value: scheme }],
@@ -137,7 +138,7 @@ describe("conformance", () => {
     });
   }
 
-  test("the eight built-in profiles conform with the entry's sheets from another origin", async () => {
+  test("the built-in profiles conform with the entry's sheets from another origin", async () => {
     // A cross-origin sheet served without CORS hides its rules: the check reads computed values
     // alone.
     const page = await open(`${fixture("conformance-cross-origin.html")}?sheets=${other.origin}`);
@@ -215,14 +216,47 @@ describe("conformance", () => {
     }
   });
 
+  test("contrast compares --fg on --bg unrounded in each scheme, and names the scheme and ratio", async () => {
+    // Two profiles the page adds, each a passing profile's tokens on a white light --bg with a
+    // light --fg either side of 4.5:1: #6c7b67 at 4.49999...:1, and #797488 at 4.50000...:1.
+    const page = await open(fixture("conformance.html"));
+    await page.evaluate(`import("/dist/registry.js").then(({ register }) => {
+      const profile = (name, fg) => \`:where([data-palette="\${name}"]) {
+        --bg: light-dark(#ffffff, #100f0f); --bg-1: light-dark(#f2f0e5, #1c1b1a);
+        --bg-2: light-dark(#e6e4d9, #282726); --border: light-dark(#dad8ce, #343331);
+        --border-2: light-dark(#cecdc3, #403e3c); --fg: light-dark(\${fg}, #e6e4d9);
+        --fg-2: light-dark(#575653, #b7b5ac); --fg-3: light-dark(#878580, #6f6e69);
+        --red: light-dark(#af3029, #d14d41); --orange: light-dark(#bc5215, #da702c);
+        --yellow: light-dark(#ad8301, #d0a215); --green: light-dark(#408739, #61a25a);
+        --cyan: light-dark(#24837b, #3aa99f); --blue: light-dark(#205ea6, #4385be);
+        --purple: light-dark(#5e409d, #8b7ec8); --magenta: light-dark(#a02f6f, #ce5d97);
+      }\`;
+      document.head.append(Object.assign(document.createElement("style"), {
+        textContent: \`@layer foundation.tokens.color {
+          \${profile("under", "#6c7b67")} \${profile("at", "#797488")}
+        }\`,
+      }));
+      register("color", "under");
+      register("color", "at");
+    })`);
+    const results = await checked(page, { color: ["under", "at", "contrast"] });
+    assert.deepEqual(results.color.under, [
+      { rule: "contrast", message: "under: --fg on --bg is under 4.5:1: 4.49:1 in light" },
+    ]);
+    assert.deepEqual(results.color.at, []);
+    assert.deepEqual(results.color.contrast, [
+      { rule: "contrast", message: "contrast: --fg on --bg is under 4.5:1: 3.74:1 in dark" },
+    ]);
+  });
+
   test("a scope painted from other tokens by a consumer's rule fails paints", async () => {
-    // A consumer rule that repaints every flexoki scope breaks paints for flexoki alone.
+    // A consumer rule that repaints every github scope breaks paints for github alone.
     const page = await open(fixture("conformance.html"));
     await page.evaluate(`document.head.append(Object.assign(document.createElement("style"), {
-      textContent: '[data-palette="flexoki"] { background-color: var(--red); }',
+      textContent: '[data-palette="github"] { background-color: var(--red); }',
     }))`);
-    const results = await checked(page, { color: ["flexoki", "primer"] });
-    assert.deepEqual(rules(results), { color: { flexoki: ["paints"], primer: [] } });
+    const results = await checked(page, { color: ["github", "zenwritten"] });
+    assert.deepEqual(rules(results), { color: { github: ["paints"], zenwritten: [] } });
   });
 
   test("freezes the rules, and rejects an unknown facet or an empty name", async () => {
@@ -251,7 +285,7 @@ describe("conformance", () => {
     const state = `[document.querySelectorAll("*").length, document.styleSheets.length,
       performance.getEntriesByType("resource").length]`;
     const before = await page.evaluate(state);
-    await checked(page, { color: ["flexoki"], space: ["regular"], type: ["mono"] });
+    await checked(page, { color: ["github"], space: ["regular"], type: ["mono"] });
     // The module itself is the one resource the check adds.
     const [elements, sheets, resources] = await page.evaluate(state);
     assert.deepEqual([elements, sheets, resources], [before[0], before[1], before[2] + 1]);
