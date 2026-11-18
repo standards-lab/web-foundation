@@ -26,6 +26,7 @@ export const RULES: Readonly<Record<Facet, readonly string[]>> = Object.freeze({
     "specificity", // the selector is :where([data-palette="<name>"])
     "paints", // a scope paints its background from its --bg and its text from its --fg
     "surfaces", // --bg, --bg-1, and --bg-2 each step closer to --fg's luminance
+    "contrast", // --fg on --bg reaches 4.5:1, WCAG's AA for body text, in light and in dark
     "registered", // the registry lists the name under color
   ]),
   space: Object.freeze([
@@ -327,7 +328,10 @@ const TOKENS: Readonly<Record<Facet, (probes: Probes, fail: Fail) => () => void>
   type: typeTokens,
 };
 
-/** The color tokens rule, reading each token in each scheme; returns paints and surfaces. */
+/** The contrast ratio --fg on --bg must reach in each scheme: WCAG's AA for body text. */
+const CONTRAST = 4.5;
+
+/** The color tokens rule, reading each token in each scheme; returns paints, surfaces, and contrast. */
 function colorTokens({ scopes }: Probes, fail: Fail): () => void {
   // Each scheme's computed color per token, or null when the token is unset or no color there.
   const colors = scopes.map(({ scheme, probe }) => {
@@ -378,6 +382,17 @@ function colorTokens({ scopes }: Probes, fail: Fail): () => void {
         `--bg, --bg-1 and --bg-2 do not step toward --fg in ${unordered.join(", ")}`,
       );
     }
+
+    // Compared unrounded, so 4.49:1 fails; shown truncated, so a failing ratio never reads 4.50:1.
+    const low = [];
+    for (const { scheme, resolved } of colors) {
+      if (!resolved["--fg"] || !resolved["--bg"]) continue;
+      const ratio = contrast(resolved["--fg"], resolved["--bg"]);
+      if (ratio < CONTRAST) {
+        low.push(`${(Math.floor(ratio * 100) / 100).toFixed(2)}:1 in ${scheme}`);
+      }
+    }
+    if (low.length) fail("contrast", `--fg on --bg is under ${CONTRAST}:1: ${low.join(", ")}`);
   };
 }
 
@@ -469,4 +484,10 @@ function luminance(color: string): number {
     return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
   });
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+/** Two computed colors' WCAG contrast ratio, 1 to 21: the lighter's luminance over the darker's. */
+function contrast(one: string, two: string): number {
+  const [lighter, darker] = [luminance(one), luminance(two)].sort((a, b) => b - a);
+  return (lighter + 0.05) / (darker + 0.05);
 }
