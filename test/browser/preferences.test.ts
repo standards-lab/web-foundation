@@ -902,7 +902,7 @@ describe("preferences: demo/unit.html", () => {
     await press(page, "t");
     await closed(page);
     assert.equal((await rooted(page))["data-palette"], "zenwritten");
-    // Zenwritten's own --bg, Normal's background.
-    assert.equal((await style(page, ":root", "--bg")).trim(), "light-dark(#eeeeee, #191919)");
+    // Zenwritten's light --bg, Normal's background, on the system scheme the page follows.
+    assert.equal(await style(page, "body", "background-color"), "rgb(238, 238, 238)");
   });
 });
