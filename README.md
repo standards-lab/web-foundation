@@ -1,4 +1,5 @@
-<!-- Adapted from spike-html-apps-foundation (07ba39a): README.md, for @standards-lab/web-foundation. -->
+<!-- Adapted from spike-html-apps-foundation (07ba39a): README.md, for
+@standards-lab/web-foundation. -->
 
 # web-foundation
 
@@ -112,7 +113,7 @@ mise run check        # lint, types, build, and the unit and browser tiers; read
 mise run build        # src/ into dist/
 mise run demo         # serve the demo pages on dist/
 mise run screenshots  # capture the demo pages light and dark, shown inline in kitty
-mise run currency     # report every tool, package, and tooling tag behind its latest
+mise run currency     # report every tool, package, action pin, and tooling tag behind its latest
 ```
 
 The demo pages, in `demo/`, are `tools.html` (every tool class), `profiles.html` (the tools page

@@ -47,7 +47,7 @@ const runtime = {
 };
 
 // skipLibCheck off is the guard: with it on, tsc skips every .d.ts, and these errors with them.
-describe("formatter declarations", () => {
+describe("declaration files", () => {
   test("tsc, under tsconfig.json, refuses runtime code in a declaration file", () => {
     assert.deepEqual(check(runtime), [
       "binding.d.ts TS1039",
