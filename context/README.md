@@ -10,6 +10,14 @@ It is a package under the `@standards-lab` scope, starting at v0.1.0 and release
 `vX.Y.Z` tag. Its goals live in the coordinator's roadmap (`standards-lab/context/roadmap.toml`,
 v1.client.stack), and its strategy is `standards-lab/context/web-client.md`.
 
+## Release
+
+A person cuts each release by hand: an annotated `vX.Y.Z` tag on a pack commit, whose tree is the
+pack and whose one parent is main's merge commit. `release.yml`, dispatched by hand with the pushed
+tag (a tag push reads its workflows from the tagged tree, which holds only the pack), verifies the
+tag, runs the check, holds the tag's tree to a fresh pack, and publishes the GitHub release.
+README.md's "Release" section gives the commands.
+
 ## Provenance
 
 The package is seeded by copy from spike-html-apps-foundation at 07ba39a, and spike-html-design
