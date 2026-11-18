@@ -1,4 +1,5 @@
-// From spike-html-apps-foundation (07ba39a): src/conformance.ts.
+// Adapted from spike-html-apps-foundation (07ba39a): src/conformance.ts, its registry key renamed
+// web-foundation.registry.
 // The conformance check: whether a profile an extension adds keeps its facet's contract, in a live
 // page. It imports nothing at runtime and reads computed values only, never a sheet's rules, which
 // chromium hides from a file:// page and across origins, so it runs alike from file://, a CDN, a
@@ -304,9 +305,8 @@ function failures(facet: Facet, name: string, probes: Probes): Failure[] {
 
   derive();
 
-  const store = (globalThis as Record<symbol, unknown>)[
-    Symbol.for("spike-html-apps-foundation.registry")
-  ] as Partial<Record<Facet, string[]>> | undefined;
+  const store = (globalThis as Record<symbol, unknown>)[Symbol.for("web-foundation.registry")] as
+    Partial<Record<Facet, string[]>> | undefined;
   if (!store?.[facet]?.includes(name)) {
     fail("registered", `is not registered under ${facet} in the registry`);
   }

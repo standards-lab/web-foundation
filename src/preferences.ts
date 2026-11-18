@@ -1,4 +1,5 @@
-// From spike-html-apps-foundation (07ba39a): src/preferences.ts.
+// Adapted from spike-html-apps-foundation (07ba39a): src/preferences.ts, its storage key renamed
+// web-foundation.preferences.
 // The reader's theme choice, applied to the root before first paint, kept in localStorage, and
 // followed across tabs; and <sl-theme-menu>, the thin element that loads the menu on first open. A
 // page loads it with blocking="render" after its registration module, so the registry is full when
@@ -20,7 +21,7 @@ export type Choice = Record<Key, string>;
 export type Loose = Partial<Record<Key, unknown>>;
 
 /** The localStorage key, so every page on an origin shares one choice. */
-export const KEY = "spike-html-apps-foundation.preferences";
+export const KEY = "web-foundation.preferences";
 
 /** Each facet's attribute, and the scheme's. */
 export const ATTRIBUTES: Readonly<Record<Key, string>> = Object.freeze({

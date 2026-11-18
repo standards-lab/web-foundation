@@ -1,4 +1,5 @@
-// From spike-html-apps-foundation (07ba39a): test/unit/registry.test.ts.
+// Adapted from spike-html-apps-foundation (07ba39a): test/unit/registry.test.ts, the store's key renamed
+// web-foundation.registry.
 // The registry's store, shared by every copy of the module. A case's page is a fresh copy, imported
 // by a URL no other case uses, after the store is removed from the global object.
 // Adapted from spike-html-packages-foundation (5dd8a58): test/unit/registry.test.js, in TypeScript.
@@ -9,7 +10,7 @@ import type * as Registry from "../../src/registry.ts";
 import type { Store } from "../../src/registry.ts";
 
 const url = new URL("../../src/registry.ts", import.meta.url).href;
-const KEY = Symbol.for("spike-html-apps-foundation.registry");
+const KEY = Symbol.for("web-foundation.registry");
 /** The global object, with the store at its key, as the registry reaches it. */
 const scope = globalThis as typeof globalThis & Record<symbol, Store | undefined>;
 

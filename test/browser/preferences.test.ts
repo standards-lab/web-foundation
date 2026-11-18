@@ -1,5 +1,5 @@
 // Adapted from spike-html-apps-foundation (07ba39a): test/browser/preferences.test.ts, importing the tooling as
-// @standards-lab/web-tooling.
+// @standards-lab/web-tooling, and with the storage key renamed web-foundation.preferences.
 // The preferences module and the theme menu from the package's dist/, as a consumer loads them:
 // the stored choice applied before first paint, kept in storage, and followed across tabs, and
 // <sl-theme-menu>, pressed with real keys through the DevTools Protocol, on
@@ -19,7 +19,7 @@ import type { Server } from "@standards-lab/web-tooling/server.js";
 /** The repository root, which the server serves. */
 const root = join(import.meta.dirname, "../..");
 
-const KEY = "spike-html-apps-foundation.preferences";
+const KEY = "web-foundation.preferences";
 const PREFERENCES = "/dist/preferences.js";
 const MENU = "button[commandfor=theme]";
 const DIALOG = "sl-theme-menu dialog";
@@ -185,6 +185,19 @@ describe("preferences: apply and storage", () => {
     assert.deepEqual(await rooted(page), APPLIED);
     assert.match(await style(page, "h1", "font-family"), /^system-ui/);
     assert.equal(await call(page, "preferences.KEY"), KEY);
+  });
+
+  test("save() stores the choice under web-foundation.preferences, and under no other key", async () => {
+    const page = await open(fixture("preferences.html"));
+    await page.evaluate("localStorage.clear()");
+    await call(page, `preferences.save(${JSON.stringify(CHOICE)})`);
+    assert.deepEqual(await page.evaluate("Object.keys(localStorage)"), [
+      "web-foundation.preferences",
+    ]);
+    assert.deepEqual(
+      await page.evaluate(`JSON.parse(localStorage.getItem("web-foundation.preferences"))`),
+      CHOICE,
+    );
   });
 
   test("the system scheme sets no data-scheme", async () => {

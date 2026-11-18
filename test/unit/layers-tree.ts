@@ -1,4 +1,5 @@
-// From spike-html-apps-foundation (07ba39a): test/unit/layers-tree.ts.
+// Adapted from spike-html-apps-foundation (07ba39a): test/unit/layers-tree.ts, its comment on the app
+// reworded for this package.
 // The layer's import cases as one file tree in the repository's shape: a file per forbidden import
 // and form, each with the rules that catch it, and the imports the layer may make in the same
 // layout. layers.test.ts lints it.
@@ -17,7 +18,7 @@ export const manifest: { name: string; devDependencies: Record<string, string> }
 );
 const foundation = manifest.name;
 
-/** The sibling layers and spike-html-apps' app, which the foundation never imports. */
+/** The sibling layers and the app, which the foundation never imports. */
 const siblings = ["components", "sdk"].map((layer) => foundation.replace(/foundation$/, layer));
 const app = foundation.replace(/-foundation$/, "");
 

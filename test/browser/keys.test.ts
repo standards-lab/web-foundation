@@ -1,5 +1,6 @@
 // Adapted from spike-html-apps-foundation (07ba39a): test/browser/keys.test.ts, importing the tooling and
-// the package as @standards-lab/web-tooling and @standards-lab/web-foundation.
+// the package as @standards-lab/web-tooling and @standards-lab/web-foundation, and with
+// the store and settings keys renamed web-foundation.keys.
 // The keys runtime and its help dialog from the package's dist/, pressed with real keys
 // through the DevTools Protocol on test/fixtures/keys*.html.
 // Adapted from spike-html-packages-foundation (5dd8a58): test/browser/keys.test.js, in TypeScript.
@@ -20,7 +21,7 @@ import type { FireDetail } from "@standards-lab/web-foundation/keys.js";
 const root = join(import.meta.dirname, "../..");
 
 const KEYS = "/dist/keys.js";
-const STORE = 'globalThis[Symbol.for("spike-html-apps-foundation.keys")]';
+const STORE = 'globalThis[Symbol.for("web-foundation.keys")]';
 // The sequence wait the tests set, short so a test waits it out quickly.
 const WAIT = 150;
 
@@ -748,6 +749,11 @@ describe("keys: extension and the store", () => {
       "wait",
       "listening",
     ]);
+    // The modals list sits beside the store, at its own well-known key.
+    assert.equal(
+      await page.evaluate(`Array.isArray(globalThis[Symbol.for("web-foundation.keys.modals")])`),
+      true,
+    );
     assert.deepEqual(
       await page.evaluate(`${STORE}.registered.map(({ keys, label }) => [keys, label])`),
       [
@@ -781,16 +787,16 @@ const declared = (page: Page) =>
 const store = (page: Page, value: unknown) => {
   const json = JSON.stringify(typeof value === "string" ? value : JSON.stringify(value));
   return page.evaluate(`(() => {
-    const oldValue = localStorage.getItem("spike-html-apps-foundation.keys");
-    localStorage.setItem("spike-html-apps-foundation.keys", ${json});
-    dispatchEvent(new StorageEvent("storage", { key: "spike-html-apps-foundation.keys", oldValue,
+    const oldValue = localStorage.getItem("web-foundation.keys");
+    localStorage.setItem("web-foundation.keys", ${json});
+    dispatchEvent(new StorageEvent("storage", { key: "web-foundation.keys", oldValue,
       newValue: ${json}, storageArea: localStorage, url: location.href }));
   })()`);
 };
 
 /** The reader's stored settings, or null. */
 const saved = (page: Page) =>
-  page.evaluate(`JSON.parse(localStorage.getItem("spike-html-apps-foundation.keys"))`);
+  page.evaluate(`JSON.parse(localStorage.getItem("web-foundation.keys"))`);
 
 /** Presses each of the settings fixture's bindings as written. */
 async function pressAll(page: Page) {
@@ -859,6 +865,13 @@ describe("keys: the reader's settings", () => {
     assert.deepEqual(await log(page), ["t"]);
   });
 
+  test("changeSettings() stores the settings under web-foundation.keys, and under no other key", async () => {
+    const page = await open(SETTINGS);
+    await page.evaluate("localStorage.clear()");
+    await call(page, `keys.changeSettings({ wait: 3000 })`);
+    assert.deepEqual(await page.evaluate("Object.keys(localStorage)"), ["web-foundation.keys"]);
+  });
+
   test("changeSettings() stores only changed settings; a default or null removes one", async () => {
     const page = await open(SETTINGS);
     await call(page, `keys.changeSettings({ wait: 3000 })`);
@@ -925,9 +938,7 @@ describe("keys: aria-keyshortcuts", () => {
 
   test("stored settings apply on load", async () => {
     const page = await open(SETTINGS);
-    await page.evaluate(
-      `localStorage.setItem("spike-html-apps-foundation.keys", '{"enabled":false}')`,
-    );
+    await page.evaluate(`localStorage.setItem("web-foundation.keys", '{"enabled":false}')`);
     await page.goto(fixture(SETTINGS));
     assert.deepEqual(await declared(page), OFF);
   });

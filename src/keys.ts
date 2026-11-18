@@ -1,4 +1,5 @@
-// From spike-html-apps-foundation (07ba39a): src/keys.ts.
+// Adapted from spike-html-apps-foundation (07ba39a): src/keys.ts, its store, modals, and storage keys
+// renamed web-foundation.keys, web-foundation.keys.modals, and web-foundation.keys.
 // The page's keyboard shortcuts: an element with data-keys is clicked or focused by its keys, and
 // register() binds a handler. One store at a well-known global key is shared by every copy, and
 // the first copy to load installs the one listener, so a key never fires twice.
@@ -68,7 +69,7 @@ interface Match {
 }
 
 /** The store's well-known global key, shared by every copy of the module. */
-const KEY = Symbol.for("spike-html-apps-foundation.keys");
+const KEY = Symbol.for("web-foundation.keys");
 const scope = globalThis as typeof globalThis & Record<symbol, Store | Element[] | undefined>;
 scope[KEY] ??= { registered: [], wait: 1500, listening: false };
 const store = scope[KEY] as Store;
@@ -77,7 +78,7 @@ const store = scope[KEY] as Store;
  * The well-known global key of the modals focus has entered, oldest first, which every copy
  * shares. The first copy to create the list tracks it.
  */
-const MODALS = Symbol.for("spike-html-apps-foundation.keys.modals");
+const MODALS = Symbol.for("web-foundation.keys.modals");
 const tracking = !scope[MODALS];
 scope[MODALS] ??= [];
 const entered = scope[MODALS] as Element[];
@@ -109,7 +110,7 @@ export function register(keys: string, label: string, handler: Handler): () => v
 export const WAITS = [1000, 1500, 3000, 5000] as const;
 
 /** The localStorage key of the reader's settings. */
-const STORAGE = "spike-html-apps-foundation.keys";
+const STORAGE = "web-foundation.keys";
 
 /** Each setting's check: the values a reader can choose. */
 const VALID: Record<keyof Settings, (value: unknown) => boolean> = {

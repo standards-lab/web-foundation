@@ -1,4 +1,5 @@
-// From spike-html-apps-foundation (07ba39a): src/registry.ts.
+// Adapted from spike-html-apps-foundation (07ba39a): src/registry.ts, its store's key renamed
+// web-foundation.registry.
 // The page's registry of the profiles it can apply, per facet, in one store at a well-known global
 // key, so every copy of this module, from any URL or tag, registers into the same lists.
 // Adapted from spike-html-packages-foundation (5dd8a58): src/registry.ts.
@@ -20,7 +21,7 @@ export const DEFAULTS: Readonly<Record<Facet, string>> = Object.freeze({
 });
 
 /** The store's well-known global key, shared by every copy of the module. */
-const KEY = Symbol.for("spike-html-apps-foundation.registry");
+const KEY = Symbol.for("web-foundation.registry");
 const scope = globalThis as typeof globalThis & Record<symbol, Store | undefined>;
 scope[KEY] ??= { color: [], space: [], type: [] };
 const store: Store = scope[KEY];
