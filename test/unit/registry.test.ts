@@ -17,7 +17,7 @@ const scope = globalThis as typeof globalThis & Record<symbol, Store | undefined
 /** The names the lean and full registration modules list, per facet, in order. */
 const LEAN = { color: ["github"], space: ["regular"], type: ["mono"] };
 const FULL = {
-  color: ["github", "zenwritten", "everforest", "kanagawa", "catppuccin", "tokyo-night"],
+  color: ["github", "zenwritten", "everforest", "catppuccin"],
   space: ["regular", "compact"],
   type: ["mono", "sans"],
 };

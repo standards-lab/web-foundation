@@ -21,10 +21,9 @@ the default color profile is now GitHub, and `flexoki` and `primer` are gone.
 
 ### Changed
 
-- The built-in color profiles are six themes, each taking its values from its upstream at a pin:
-  GitHub, the new default; Zenwritten; Everforest, its medium contrast; Kanagawa, lotus in light
-  and dragon in dark; Catppuccin, latte in light and mocha in dark, with `--bg` now its base; and
-  Tokyo Night, day in light and night in dark.
+- The built-in color profiles are four themes, each taking its values from its upstream at a pin:
+  GitHub, the new default; Zenwritten; Everforest, its medium contrast; and Catppuccin, latte in
+  light and mocha in dark, with `--bg` now its base.
 
 ### Removed
 

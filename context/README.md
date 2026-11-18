@@ -34,8 +34,8 @@ comment, so their provenance is here:
 
 - **Baseline**: the tokens, reset, and elements sheets.
 - **Profiles**: the registry of the profiles a page can apply, and the built-in profiles, each a
-  sheet with its registration module: six color themes, light and dark, each from its upstream at
-  a pin (GitHub, the default, Zenwritten, Everforest, Kanagawa, Catppuccin, and Tokyo Night),
+  sheet with its registration module: four color themes, light and dark, each from its upstream at
+  a pin (GitHub, the default, Zenwritten, Everforest, and Catppuccin),
   regular and compact space, and mono and sans type.
 - **Entries**: `page.css` with `register.ts`, the defaults alone, and `page-full.css` with
   `register-full.ts`, every built-in profile.
@@ -48,6 +48,7 @@ comment, so their provenance is here:
   menu.
 - **Conformance**: the profile conformance check, each facet's rules in `RULES`. The `contrast`
   rule holds `--fg` on `--bg` to WCAG's 4.5:1 in light and dark.
-- **Specimen**: `demo/specimen.html` shows each color theme, light and dark, beside its backup.
-  The backups' sheets, in `demo/backups/`, are demo-only: the package and the registry hold none.
+- **Specimen**: `demo/specimen.html` shows each color theme, light and dark, beside its backup:
+  GitHub beside Tomorrow, Zenwritten beside Seoulbones, Everforest beside Nightfox, and Catppuccin
+  beside Ayu. The backups' sheets, in `demo/backups/`, are demo-only: the package and the registry hold none.
 - **Formatters**: the Intl formatters for bytes, dates, date-times, relative time, and durations.

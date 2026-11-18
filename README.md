@@ -47,7 +47,7 @@ modules by their `.js` subpaths. The lean entry, `page.css`, carries the default
   `structure.css`, and `utilities.css`), and the menu's `theme-menu.css`.
 - `./profiles/<facet>/<name>.{css,js}`: the built-in profiles, each a unit of a sheet and a
   registration module. Color has `github` (the default), `zenwritten`, `everforest`,
-  `kanagawa`, `catppuccin`, and `tokyo-night`; space has `regular` (the default) and `compact`;
+  and `catppuccin`; space has `regular` (the default) and `compact`;
   type has `mono` (the default) and `sans`. A page adds a unit by linking its sheet after
   `page.css` and importing its module beside `register.js`. `page-full.css` and
   `register-full.js` import every unit, in place of `page.css` and `register.js`.
@@ -81,7 +81,7 @@ with `--magenta` as its fallback, and no profile declares. Where `--interaction-
 you can act on, `--accent-color` marks what is current, active, or in progress: emphasis that
 reports state rather than inviting interaction. In the baseline, native `progress` follows it. A
 page sets it on any element in its own layer, and per palette if it wants:
-`:where([data-palette="kanagawa"]) { --accent-color: var(--cyan); }`. The hook shares its name with
+`:where([data-palette="everforest"]) { --accent-color: var(--cyan); }`. The hook shares its name with
 the CSS property: `accent-color` follows `--interaction-color` on every element except `progress`,
 where it follows `--accent-color`.
 

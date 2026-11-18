@@ -103,7 +103,7 @@ const ATTRIBUTES: Record<Facet, string> = {
 /** The profiles each entry ships, per facet, in the order it imports them. */
 const LEAN: Record<Facet, string[]> = { color: ["github"], space: ["regular"], type: ["mono"] };
 const FULL: Record<Facet, string[]> = {
-  color: ["github", "zenwritten", "everforest", "kanagawa", "catppuccin", "tokyo-night"],
+  color: ["github", "zenwritten", "everforest", "catppuccin"],
   space: ["regular", "compact"],
   type: ["mono", "sans"],
 };

@@ -29,7 +29,7 @@ type Results = Record<string, Record<string, Failure[]>>;
 
 /** The full entry's profiles, per facet. */
 const BUILT_IN: Names = {
-  color: ["github", "zenwritten", "everforest", "kanagawa", "catppuccin", "tokyo-night"],
+  color: ["github", "zenwritten", "everforest", "catppuccin"],
   space: ["regular", "compact"],
   type: ["mono", "sans"],
 };

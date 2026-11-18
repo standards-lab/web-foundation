@@ -25,22 +25,18 @@ const BACKUPS: Record<string, string> = {
   github: "tomorrow",
   zenwritten: "seoulbones",
   everforest: "nightfox",
-  kanagawa: "rose-pine",
   catppuccin: "ayu",
-  "tokyo-night": "night-owl",
 };
 
 /**
- * The rules each backup breaks, as check() reports them. None is registered, by design; ayu's and
- * Rosé Pine's light raised surfaces are lighter than their base, as upstream draws them.
+ * The rules each backup breaks, as check() reports them. None is registered, by design; ayu's light
+ * raised surfaces are lighter than its base, as upstream draws them.
  */
 const BACKUP_RULES: Record<string, string[]> = {
   tomorrow: ["registered"],
   seoulbones: ["registered"],
   nightfox: ["registered"],
-  "rose-pine": ["surfaces", "registered"],
   ayu: ["surfaces", "registered"],
-  "night-owl": ["registered"],
 };
 
 const SCHEMES = ["light", "dark"] as const;

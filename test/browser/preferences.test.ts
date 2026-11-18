@@ -226,7 +226,7 @@ describe("preferences: apply and storage", () => {
   });
 
   // A palette the package no longer ships, as a choice saved before it went, or any unknown name.
-  for (const color of ["flexoki", "primer", "unknown"]) {
+  for (const color of ["flexoki", "primer", "kanagawa", "tokyo-night", "unknown"]) {
     test(`a stored ${color} palette applies github and stays in storage`, async () => {
       const choice = { ...CHOICE, color };
       await seed(choice);
@@ -364,11 +364,11 @@ describe("preferences: the storage event", () => {
     const saver = await open(fixture("preferences.html"));
     await press(page, "l");
     assert.equal((await rooted(page))["data-palette"], "everforest");
-    const next = { color: "kanagawa", space: "regular", type: "mono", scheme: "light" };
+    const next = { color: "catppuccin", space: "regular", type: "mono", scheme: "light" };
     await call(saver, `preferences.save(${JSON.stringify(next)})`);
     await until(
       page,
-      `JSON.parse(localStorage.getItem(${JSON.stringify(KEY)})).color === "kanagawa"`,
+      `JSON.parse(localStorage.getItem(${JSON.stringify(KEY)})).color === "catppuccin"`,
     );
     // Time for the storage event to have been delivered, had it been followed.
     await sleep(page, 100);
@@ -381,7 +381,7 @@ describe("preferences: the storage event", () => {
     await press(page, "Escape");
     await closed(page);
     assert.deepEqual(await rooted(page), {
-      "data-palette": "kanagawa",
+      "data-palette": "catppuccin",
       "data-space": "regular",
       "data-type": "mono",
       "data-scheme": "light",
@@ -516,14 +516,7 @@ describe("preferences: the menu", () => {
       arrows: ["◀", "▶"],
     });
     assert.deepEqual(menu.rows, [
-      row("color", "Color", [
-        "github",
-        "zenwritten",
-        "everforest",
-        "kanagawa",
-        "catppuccin",
-        "tokyo-night",
-      ]),
+      row("color", "Color", ["github", "zenwritten", "everforest", "catppuccin"]),
       row("scheme", "Scheme", ["system", "light", "dark"]),
       row("space", "Space", ["regular", "compact"]),
       row("type", "Type", ["mono", "sans"]),
@@ -606,9 +599,9 @@ describe("preferences: the menu", () => {
     await press(page, "k");
     await press(page, "h");
     now = await state(page);
-    assert.deepEqual(now.focus, ["color", "tokyo-night"]);
-    assert.equal(now.root["data-palette"], "tokyo-night");
-    assert.equal(now.preview["data-palette"], "tokyo-night");
+    assert.deepEqual(now.focus, ["color", "catppuccin"]);
+    assert.equal(now.root["data-palette"], "catppuccin");
+    assert.equal(now.preview["data-palette"], "catppuccin");
   });
 
   test("a click on a row's arrow steps it", async () => {
@@ -753,7 +746,7 @@ describe("preferences: the menu", () => {
         }
       return { count, tokens: Object.keys(tokens(preview)).length, mismatches };
     })()`);
-    assert.equal(result.count, 6 * 3 * 2 * 2);
+    assert.equal(result.count, 4 * 3 * 2 * 2);
     assert.ok(result.tokens > 30, `${result.tokens} tokens`);
     assert.deepEqual(result.mismatches, []);
   });
