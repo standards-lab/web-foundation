@@ -1,0 +1,24 @@
+<!doctype html>
+<!-- The DOM helpers' fixture: an element awaiting its definition, a shadow host, and a list. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>dom fixture</title>
+  </head>
+  <body>
+    <h1>dom fixture</h1>
+    <p>
+      The tests define dom-probe, which the first element awaits, emit from inside the host's
+      shadow root, and require the list's items, the first of them and one inside the section.
+    </p>
+    <dom-probe id="waiting"></dom-probe>
+    <div id="host"></div>
+    <ul id="list">
+      <li id="first" class="item">first</li>
+      <li id="second" class="item">second</li>
+    </ul>
+    <section id="section">
+      <p id="inner" class="inner">inner</p>
+    </section>
+  </body>
+</html>
