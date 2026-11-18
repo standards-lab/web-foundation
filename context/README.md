@@ -13,10 +13,8 @@ v1.client.stack), and its strategy is `standards-lab/context/web-client.md`.
 ## Release
 
 A person cuts each release by hand: an annotated `vX.Y.Z` tag on a pack commit, whose tree is the
-pack and whose one parent is main's merge commit. `release.yml`, dispatched by hand with the pushed
-tag (a tag push reads its workflows from the tagged tree, which holds only the pack), verifies the
-tag, runs the check, holds the tag's tree to a fresh pack, and publishes the GitHub release.
-README.md's "Release" section gives the commands.
+pack and whose one parent is main's merge commit, and then dispatches `release.yml` with the tag.
+README.md's "Release" section gives the steps and what the workflow verifies.
 
 ## Provenance
 

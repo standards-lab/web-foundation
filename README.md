@@ -42,9 +42,9 @@ modules by their `.js` subpaths. The lean entry, `page.css`, carries the default
 </script>
 ```
 
-- `./*.css`: the stylesheets: the page entries, `page.css` and `page-full.css`, `baseline.css`,
-  the tool sheets, `meta.css`, `structure.css`, and `utilities.css`, and the menu's
-  `theme-menu.css`, each self-layered so a shadow root adopts it alone.
+- `./*.css`: the stylesheets, each self-layered so a shadow root adopts it alone: the page
+  entries `page.css` and `page-full.css`, `baseline.css`, the tool sheets (`meta.css`,
+  `structure.css`, and `utilities.css`), and the menu's `theme-menu.css`.
 - `./profiles/<facet>/<name>.{css,js}`: the built-in profiles, each a unit of a sheet and a
   registration module. Color has `flexoki` (the default), `primer`, `catppuccin`, and
   `everforest`; space has `regular` (the default) and `compact`; type has `mono` (the default)
@@ -124,11 +124,11 @@ overridden). Page layout belongs to the consumer, so each page links `demo.css`,
 its own that lays out the column and its sections. `mise run demo` serves the repository on the
 loopback address and prints each page's URL; the pages load `dist/`, which the task builds first.
 
-`mise run screenshots` renders the tools page, keys help, the theme menu, wide and narrow, and the
-hooks page, light and dark, on `page-full.css`. It runs the `web-screenshots` bin of
-[web-tooling](https://github.com/standards-lab/web-tooling), the devDependency the browser tier's
-driver and server also come from, over the capture description in `scripts/screenshots.config.ts`,
-and passes its arguments on. With none it captures the default profile; `--palette`, `--space`,
+`mise run screenshots` captures the tools page, the keys help open, the theme menu open at a wide
+and a narrow width, and the hooks page, each light and dark, on `page-full.css`. It runs the
+`web-screenshots` bin of [web-tooling](https://github.com/standards-lab/web-tooling), the
+devDependency the browser tier's driver and server also come from, over the capture description
+in `scripts/screenshots.config.ts`, and passes its arguments on. With none it captures the default profile; `--palette`, `--space`,
 and `--type` choose a profile, and `--all` captures every color and compact and sans.
 `--output directory --dir <path>` writes the files instead of showing them in kitty;
 `mise run screenshots -- --help` lists the other flags, and web-tooling's README documents them.

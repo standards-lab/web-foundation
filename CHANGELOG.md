@@ -39,7 +39,7 @@ All notable changes to `@standards-lab/web-foundation` are documented here. The 
   `web-foundation.keys`, and `web-foundation.keys.modals` on `globalThis`.
 - The browser tier on `@standards-lab/web-tooling` v0.1.0, its driver, server, and screenshot
   command, in a pinned chrome-headless-shell.
-- Releases by tag: each `v<version>` tag marks a pack commit on main's merge commit, whose tree is
-  the pack, the build included, and its GitHub release carries the tarball.
+- Releases by tag: each `v<version>` tag marks a pack commit whose tree is the pack, the build
+  included, and whose one parent is main's merge commit; its GitHub release carries the tarball.
 
 [0.1.0]: https://github.com/standards-lab/web-foundation/releases/tag/v0.1.0
