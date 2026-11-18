@@ -129,7 +129,7 @@ const rules = (results: Results) =>
 
 describe("conformance", () => {
   for (const scheme of ["light", "dark"]) {
-    test(`the eight built-in profiles conform on the full entry, with the system in ${scheme}`, async () => {
+    test(`the built-in profiles conform on the full entry, with the system in ${scheme}`, async () => {
       const page = await open(fixture("conformance.html"));
       await page.cdp("Emulation.setEmulatedMedia", {
         features: [{ name: "prefers-color-scheme", value: scheme }],
@@ -138,7 +138,7 @@ describe("conformance", () => {
     });
   }
 
-  test("the eight built-in profiles conform with the entry's sheets from another origin", async () => {
+  test("the built-in profiles conform with the entry's sheets from another origin", async () => {
     // A cross-origin sheet served without CORS hides its rules: the check reads computed values
     // alone.
     const page = await open(`${fixture("conformance-cross-origin.html")}?sheets=${other.origin}`);
