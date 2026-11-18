@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>foundation specimen</title>
+    <!-- The color specimen: every color profile register-full.js registers, read from the registry,
+         in light and dark, each beside its backup, the palette that stands in should the profile
+         be dropped. A sheet shows the sixteen tokens as labelled swatches, each text token and hue
+         as text on the three surfaces, and the two borders as borders, all read from the tokens
+         its own data-palette and data-scheme resolve. The backups' sheets live beside this page,
+         in demo/backups/: they are not profiles, so the package neither ships nor registers them,
+         and this page names them in BACKUPS. The Theme and Scheme switches narrow the page to one
+         pair or one scheme; mise run screenshots sets them from the root's data-palette and
+         data-scheme, one capture per pair per scheme. Its module runs served only: mise run
+         demo. -->
+    <link rel="stylesheet" href="../dist/page-full.css" />
+    <link rel="stylesheet" href="demo.css" />
+    <link rel="stylesheet" href="backups/tomorrow.css" />
+    <link rel="stylesheet" href="backups/seoulbones.css" />
+    <link rel="stylesheet" href="backups/ayu.css" />
+    <link rel="stylesheet" href="backups/night-owl.css" />
+    <link rel="stylesheet" href="backups/nightfox.css" />
+    <link rel="stylesheet" href="backups/rose-pine.css" />
+    <style>
+      @layer demo {
+        /* A pair's two sheets side by side, and its two schemes one under the other; one column
+           when the pair can't fit. A hidden row stays hidden: the grid would otherwise override
+           the hidden attribute's display. */
+        .pair-scheme:not([hidden]) {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(min(100%, 30rem), 1fr));
+          gap: var(--space-m);
+          margin-block-start: var(--space-m);
+        }
+
+        /* A sheet is a scope: its data-palette and data-scheme paint it from its own tokens. */
+        .sheet {
+          padding: var(--space-m);
+          border: var(--line-s) solid var(--border-2);
+          border-radius: var(--radius-md);
+        }
+
+        .sheet h3 {
+          margin-block-end: var(--space-xs);
+        }
+
+        .sheet h3 small {
+          color: var(--fg-2);
+          font-weight: normal;
+        }
+
+        /* The backup's sheet is told apart by a dashed edge as well as its heading. */
+        .sheet[data-role="backup"] {
+          border-style: dashed;
+        }
+
+        /* The swatches: four to a row, each a chip over its token's name and value. */
+        .swatches {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: var(--space-xs);
+          margin: 0;
+          padding: 0;
+          list-style: none;
+        }
+
+        .swatches li {
+          margin: 0;
+          font-family: var(--font-code);
+          font-size: var(--text-xs);
+          line-height: 1.3;
+        }
+
+        .swatch {
+          display: block;
+          block-size: 1.5rem;
+          margin-block-end: var(--space-3xs);
+          border-radius: var(--radius-sm);
+          box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--fg) 20%, transparent);
+        }
+
+        .swatches .value {
+          color: var(--fg-2);
+        }
+
+        /* The text samples: a row per text token or hue, a column per surface. */
+        .samples {
+          inline-size: 100%;
+          margin-block: var(--space-s) 0;
+          font-size: var(--text-s);
+        }
+
+        .samples th,
+        .samples td {
+          padding: var(--space-3xs) var(--space-2xs);
+        }
+
+        .samples th[scope="row"] {
+          font-family: var(--font-code);
+          font-size: var(--text-xs);
+          font-weight: normal;
+        }
+
+        /* The borders, drawn as borders on the base. */
+        .borders {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: var(--space-s);
+          margin-block-start: var(--space-s);
+        }
+
+        .borders div {
+          padding: var(--space-xs) var(--space-s);
+          border-width: var(--line-m);
+          border-style: solid;
+          font-family: var(--font-code);
+          font-size: var(--text-xs);
+        }
+      }
+    </style>
+    <script type="module">
+      import "../dist/register-full.js";
+      import { profiles } from "../dist/registry.js";
+
+      /**
+       * Each built-in color profile's backup: the data-palette its sheet in backups/ answers to,
+       * and its upstream's name.
+       */
+      const BACKUPS = {
+        github: { palette: "tomorrow", title: "Tomorrow" },
+        zenwritten: { palette: "seoulbones", title: "Seoulbones" },
+        everforest: { palette: "nightfox", title: "Nightfox" },
+        kanagawa: { palette: "rose-pine", title: "Rosé Pine" },
+        catppuccin: { palette: "ayu", title: "Ayu" },
+        "tokyo-night": { palette: "night-owl", title: "Night Owl" },
+      };
+
+      /** The sixteen tokens, in the facet's order. */
+      const SURFACES = ["--bg", "--bg-1", "--bg-2"];
+      const BORDERS = ["--border", "--border-2"];
+      const TEXT = ["--fg", "--fg-2", "--fg-3"];
+      const HUES = ["--red", "--orange", "--yellow", "--green", "--cyan", "--blue", "--purple", "--magenta"];
+      const TOKENS = [...SURFACES, ...BORDERS, ...TEXT, ...HUES];
+      const SCHEMES = ["light", "dark"];
+
+      /** An element of the tag, its attributes and children given. */
+      function h(tag, attributes = {}, ...children) {
+        const el = document.createElement(tag);
+        for (const [name, value] of Object.entries(attributes)) el.setAttribute(name, value);
+        el.append(...children);
+        return el;
+      }
+
+      /** A sheet of the palette in the scheme: its heading, swatches, text samples, and borders. */
+      function sheet(palette, scheme, role, heading, note) {
+        const swatches = h(
+          "ul",
+          { class: "swatches" },
+          ...TOKENS.map((token) =>
+            h(
+              "li",
+              {},
+              h("span", { class: "swatch", "data-token": token, style: `background-color: var(${token})` }),
+              token,
+              h("br"),
+              h("span", { class: "value" }),
+            ),
+          ),
+        );
+        const samples = h(
+          "table",
+          { class: "samples" },
+          h(
+            "thead",
+            {},
+            h(
+              "tr",
+              {},
+              h("th", { scope: "col" }, "Text"),
+              ...SURFACES.map((surface) => h("th", { scope: "col" }, `on ${surface}`)),
+            ),
+          ),
+          h(
+            "tbody",
+            {},
+            ...[...TEXT, ...HUES].map((token) =>
+              h(
+                "tr",
+                {},
+                h("th", { scope: "row" }, token),
+                ...SURFACES.map((surface) =>
+                  h(
+                    "td",
+                    {
+                      "data-text": token,
+                      "data-surface": surface,
+                      style: `color: var(${token}); background-color: var(${surface})`,
+                    },
+                    "Sphinx of quartz",
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        const borders = h(
+          "div",
+          { class: "borders" },
+          ...BORDERS.map((token) => h("div", { "data-border": token, style: `border-color: var(${token})` }, token)),
+        );
+        return h(
+          "article",
+          { class: "sheet", "data-palette": palette, "data-scheme": scheme, "data-role": role },
+          h("h3", {}, heading, " ", h("small", {}, note)),
+          swatches,
+          samples,
+          borders,
+        );
+      }
+
+      /** Labels each swatch with its computed value as hex, as its sheet's scheme resolves it. */
+      function label() {
+        for (const swatch of document.querySelectorAll(".swatch")) {
+          const channels = getComputedStyle(swatch).backgroundColor.match(/\d+(\.\d+)?/g).slice(0, 3);
+          const hex = channels.map((channel) => Number(channel).toString(16).padStart(2, "0")).join("");
+          swatch.parentElement.querySelector(".value").textContent = `#${hex}`;
+        }
+      }
+
+      const main = document.querySelector("main");
+      const theme = document.querySelector('select[name="theme"]');
+      const schemeSelect = document.querySelector('select[name="scheme"]');
+      const names = profiles("color");
+
+      for (const name of names) {
+        const backup = BACKUPS[name];
+        const section = h(
+          "section",
+          { "data-theme": name },
+          h("h2", {}, name, " ", h("small", {}, backup ? `and its backup, ${backup.title}` : "with no backup")),
+        );
+        for (const scheme of SCHEMES) {
+          section.append(
+            h(
+              "div",
+              { class: "pair-scheme", "data-for-scheme": scheme },
+              sheet(name, scheme, "theme", name, scheme),
+              ...(backup ? [sheet(backup.palette, scheme, "backup", `Backup: ${backup.title}`, scheme)] : []),
+            ),
+          );
+        }
+        main.append(section);
+      }
+      theme.append(new Option("all", ""), ...names.map((name) => new Option(name, name)));
+      schemeSelect.append(new Option("both", ""), ...SCHEMES.map((scheme) => new Option(scheme, scheme)));
+
+      // Narrows the page to the chosen theme's pair and the chosen scheme; empty shows them all.
+      function narrow() {
+        for (const section of main.querySelectorAll("section[data-theme]")) {
+          section.hidden = theme.value !== "" && section.dataset.theme !== theme.value;
+          for (const row of section.querySelectorAll("[data-for-scheme]")) {
+            row.hidden = schemeSelect.value !== "" && row.dataset.forScheme !== schemeSelect.value;
+          }
+        }
+      }
+      theme.addEventListener("change", narrow);
+      schemeSelect.addEventListener("change", narrow);
+      label();
+    </script>
+  </head>
+  <body>
+    <main>
+      <h1>Foundation specimen</h1>
+      <p>
+        Each color profile in light and dark, beside its backup: the sixteen tokens, each text token
+        and hue as text on the three surfaces, and the two borders.
+      </p>
+      <p>
+        <label>Theme <select name="theme"></select></label>
+        <label>Scheme <select name="scheme"></select></label>
+      </p>
+    </main>
+  </body>
+</html>
