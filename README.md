@@ -46,11 +46,11 @@ modules by their `.js` subpaths. The lean entry, `page.css`, carries the default
   entries `page.css` and `page-full.css`, `baseline.css`, the tool sheets (`meta.css`,
   `structure.css`, and `utilities.css`), and the menu's `theme-menu.css`.
 - `./profiles/<facet>/<name>.{css,js}`: the built-in profiles, each a unit of a sheet and a
-  registration module. Color has `github` (the default), `zenwritten`, `everforest`,
-  and `catppuccin`; space has `regular` (the default) and `compact`;
-  type has `mono` (the default) and `sans`. A page adds a unit by linking its sheet after
-  `page.css` and importing its module beside `register.js`. `page-full.css` and
-  `register-full.js` import every unit, in place of `page.css` and `register.js`.
+  registration module. Color has `github` (the default), `zenwritten`, `everforest`, and
+  `catppuccin`; space has `regular` (the default) and `compact`; type has `mono` (the default)
+  and `sans`. A page adds a unit by linking its sheet after `page.css` and importing its module
+  beside `register.js`. `page-full.css` and `register-full.js` import every unit, in place of
+  `page.css` and `register.js`.
 - `./*.js`: the modules, with their `.d.ts`: `dom.js`, `registry.js`, `keys.js`, `keys-help.js`,
   `keys-grammar.js`, `register.js`, `register-full.js`, `preferences.js`, `theme-menu.js`,
   `conformance.js`, and `format.js`.
@@ -81,9 +81,9 @@ with `--magenta` as its fallback, and no profile declares. Where `--interaction-
 you can act on, `--accent-color` marks what is current, active, or in progress: emphasis that
 reports state rather than inviting interaction. In the baseline, native `progress` follows it. A
 page sets it on any element in its own layer, and per palette if it wants:
-`:where([data-palette="everforest"]) { --accent-color: var(--cyan); }`. The hook shares its name with
-the CSS property: `accent-color` follows `--interaction-color` on every element except `progress`,
-where it follows `--accent-color`.
+`:where([data-palette="everforest"]) { --accent-color: var(--cyan); }`. The hook shares its name
+with the CSS property: `accent-color` follows `--interaction-color` on every element except
+`progress`, where it follows `--accent-color`.
 
 A package outside the foundation adds a profile as a built-in unit does: a sheet that declares
 its facet's tokens in one `:where([data-<attribute>="<name>"])` block inside that facet's layer,
