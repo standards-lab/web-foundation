@@ -5,25 +5,33 @@
  * 7.10.0 (MIT) with the theme's own overrides in src/colors.js, which set fg.default and fg.muted
  * in both and accent.fg in dark.
  *
- * profiles/color/github.css, the GitHub profile of the color facet, the default: one
- * zero-specificity block, applied by data-palette="github" on any element to its subtree and on
- * the root with no attribute anywhere, declaring the sixteen color tokens as light-dark() pairs,
- * Light Default / Dark Default, and nothing else. The tokens' roles and how a profile is selected
- * are the facet's, in baseline/tokens/color.css. Each value's comment names its upstream swatch,
- * the one name both schemes share. neutral.muted is translucent upstream, rgba(175, 184, 193, 0.2)
- * light and rgba(110, 118, 129, 0.4) dark: --bg-2 is the opaque color each produces over
- * canvas.default, as the surfaces rule reads a surface's luminance. The theme has no functional
- * cyan, so --cyan is its terminal's, ansi.cyan.
+ * profiles/color/github.css, the GitHub profile of the color facet: one zero-specificity block,
+ * applied by data-palette="github" on any element to its subtree, declaring the sixteen color
+ * tokens as light-dark() pairs, Light Default / Dark Default, and nothing else. The tokens' roles
+ * and how a profile is selected are the facet's, in baseline/tokens/color.css. Each value's
+ * comment names its upstream swatch, the one name both schemes share. neutral.muted is translucent
+ * upstream, rgba(175, 184, 193, 0.2) light and rgba(110, 118, 129, 0.4) dark: --bg-2 is the opaque
+ * color each produces over canvas.default, as the surfaces rule reads a surface's luminance. The
+ * theme has no functional cyan, so --cyan is its terminal's, ansi.cyan.
  *
  * The package exports this file as ./profiles/color/github.css, and its registration module as
- * ./profiles/color/github.js: together, the GitHub unit. Both entries, page.css through
- * baseline.css and page-full.css, import this sheet into foundation.tokens.color after the facet's
- * own file, and both registration modules, register.js and register-full.js, import the module,
- * which registers github and loads no CSS.
+ * ./profiles/color/github.js: together, the GitHub unit. A page that links the lean entry,
+ * page.css, links this sheet after it, which layers itself into foundation.tokens.color after Zen,
+ * and imports the module, which registers github and loads no CSS; data-palette then names it, and
+ * the theme menu lists it. <base> is where the package is served from, as a jsDelivr tag's dist/:
+ *
+ *   <link rel="stylesheet" href="<base>/page.css" />
+ *   <link rel="stylesheet" href="<base>/profiles/color/github.css" />
+ *   <script type="module" blocking="render" src="<base>/register.js"></script>
+ *   <script type="module" blocking="render" src="<base>/profiles/color/github.js"></script>
+ *   <html data-palette="github">
+ *
+ * The full entry, page-full.css, imports this sheet already, after Zen, and register-full.js
+ * imports the module.
  */
 
 @layer foundation.tokens.color {
-  :where(:root, [data-palette="github"]) {
+  :where([data-palette="github"]) {
     /* Surfaces: the base, the first elevated surface, the element surface, the border and the
        control boundary. */
     --bg: light-dark(#ffffff, #0d1117); /* canvas.default */

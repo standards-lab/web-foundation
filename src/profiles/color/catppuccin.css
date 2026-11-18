@@ -11,7 +11,7 @@
  * The package exports this file as ./profiles/color/catppuccin.css, and its registration module as
  * ./profiles/color/catppuccin.js: together, the Catppuccin unit. A page that links the lean entry,
  * page.css, links this sheet after it, which layers itself into foundation.tokens.color after
- * GitHub, and imports the module, which registers catppuccin and loads no CSS; data-palette then
+ * Zen, and imports the module, which registers catppuccin and loads no CSS; data-palette then
  * names it, and the theme menu lists it. <base> is where the package is served from, as a jsDelivr
  * tag's dist/:
  *
@@ -21,7 +21,7 @@
  *   <script type="module" blocking="render" src="<base>/profiles/color/catppuccin.js"></script>
  *   <html data-palette="catppuccin">
  *
- * The full entry, page-full.css, imports this sheet already, after GitHub, and register-full.js
+ * The full entry, page-full.css, imports this sheet already, after Zen, and register-full.js
  * imports the module.
  */
 

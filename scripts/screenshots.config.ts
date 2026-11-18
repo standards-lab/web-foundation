@@ -140,13 +140,13 @@ const description: Description = {
     },
   ],
   facets: [
-    { flag: "palette", attribute: "data-palette", default: "github" },
+    { flag: "palette", attribute: "data-palette", default: "zen" },
     { flag: "space", attribute: "data-space", default: "regular" },
     { flag: "type", attribute: "data-type", default: "mono" },
   ],
   // Every color at the defaults, then the other space and the other type at the default color.
   all: [
-    ...["github", "zenwritten", "everforest", "catppuccin"].map((palette) => ({ palette })),
+    ...["zen", "github", "catppuccin", "everforest"].map((palette) => ({ palette })),
     { space: "compact" },
     { type: "sans" },
   ],

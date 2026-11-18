@@ -15,9 +15,9 @@ const KEY = Symbol.for("web-foundation.registry");
 const scope = globalThis as typeof globalThis & Record<symbol, Store | undefined>;
 
 /** The names the lean and full registration modules list, per facet, in order. */
-const LEAN = { color: ["github"], space: ["regular"], type: ["mono"] };
+const LEAN = { color: ["zen"], space: ["regular"], type: ["mono"] };
 const FULL = {
-  color: ["github", "zenwritten", "everforest", "catppuccin"],
+  color: ["zen", "github", "catppuccin", "everforest"],
   space: ["regular", "compact"],
   type: ["mono", "sans"],
 };
@@ -36,7 +36,7 @@ async function page() {
 
 /** Registers what register.js does, through the registry given. */
 function registerLean({ register }: typeof Registry) {
-  register("color", "github");
+  register("color", "zen");
   register("space", "regular");
   register("type", "mono");
 }
@@ -93,19 +93,19 @@ describe("registry", () => {
     // A store an older copy made, with no type facet: the new copy keeps it, and gives type its
     // list on first use.
     delete scope[KEY];
-    const older = { color: ["github"], space: [] };
+    const older = { color: ["zen"], space: [] };
     scope[KEY] = older;
     const registry = await copy(`page=${++pages}`);
     registry.register("type", "mono");
     assert.equal(scope[KEY], older);
-    assert.deepEqual(STORE(), { color: ["github"], space: [], type: ["mono"] });
+    assert.deepEqual(STORE(), { color: ["zen"], space: [], type: ["mono"] });
   });
 
   test("profiles() returns a copy, so changing it changes no store", async () => {
     const { registry } = await page();
     registerLean(registry);
     registry.profiles("color").push("mutated");
-    assert.deepEqual(registry.profiles("color"), ["github"]);
+    assert.deepEqual(registry.profiles("color"), ["zen"]);
     assert.deepEqual(STORE(), LEAN);
   });
 

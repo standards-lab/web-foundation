@@ -4,10 +4,10 @@
  * values its generated colors/seoulbones.vim bakes for them.
  *
  * demo/backups/seoulbones.css, the backup the specimen page, demo/specimen.html, shows beside
- * zenwritten: one zero-specificity block in foundation.tokens.color, applied by
+ * zen: one zero-specificity block in foundation.tokens.color, applied by
  * data-palette="seoulbones" on any element to its subtree, declaring the sixteen color tokens as
  * light-dark() pairs, light / dark. It is a demo sheet, not a profile: not under src/, not in the
- * package, and not registered. It maps as zenwritten.css does, and each value's comment names its
+ * package, and not registered. It maps as zen.css does, and each value's comment names its
  * upstream source, the one name both schemes share: a highlight group's color, or a palette swatch
  * as the file's terminal colors bake it. --fg-2 is fg1, baked as the bright-white terminal color.
  * Fills: Seoulbones' comments are green, not a text step, so --fg-3 is LineNr fg, the dimmest

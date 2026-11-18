@@ -40,7 +40,7 @@
  * layers/tokens/color/, imported into this same sub-layer and applied by data-palette on any
  * element to its subtree. Each profile is one block, :where([data-palette="<name>"]), with zero
  * specificity, so the nearest scope wins by inheritance and a consumer's later layer beats every
- * profile. GitHub is the default: its block also matches :where(:root), so it applies with no
+ * profile. Zen is the default: its block also matches :where(:root), so it applies with no
  * attribute anywhere, and a data-palette on the root, matched by a later profile block of equal
  * (zero) specificity, overrides it. This file declares no token: every value is a profile's.
  *
@@ -51,8 +51,8 @@
  * With no attribute, the page follows the system scheme and changes when it does.
  *
  * Both entries import this file into foundation.tokens.color, then the profiles into the
- * same sub-layer: baseline.css, the lean entry, imports GitHub's file,
- * layers/tokens/color/github.css; full.css, the full entry, imports GitHub's and then every other
+ * same sub-layer: baseline.css, the lean entry, imports Zen's file,
+ * layers/tokens/color/zen.css; full.css, the full entry, imports Zen's and then every other
  * profile's. Pages link an entry, never this file: linked on its own, its rules would be unlayered.
  */
 

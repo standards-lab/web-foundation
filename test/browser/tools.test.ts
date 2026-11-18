@@ -6,8 +6,8 @@
 // type profiles compute as v0.7.0's full entry's, in light and in dark, and dropping any one
 // declaration of one it adds shows. The color profiles are the package's own, not v0.7.0's: every
 // comparison with v0.7.0 pins the color tokens on both pages to v0.7.0's default's values, so it
-// holds which token each declaration reads and never a palette's values; the default, github,
-// resolves to GitHub's swatches, and dropping any one declaration of a color profile shows on its
+// holds which token each declaration reads and never a palette's values; the default, zen,
+// resolves to its own swatches, and dropping any one declaration of a color profile shows on its
 // scope. Each entry's registration module lists exactly the profiles it defines, and each
 // built-in unit's module registers its one profile and loads no CSS.
 // demo/profiles.html switches the tools page through every profile.
@@ -81,7 +81,7 @@ const LAYER_ORDER = [
 const FACETS: Facet[] = ["color", "space", "type"];
 /** One token per facet that tells its profile apart, with its value under each profile. */
 const PROFILES: Record<Facet, Record<string, Record<string, string>>> = {
-  color: { github: { "--bg": "light-dark(#ffffff, #0d1117)" } },
+  color: { zen: { "--bg": "light-dark(#eeeeee, #191919)" } },
   space: { regular: { "--radius-base": "0.375rem" } },
   type: {
     mono: {
@@ -101,9 +101,9 @@ const ATTRIBUTES: Record<Facet, string> = {
   type: "data-type",
 };
 /** The profiles each entry ships, per facet, in the order it imports them. */
-const LEAN: Record<Facet, string[]> = { color: ["github"], space: ["regular"], type: ["mono"] };
+const LEAN: Record<Facet, string[]> = { color: ["zen"], space: ["regular"], type: ["mono"] };
 const FULL: Record<Facet, string[]> = {
-  color: ["github", "zenwritten", "everforest", "catppuccin"],
+  color: ["zen", "github", "catppuccin", "everforest"],
   space: ["regular", "compact"],
   type: ["mono", "sans"],
 };
@@ -119,25 +119,25 @@ const UPSTREAM_HELD = FULL_PROFILES.filter(({ facet }) => facet !== "color");
 /** The color profiles, the package's own, each held to its own reading. */
 const COLORS = FULL_PROFILES.filter(({ facet }) => facet === "color");
 
-/** github's sixteen tokens, light / dark: GitHub Light Default's and GitHub Dark Default's
- * swatches, from primer/github-vscode-theme v6.3.5 over @primer/primitives 7.10.0. */
-const GITHUB: Record<string, [string, string]> = {
-  "--bg": ["#ffffff", "#0d1117"],
-  "--bg-1": ["#f6f8fa", "#161b22"],
-  "--bg-2": ["#eff1f3", "#343941"],
-  "--border": ["#d8dee4", "#21262d"],
-  "--border-2": ["#d0d7de", "#30363d"],
-  "--fg": ["#1f2328", "#e6edf3"],
-  "--fg-2": ["#656d76", "#7d8590"],
-  "--fg-3": ["#6e7781", "#6e7681"],
-  "--red": ["#cf222e", "#f85149"],
-  "--orange": ["#bc4c00", "#db6d28"],
-  "--yellow": ["#9a6700", "#d29922"],
-  "--green": ["#1a7f37", "#3fb950"],
-  "--cyan": ["#1b7c83", "#39c5cf"],
-  "--blue": ["#0969da", "#2f81f7"],
-  "--purple": ["#8250df", "#a371f7"],
-  "--magenta": ["#bf3989", "#db61a2"],
+/** zen's sixteen tokens, light / dark: zenbones.nvim v4.12.0's generated colors for its light and
+ * dark backgrounds. */
+const ZEN: Record<string, [string, string]> = {
+  "--bg": ["#eeeeee", "#191919"],
+  "--bg-1": ["#e5e5e5", "#222222"],
+  "--bg-2": ["#d7d7d7", "#2c2c2c"],
+  "--border": ["#cfcfcf", "#303030"],
+  "--border-2": ["#989898", "#616161"],
+  "--fg": ["#353535", "#bbbbbb"],
+  "--fg-2": ["#5c5c5c", "#8e8e8e"],
+  "--fg-3": ["#8b8b8b", "#686868"],
+  "--red": ["#a8334c", "#de6e7c"],
+  "--orange": ["#944927", "#b77e64"],
+  "--yellow": ["#944927", "#b77e64"],
+  "--green": ["#4f6c31", "#819b69"],
+  "--cyan": ["#3b8992", "#66a5ad"],
+  "--blue": ["#286486", "#6099c0"],
+  "--purple": ["#88507d", "#b279a7"],
+  "--magenta": ["#88507d", "#b279a7"],
 };
 /** A #rrggbb color as getComputedStyle gives it. */
 const rgb = (hex: string) =>
@@ -361,13 +361,13 @@ describe("foundation tools", () => {
   });
 
   for (const [i, scheme] of SCHEMES.entries()) {
-    test(`with no profile attribute, the page entry resolves GitHub's swatches, ${scheme}`, async () => {
+    test(`with no profile attribute, the page entry resolves zen's swatches, ${scheme}`, async () => {
       const page = await toolsPage(entry);
       const resolved: Record<string, string> = await page.evaluate(`(() => {
         document.documentElement.setAttribute("data-scheme", "${scheme}");
         const probe = document.body.appendChild(document.createElement("i"));
         const out = {};
-        for (const token of ${JSON.stringify(Object.keys(GITHUB))}) {
+        for (const token of ${JSON.stringify(Object.keys(ZEN))}) {
           probe.style.color = "var(" + token + ")";
           out[token] = getComputedStyle(probe).color;
         }
@@ -375,7 +375,7 @@ describe("foundation tools", () => {
         return out;
       })()`);
       await page.close();
-      const expected = Object.entries(GITHUB).map(([token, pair]) => [token, rgb(pair[i])]);
+      const expected = Object.entries(ZEN).map(([token, pair]) => [token, rgb(pair[i])]);
       assert.deepEqual(resolved, Object.fromEntries(expected));
     });
   }

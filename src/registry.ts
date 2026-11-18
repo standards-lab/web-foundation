@@ -15,7 +15,7 @@ export const FACETS: readonly Facet[] = Object.freeze(["color", "space", "type"]
 
 /** Each facet's default profile: the one both CSS entries apply with no attribute. */
 export const DEFAULTS: Readonly<Record<Facet, string>> = Object.freeze({
-  color: "github",
+  color: "zen",
   space: "regular",
   type: "mono",
 });

@@ -7,6 +7,23 @@ All notable changes to `@standards-lab/web-foundation` are documented here. The 
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the package adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-11-18
+
+This minor release breaks a page that relies on the default palette or names `zenwritten`: the
+color profile `zenwritten` is now `zen`, and it is the default.
+
+### Changed
+
+- The Zenwritten color profile is renamed `zen`: its sheet and registration module are
+  `profiles/color/zen.css` and `profiles/color/zen.js`, and `data-palette="zen"` applies it. Its
+  values are unchanged. A reader's stored `zenwritten` choice now applies the default, `zen`, and
+  stays in storage; no alias maps the old name.
+- The default color profile is now Zen: it applies with no attribute, and `page.css` and
+  `register.js` carry it alone. GitHub moves to `page-full.css` and `register-full.js`, and to a
+  unit a page links after `page.css`.
+- The full entry, its registration module, and the theme menu order the color profiles zen,
+  github, catppuccin, everforest.
+
 ## [0.2.0] - 2026-11-18
 
 This minor release breaks a page that relies on the default palette or names a removed profile:
@@ -65,5 +82,6 @@ the default color profile is now GitHub, and `flexoki` and `primer` are gone.
 - Releases by tag: each `v<version>` tag marks a pack commit whose tree is the pack, the build
   included, and whose one parent is main's merge commit; its GitHub release carries the tarball.
 
+[0.3.0]: https://github.com/standards-lab/web-foundation/releases/tag/v0.3.0
 [0.2.0]: https://github.com/standards-lab/web-foundation/releases/tag/v0.2.0
 [0.1.0]: https://github.com/standards-lab/web-foundation/releases/tag/v0.1.0

@@ -46,8 +46,8 @@ modules by their `.js` subpaths. The lean entry, `page.css`, carries the default
   entries `page.css` and `page-full.css`, `baseline.css`, the tool sheets (`meta.css`,
   `structure.css`, and `utilities.css`), and the menu's `theme-menu.css`.
 - `./profiles/<facet>/<name>.{css,js}`: the built-in profiles, each a unit of a sheet and a
-  registration module. Color has `github` (the default), `zenwritten`, `everforest`, and
-  `catppuccin`; space has `regular` (the default) and `compact`; type has `mono` (the default)
+  registration module. Color has `zen` (the default), `github`, `catppuccin`, and
+  `everforest`; space has `regular` (the default) and `compact`; type has `mono` (the default)
   and `sans`. A page adds a unit by linking its sheet after `page.css` and importing its module
   beside `register.js`. `page-full.css` and `register-full.js` import every unit, in place of
   `page.css` and `register.js`.
@@ -119,7 +119,7 @@ mise run currency     # report every tool, package, action pin, and tooling tag 
 The demo pages, in `demo/`, are `tools.html` (every tool class), `profiles.html` (the tools page
 switched through every profile), `specimen.html` (each color profile light and dark, beside its
 backup from `demo/backups/`), `theme.html` (the theme menu on `page-full.css`), `unit.html`
-(`page.css` with the Zenwritten unit), `keys.html` (bindings and the help dialog), `format.html`
+(`page.css` with the GitHub unit), `keys.html` (bindings and the help dialog), `format.html`
 (each formatter on sample values), and `hooks.html` (the two color hooks, at their fallbacks and
 overridden). Page layout belongs to the consumer, so each page links `demo.css`, a `demo` layer of
 its own that lays out the column and its sections. `mise run demo` serves the repository on the
