@@ -1,5 +1,5 @@
-// Adapted from spike-html-apps-foundation (07ba39a): test/unit/registry.test.ts, the store's key renamed
-// web-foundation.registry.
+// Adapted from spike-html-apps-foundation (07ba39a): test/unit/registry.test.ts, the store's key
+// renamed web-foundation.registry.
 // The registry's store, shared by every copy of the module. A case's page is a fresh copy, imported
 // by a URL no other case uses, after the store is removed from the global object.
 // Adapted from spike-html-packages-foundation (5dd8a58): test/unit/registry.test.js, in TypeScript.

@@ -1,5 +1,5 @@
-// Adapted from spike-html-apps-foundation (07ba39a): test/browser/backdrop.test.ts, importing the tooling as
-// @standards-lab/web-tooling.
+// Adapted from spike-html-apps-foundation (07ba39a): test/browser/backdrop.test.ts, importing the
+// tooling as @standards-lab/web-tooling.
 // The baseline's ::backdrop veil from the package's dist/, on test/fixtures/backdrop.html under the
 // full page entry, in each built-in palette and scheme: a modal dialog's backdrop computes to the
 // veil, the page's --bg at 80%, a popover's, hint, auto, or manual, on the page or inside the open

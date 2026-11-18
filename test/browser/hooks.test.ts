@@ -1,5 +1,5 @@
-// Adapted from spike-html-apps-foundation (07ba39a): test/browser/hooks.test.ts, importing the tooling as
-// @standards-lab/web-tooling.
+// Adapted from spike-html-apps-foundation (07ba39a): test/browser/hooks.test.ts, importing the
+// tooling as @standards-lab/web-tooling.
 // The baseline's two color hooks from the package's dist/, on test/fixtures/hooks.html under the
 // full page entry, in each built-in palette and scheme: progress takes --accent-color, by
 // default --magenta, and the checkbox and the link take --interaction-color, by default --blue;

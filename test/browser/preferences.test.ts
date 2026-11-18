@@ -1,5 +1,6 @@
-// Adapted from spike-html-apps-foundation (07ba39a): test/browser/preferences.test.ts, importing the tooling as
-// @standards-lab/web-tooling, and with the storage key renamed web-foundation.preferences.
+// Adapted from spike-html-apps-foundation (07ba39a): test/browser/preferences.test.ts, importing
+// the tooling as @standards-lab/web-tooling, and with the storage key renamed
+// web-foundation.preferences.
 // The preferences module and the theme menu from the package's dist/, as a consumer loads them:
 // the stored choice applied before first paint, kept in storage, and followed across tabs, and
 // <sl-theme-menu>, pressed with real keys through the DevTools Protocol, on

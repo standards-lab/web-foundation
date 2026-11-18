@@ -6,8 +6,11 @@
 # that pack and the tag to package.json's version, and creates a GitHub release from CHANGELOG.md
 # with the tarball attached.
 # From web-tooling (1ff49e4): .github/workflows/release.yml.
-# Adapted from spike-html-apps-foundation (07ba39a): .github/workflows/release.yml, dispatched by
-# hand with the tag a person pushes, as web-tooling's is, instead of cutting it on a push to main.
+# Adapted from spike-html-apps-tooling (d77877b): .github/workflows/release.yml, dispatched by hand
+# with the tag a person pushes instead of cutting it on a push to main, since a tag push reads its
+# workflows from the tagged tree, the pack; the tag held to a pack commit on main's merge commit,
+# its pins at their latest.
+# Adapted from spike-html-apps-foundation (9c15b8d): .github/workflows/release.yml, renamed.
 name: Release
 
 on:

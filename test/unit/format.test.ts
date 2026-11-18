@@ -1,5 +1,5 @@
-// Adapted from spike-html-apps-foundation (07ba39a): test/unit/format.test.ts, importing the package as
-// @standards-lab/web-foundation.
+// Adapted from spike-html-apps-foundation (07ba39a): test/unit/format.test.ts, importing the
+// package as @standards-lab/web-foundation.
 // The formatters as a consumer imports them: the package's ./format.js export, which resolves to
 // the dist/ mise run build wrote. Every case pins its locale, en-US, and a date's time zone, UTC.
 

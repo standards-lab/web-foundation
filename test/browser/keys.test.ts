@@ -1,5 +1,5 @@
-// Adapted from spike-html-apps-foundation (07ba39a): test/browser/keys.test.ts, importing the tooling and
-// the package as @standards-lab/web-tooling and @standards-lab/web-foundation, and with
+// Adapted from spike-html-apps-foundation (07ba39a): test/browser/keys.test.ts, importing the
+// tooling and the package as @standards-lab/web-tooling and @standards-lab/web-foundation, and with
 // the store and settings keys renamed web-foundation.keys.
 // The keys runtime and its help dialog from the package's dist/, pressed with real keys
 // through the DevTools Protocol on test/fixtures/keys*.html.

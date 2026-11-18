@@ -1,5 +1,5 @@
-// Adapted from spike-html-apps-foundation (07ba39a): test/browser/conformance.test.ts, importing the tooling
-// and the package as @standards-lab/web-tooling and @standards-lab/web-foundation.
+// Adapted from spike-html-apps-foundation (07ba39a): test/browser/conformance.test.ts, importing
+// the tooling and the package as @standards-lab/web-tooling and @standards-lab/web-foundation.
 // The conformance module from the package's dist/, as an extension's author runs it: every
 // built-in profile of the full entry conforms, in light and in dark, and with the entry's sheets
 // from another origin, whose rules chromium hides; each fixture profile in

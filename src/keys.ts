@@ -1,5 +1,5 @@
-// Adapted from spike-html-apps-foundation (07ba39a): src/keys.ts, its store, modals, and storage keys
-// renamed web-foundation.keys, web-foundation.keys.modals, and web-foundation.keys.
+// Adapted from spike-html-apps-foundation (07ba39a): src/keys.ts, its store, modals, and storage
+// keys renamed web-foundation.keys, web-foundation.keys.modals, and web-foundation.keys.
 // The page's keyboard shortcuts: an element with data-keys is clicked or focused by its keys, and
 // register() binds a handler. One store at a well-known global key is shared by every copy, and
 // the first copy to load installs the one listener, so a key never fires twice.
