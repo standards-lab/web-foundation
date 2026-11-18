@@ -46,10 +46,10 @@ modules by their `.js` subpaths. The lean entry, `page.css`, carries the default
   entries `page.css` and `page-full.css`, `baseline.css`, the tool sheets (`meta.css`,
   `structure.css`, and `utilities.css`), and the menu's `theme-menu.css`.
 - `./profiles/<facet>/<name>.{css,js}`: the built-in profiles, each a unit of a sheet and a
-  registration module. Color has `flexoki` (the default), `primer`, `catppuccin`, and
-  `everforest`; space has `regular` (the default) and `compact`; type has `mono` (the default)
-  and `sans`. A page adds a unit by linking its sheet after `page.css` and importing its module
-  beside `register.js`. `page-full.css` and `register-full.js` import every unit, in place of
+  registration module. Color has `github` (the default), `zenwritten`, `everforest`,
+  `kanagawa`, `catppuccin`, and `tokyo-night`; space has `regular` (the default) and `compact`;
+  type has `mono` (the default) and `sans`. A page adds a unit by linking its sheet after
+  `page.css` and importing its module beside `register.js`. `page-full.css` and `register-full.js` import every unit, in place of
   `page.css` and `register.js`.
 - `./*.js`: the modules, with their `.d.ts`: `dom.js`, `registry.js`, `keys.js`, `keys-help.js`,
   `keys-grammar.js`, `register.js`, `register-full.js`, `preferences.js`, `theme-menu.js`,
@@ -81,7 +81,7 @@ with `--magenta` as its fallback, and no profile declares. Where `--interaction-
 you can act on, `--accent-color` marks what is current, active, or in progress: emphasis that
 reports state rather than inviting interaction. In the baseline, native `progress` follows it. A
 page sets it on any element in its own layer, and per palette if it wants:
-`:where([data-palette="primer"]) { --accent-color: var(--cyan); }`. The hook shares its name with
+`:where([data-palette="kanagawa"]) { --accent-color: var(--cyan); }`. The hook shares its name with
 the CSS property: `accent-color` follows `--interaction-color` on every element except `progress`,
 where it follows `--accent-color`.
 
@@ -118,7 +118,7 @@ mise run currency     # report every tool, package, action pin, and tooling tag 
 
 The demo pages, in `demo/`, are `tools.html` (every tool class), `profiles.html` (the tools page
 switched through every profile), `theme.html` (the theme menu on `page-full.css`), `unit.html`
-(`page.css` with the Primer unit), `keys.html` (bindings and the help dialog), `format.html` (each
+(`page.css` with the Zenwritten unit), `keys.html` (bindings and the help dialog), `format.html` (each
 formatter on sample values), and `hooks.html` (the two color hooks, at their fallbacks and
 overridden). Page layout belongs to the consumer, so each page links `demo.css`, a `demo` layer of
 its own that lays out the column and its sections. `mise run demo` serves the repository on the
