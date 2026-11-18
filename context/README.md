@@ -19,7 +19,8 @@ README.md's "Release" section gives the steps and what the workflow verifies.
 ## Provenance
 
 The package is seeded by copy from spike-html-apps-foundation at 07ba39a, and spike-html-design
-v0.7.0 stays its frozen visual reference. The spikes are archived and never a dependency. Each
+v0.7.0 stays its frozen visual reference, except for the color profiles' values, which follow their
+upstream themes (STANDARDS.md, "Design"). The spikes are archived and never a dependency. Each
 copied file that takes comments names its source in a provenance line. The JSON files take no
 comment, so their provenance is here:
 
@@ -33,8 +34,9 @@ comment, so their provenance is here:
 
 - **Baseline**: the tokens, reset, and elements sheets.
 - **Profiles**: the registry of the profiles a page can apply, and the built-in profiles, each a
-  sheet with its registration module: four color profiles, light and dark (Flexoki, the default,
-  Primer, Catppuccin, and Everforest), regular and compact space, and mono and sans type.
+  sheet with its registration module: six color themes, light and dark, each from its upstream at
+  a pin (GitHub, the default, Zenwritten, Everforest, Kanagawa, Catppuccin, and Tokyo Night),
+  regular and compact space, and mono and sans type.
 - **Entries**: `page.css` with `register.ts`, the defaults alone, and `page-full.css` with
   `register-full.ts`, every built-in profile.
 - **Tool sheets and DOM helpers**: the meta, structure, and utilities sheets (buttons, the field
@@ -44,6 +46,8 @@ comment, so their provenance is here:
   settings, and the keyboard help dialog.
 - **Theme preferences**: the stored preferences module, applied before first paint, and the theme
   menu.
-- **Conformance**: the profile conformance check, each facet's rules in `RULES`. It has no
-  contrast rule: a contrast rule, at WCAG's 4.5:1, is the `palettes` task's.
+- **Conformance**: the profile conformance check, each facet's rules in `RULES`. The `contrast`
+  rule holds `--fg` on `--bg` to WCAG's 4.5:1 in light and dark.
+- **Specimen**: `demo/specimen.html` shows each color theme, light and dark, beside its backup.
+  The backups' sheets, in `demo/backups/`, are demo-only: the package and the registry hold none.
 - **Formatters**: the Intl formatters for bytes, dates, date-times, relative time, and durations.

@@ -12,6 +12,13 @@ All notable changes to `@standards-lab/web-foundation` are documented here. The 
 This minor release breaks a page that relies on the default palette or names a removed profile:
 the default color profile is now GitHub, and `flexoki` and `primer` are gone.
 
+### Added
+
+- The conformance rule `contrast`: a color profile's `--fg` on its `--bg` reaches 4.5:1 in light
+  and in dark.
+- The specimen demo page, `demo/specimen.html`, which shows each color theme beside its backup.
+  The backups' sheets live in `demo/backups/`, outside the package.
+
 ### Changed
 
 - The built-in color profiles are six themes, each taking its values from its upstream at a pin:
@@ -23,12 +30,6 @@ the default color profile is now GitHub, and `flexoki` and `primer` are gone.
 
 - The `flexoki` and `primer` color profiles. A reader's stored `flexoki` or `primer` choice
   applies the default, `github`.
-
-### Added
-
-- The conformance rule `contrast`: a color profile's `--fg` on its `--bg` reaches 4.5:1 in light
-  and in dark.
-- The specimen demo page, `specimen.html`, with each theme's backup beside it in `demo/backups/`.
 
 ## [0.1.0] - 2026-11-18
 

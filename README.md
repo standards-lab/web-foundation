@@ -127,11 +127,12 @@ loopback address and prints each page's URL; the pages load `dist/`, which the t
 
 `mise run screenshots` captures the tools page, the keys help open, the theme menu open at a wide
 and a narrow width, the hooks page, and the specimen narrowed to the color profile and its backup,
-each light and dark, on `page-full.css`. It runs the
-`web-screenshots` bin of [web-tooling](https://github.com/standards-lab/web-tooling), the
-devDependency the browser tier's driver and server also come from, over the capture description
-in `scripts/screenshots.config.ts`, and passes its arguments on. With none it captures the default profile; `--palette`, `--space`,
-and `--type` choose a profile, and `--all` captures every color and compact and sans.
+each light and dark, on `page-full.css`. It runs the `web-screenshots` bin of
+[web-tooling](https://github.com/standards-lab/web-tooling), the devDependency the browser tier's
+driver and server also come from, over the capture description in
+`scripts/screenshots.config.ts`, and passes its arguments on. With none it captures the default
+profile; `--palette`, `--space`, and `--type` choose a profile, and `--all` captures every color
+and compact and sans.
 `--output directory --dir <path>` writes the files instead of showing them in kitty;
 `mise run screenshots -- --help` lists the other flags, and web-tooling's README documents them.
 The check never runs either task.
