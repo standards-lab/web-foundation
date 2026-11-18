@@ -29,7 +29,7 @@ type Results = Record<string, Record<string, Failure[]>>;
 
 /** The full entry's profiles, per facet. */
 const BUILT_IN: Names = {
-  color: ["github", "zenwritten", "everforest", "catppuccin"],
+  color: ["zen", "github", "catppuccin", "everforest"],
   space: ["regular", "compact"],
   type: ["mono", "sans"],
 };
@@ -255,8 +255,8 @@ describe("conformance", () => {
     await page.evaluate(`document.head.append(Object.assign(document.createElement("style"), {
       textContent: '[data-palette="github"] { background-color: var(--red); }',
     }))`);
-    const results = await checked(page, { color: ["github", "zenwritten"] });
-    assert.deepEqual(rules(results), { color: { github: ["paints"], zenwritten: [] } });
+    const results = await checked(page, { color: ["zen", "github"] });
+    assert.deepEqual(rules(results), { color: { zen: [], github: ["paints"] } });
   });
 
   test("freezes the rules, and rejects an unknown facet or an empty name", async () => {
@@ -285,7 +285,7 @@ describe("conformance", () => {
     const state = `[document.querySelectorAll("*").length, document.styleSheets.length,
       performance.getEntriesByType("resource").length]`;
     const before = await page.evaluate(state);
-    await checked(page, { color: ["github"], space: ["regular"], type: ["mono"] });
+    await checked(page, { color: ["zen"], space: ["regular"], type: ["mono"] });
     // The module itself is the one resource the check adds.
     const [elements, sheets, resources] = await page.evaluate(state);
     assert.deepEqual([elements, sheets, resources], [before[0], before[1], before[2] + 1]);

@@ -22,10 +22,10 @@ const root = join(import.meta.dirname, "../..");
 
 /** Each built-in color profile's backup, by its data-palette, as the specimen pairs them. */
 const BACKUPS: Record<string, string> = {
+  zen: "seoulbones",
   github: "tomorrow",
-  zenwritten: "seoulbones",
-  everforest: "nightfox",
   catppuccin: "ayu",
+  everforest: "nightfox",
 };
 
 /**

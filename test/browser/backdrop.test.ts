@@ -18,7 +18,7 @@ import type { Server } from "@standards-lab/web-tooling/server.js";
 /** The repository root, which the server serves. */
 const root = join(import.meta.dirname, "../..");
 
-const PALETTES = ["github", "zenwritten", "everforest", "catppuccin"];
+const PALETTES = ["zen", "github", "catppuccin", "everforest"];
 const SCHEMES = ["light", "dark"];
 /** A transparent background, as getComputedStyle gives it. */
 const TRANSPARENT = "rgba(0, 0, 0, 0)";
