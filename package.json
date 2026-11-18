@@ -2,7 +2,6 @@
   "name": "@standards-lab/web-foundation",
   "version": "0.1.0",
   "license": "Apache-2.0",
-  "repository": "github:standards-lab/web-foundation",
   "type": "module",
   "files": [
     "dist"

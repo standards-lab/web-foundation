@@ -26,9 +26,8 @@ copied file that takes comments names its source in a provenance line. The JSON 
 comment, so their provenance is here:
 
 - `package.json` is adapted from spike-html-apps-foundation (07ba39a): package.json. It is renamed
-  `@standards-lab/web-foundation` at 0.1.0, gains a `repository` field naming
-  `standards-lab/web-foundation`, takes `@standards-lab/web-tooling` at v0.1.0 as its tooling
-  devDependency in place of the spike's tooling, and pins typescript-eslint at 8.73.0.
+  `@standards-lab/web-foundation` at 0.1.0, takes `@standards-lab/web-tooling` at v0.1.0 as its
+  tooling devDependency in place of the spike's tooling, and pins typescript-eslint at 8.73.0.
 - `.prettierrc.json` is from spike-html-apps-foundation (07ba39a): .prettierrc.json.
 - `pnpm-lock.yaml` is generated, not copied.
 
