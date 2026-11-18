@@ -119,8 +119,8 @@ const UPSTREAM_HELD = FULL_PROFILES.filter(({ facet }) => facet !== "color");
 /** The color profiles, the package's own, each held to its own reading. */
 const COLORS = FULL_PROFILES.filter(({ facet }) => facet === "color");
 
-/** zen's sixteen tokens, light / dark: zenbones.nvim v4.12.0's generated colors for its light and
- * dark backgrounds. */
+/** zen's sixteen tokens, light / dark: the upstream values zen.css credits, zenbones.nvim
+ * v4.12.0's generated colorscheme for its light and dark backgrounds. */
 const ZEN: Record<string, [string, string]> = {
   "--bg": ["#eeeeee", "#191919"],
   "--bg-1": ["#e5e5e5", "#222222"],
