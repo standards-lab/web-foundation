@@ -46,5 +46,6 @@ comment, so their provenance is here:
   settings, and the keyboard help dialog.
 - **Theme preferences**: the stored preferences module, applied before first paint, and the theme
   menu.
-- **Conformance**: the profile conformance check, each facet's rules in `RULES`.
+- **Conformance**: the profile conformance check, each facet's rules in `RULES`. It has no
+  contrast rule: a contrast rule, at WCAG's 4.5:1, is the `palettes` task's.
 - **Formatters**: the Intl formatters for bytes, dates, date-times, relative time, and durations.
