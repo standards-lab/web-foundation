@@ -1,0 +1,18 @@
+// Adapted from spike-html-apps-foundation (07ba39a): tsconfig.test.json, with no capture
+// description to check.
+// The type check of the suite, mise run types:test: the tests and their helpers, which node runs
+// under its type stripping, checked against dist/ as a consumer's code is and never emitted. allowJs
+// reads the browser tier's in-page support/ module, which stays .js because the server sends it as
+// written.
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "types": ["node"],
+    "noEmit": true,
+    "allowJs": true,
+    "rootDir": "."
+  },
+  "include": ["test/**/*.ts"]
+}

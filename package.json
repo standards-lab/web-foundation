@@ -1,0 +1,34 @@
+{
+  "name": "@standards-lab/web-foundation",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "repository": "github:standards-lab/web-foundation",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    "./css": {
+      "types": "./dist/css.d.ts"
+    },
+    "./css.js": null,
+    "./*.js": {
+      "types": "./dist/*.d.ts",
+      "default": "./dist/*.js"
+    },
+    "./*.css": "./dist/*.css"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@standards-lab/web-tooling": "github:standards-lab/web-tooling#v0.1.0",
+    "@types/node": "26.6.6",
+    "eslint": "10.15.0",
+    "eslint-import-resolver-typescript": "4.4.5",
+    "eslint-plugin-boundaries": "7.4.4",
+    "eslint-plugin-import-x": "4.18.1",
+    "globals": "17.14.0",
+    "prettier": "3.10.1",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.73.0"
+  }
+}
