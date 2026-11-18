@@ -1,6 +1,6 @@
 # Adapted from spike-html-apps-foundation (07ba39a): mise.toml, its pins at their latest, with no
-# demo or screenshots task, no workflow lint, since there is no workflow yet, and the suite's type
-# check without the capture description.
+# workflow lint, since there is no workflow yet, and the screenshots task on web-tooling's
+# web-screenshots bin.
 # Adapted from spike-html-packages-foundation (5dd8a58): mise.toml, renamed.
 # Tasks never install a missing tool; mise run install is the one task that reads the network.
 [settings]
@@ -57,7 +57,7 @@ run = "tsc --noEmit -p ."
 
 # The suite imports the package's own exports, which resolve to dist/'s declarations.
 [tasks."types:test"]
-description = "Type-check the suite with tsc, under tsconfig.test.json"
+description = "Type-check the suite and the capture description with tsc, under tsconfig.test.json"
 depends = ["build"]
 run = "tsc -p tsconfig.test.json"
 
@@ -82,6 +82,21 @@ depends = ["lint", "types", "build", "test:unit", "test:browser"]
 [tasks.install]
 description = "Install the pins and node_modules; reads the network"
 run = ["mise install", "pnpm install --frozen-lockfile"]
+
+[tasks.demo]
+description = "Serve the tools, profiles, theme, unit, keys, format, and hooks demo pages, on dist/, on the loopback address"
+depends = ["build"]
+run = "node scripts/demo.js"
+
+# Never a dependency of check: a reviewer's look at the pages, not a test.
+[tasks.screenshots]
+description = "Capture the tools page, keys help, the theme menu, and the hooks page light and dark, inline in kitty: at the defaults, or --palette/--space/--type <name>, or --all for every profile; --page <name> (repeatable) and --scheme light|dark narrow it; --output terminal|directory|browser and --dir <path> choose where they go; --keep leaves the captures"
+depends = ["preflight browser", "build"]
+# The tooling's bin over the capture description; the task's arguments follow it, with or without
+# a leading --.
+# raw: with dependencies, mise prefixes a task's output through a pipe; icat needs the terminal.
+raw = true
+run = "BROWSER_EXECUTABLE=$(mise which chrome-headless-shell) pnpm exec web-screenshots scripts/screenshots.config.ts"
 
 [tasks.currency]
 description = "Report every mise tool, package.json pin, action pin, and the tooling's tag behind its latest, exiting nonzero if any"
