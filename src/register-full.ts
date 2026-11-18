@@ -5,9 +5,11 @@
 // Adapted from spike-html-design (fe75220): modules/register-full.js.
 
 import "./profiles/color/github.ts";
-import "./profiles/color/primer.ts";
-import "./profiles/color/catppuccin.ts";
+import "./profiles/color/zenwritten.ts";
 import "./profiles/color/everforest.ts";
+import "./profiles/color/kanagawa.ts";
+import "./profiles/color/catppuccin.ts";
+import "./profiles/color/tokyo-night.ts";
 import "./profiles/space/regular.ts";
 import "./profiles/space/compact.ts";
 import "./profiles/type/mono.ts";

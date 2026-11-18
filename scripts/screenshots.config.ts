@@ -113,7 +113,9 @@ const description: Description = {
   ],
   // Every color at the defaults, then the other space and the other type at the default color.
   all: [
-    ...["github", "primer", "catppuccin", "everforest"].map((palette) => ({ palette })),
+    ...["github", "zenwritten", "everforest", "kanagawa", "catppuccin", "tokyo-night"].map(
+      (palette) => ({ palette }),
+    ),
     { space: "compact" },
     { type: "sans" },
   ],

@@ -17,7 +17,7 @@ const scope = globalThis as typeof globalThis & Record<symbol, Store | undefined
 /** The names v0.7.0's lean and full registration modules list, per facet, in order. */
 const LEAN = { color: ["github"], space: ["regular"], type: ["mono"] };
 const FULL = {
-  color: ["github", "primer", "catppuccin", "everforest"],
+  color: ["github", "zenwritten", "everforest", "kanagawa", "catppuccin", "tokyo-night"],
   space: ["regular", "compact"],
   type: ["mono", "sans"],
 };
@@ -43,7 +43,7 @@ function registerLean({ register }: typeof Registry) {
 
 /** Registers what v0.7.0's modules/register-full.js does, through the registry given. */
 function registerFull({ register }: typeof Registry) {
-  for (const name of ["github", "primer", "catppuccin", "everforest"]) register("color", name);
+  for (const name of FULL.color) register("color", name);
   for (const name of ["regular", "compact"]) register("space", name);
   for (const name of ["mono", "sans"]) register("type", name);
 }

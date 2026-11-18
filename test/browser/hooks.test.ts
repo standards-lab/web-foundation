@@ -18,7 +18,7 @@ import type { Server } from "@standards-lab/web-tooling/server.js";
 /** The repository root, which the server serves. */
 const root = join(import.meta.dirname, "../..");
 
-const PALETTES = ["github", "primer", "catppuccin", "everforest"];
+const PALETTES = ["github", "zenwritten", "everforest", "kanagawa", "catppuccin", "tokyo-night"];
 const SCHEMES = ["light", "dark"];
 /** The colors the fixture's app layer gives each hook on its subtree. */
 const ACCENT = "rgb(1, 2, 3)";

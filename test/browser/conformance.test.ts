@@ -29,7 +29,7 @@ type Results = Record<string, Record<string, Failure[]>>;
 
 /** The full entry's profiles, per facet. */
 const BUILT_IN: Names = {
-  color: ["github", "primer", "catppuccin", "everforest"],
+  color: ["github", "zenwritten", "everforest", "kanagawa", "catppuccin", "tokyo-night"],
   space: ["regular", "compact"],
   type: ["mono", "sans"],
 };
@@ -255,8 +255,8 @@ describe("conformance", () => {
     await page.evaluate(`document.head.append(Object.assign(document.createElement("style"), {
       textContent: '[data-palette="github"] { background-color: var(--red); }',
     }))`);
-    const results = await checked(page, { color: ["github", "primer"] });
-    assert.deepEqual(rules(results), { color: { github: ["paints"], primer: [] } });
+    const results = await checked(page, { color: ["github", "zenwritten"] });
+    assert.deepEqual(rules(results), { color: { github: ["paints"], zenwritten: [] } });
   });
 
   test("freezes the rules, and rejects an unknown facet or an empty name", async () => {

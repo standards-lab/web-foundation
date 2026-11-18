@@ -25,9 +25,9 @@ const PREFERENCES = "/dist/preferences.js";
 const MENU = "button[commandfor=theme]";
 const DIALOG = "sl-theme-menu dialog";
 /** A profile other than the default in every facet, and the dark scheme. */
-const CHOICE = { color: "primer", space: "compact", type: "sans", scheme: "dark" };
+const CHOICE = { color: "zenwritten", space: "compact", type: "sans", scheme: "dark" };
 const APPLIED = {
-  "data-palette": "primer",
+  "data-palette": "zenwritten",
   "data-space": "compact",
   "data-type": "sans",
   "data-scheme": "dark",
@@ -226,7 +226,7 @@ describe("preferences: apply and storage", () => {
   });
 
   // A palette the package no longer ships, as a choice saved before it went, or any unknown name.
-  for (const color of ["flexoki", "unknown"]) {
+  for (const color of ["flexoki", "primer", "unknown"]) {
     test(`a stored ${color} palette applies github and stays in storage`, async () => {
       const choice = { ...CHOICE, color };
       await seed(choice);
@@ -274,7 +274,7 @@ describe("preferences: apply and storage", () => {
       }`,
     );
     assert.deepEqual(set, [
-      "data-palette=primer",
+      "data-palette=zenwritten",
       "data-scheme=dark",
       "data-space=compact",
       "data-type=sans",
@@ -302,15 +302,15 @@ describe("preferences: apply and storage", () => {
     // The menu opens, applies, and closes on Save and on Escape, storing nothing.
     await clickTheme(page);
     await press(page, "l");
-    assert.equal((await rooted(page))["data-palette"], "primer");
+    assert.equal((await rooted(page))["data-palette"], "zenwritten");
     await press(page, "t");
     await closed(page);
-    assert.equal((await rooted(page))["data-palette"], "primer");
+    assert.equal((await rooted(page))["data-palette"], "zenwritten");
     await clickTheme(page);
     await press(page, "l");
     await press(page, "Escape");
     await closed(page);
-    assert.equal((await rooted(page))["data-palette"], "primer");
+    assert.equal((await rooted(page))["data-palette"], "zenwritten");
     assert.deepEqual(await page.evaluate("window.errors"), []);
   });
 });
@@ -351,7 +351,7 @@ describe("preferences: the storage event", () => {
     const saver = await open(fixture("preferences.html"));
     const page = await open(fixture("preferences.html"));
     await call(saver, `preferences.save(${JSON.stringify(CHOICE)})`);
-    await until(page, `document.documentElement.getAttribute("data-palette") === "primer"`);
+    await until(page, `document.documentElement.getAttribute("data-palette") === "zenwritten"`);
     assert.deepEqual(await rooted(page), APPLIED);
     // A cleared key restores the defaults.
     await saver.evaluate("localStorage.clear()");
@@ -363,32 +363,32 @@ describe("preferences: the storage event", () => {
     const page = await openMenu(CHOICE);
     const saver = await open(fixture("preferences.html"));
     await press(page, "l");
-    assert.equal((await rooted(page))["data-palette"], "catppuccin");
-    const next = { color: "everforest", space: "regular", type: "mono", scheme: "light" };
+    assert.equal((await rooted(page))["data-palette"], "everforest");
+    const next = { color: "kanagawa", space: "regular", type: "mono", scheme: "light" };
     await call(saver, `preferences.save(${JSON.stringify(next)})`);
     await until(
       page,
-      `JSON.parse(localStorage.getItem(${JSON.stringify(KEY)})).color === "everforest"`,
+      `JSON.parse(localStorage.getItem(${JSON.stringify(KEY)})).color === "kanagawa"`,
     );
     // Time for the storage event to have been delivered, had it been followed.
     await sleep(page, 100);
     assert.deepEqual(await state(page), {
-      focus: ["color", "catppuccin"],
-      selection: { ...CHOICE, color: "catppuccin" },
-      root: { ...APPLIED, "data-palette": "catppuccin" },
-      preview: { ...APPLIED, "data-palette": "catppuccin" },
+      focus: ["color", "everforest"],
+      selection: { ...CHOICE, color: "everforest" },
+      root: { ...APPLIED, "data-palette": "everforest" },
+      preview: { ...APPLIED, "data-palette": "everforest" },
     });
     await press(page, "Escape");
     await closed(page);
     assert.deepEqual(await rooted(page), {
-      "data-palette": "everforest",
+      "data-palette": "kanagawa",
       "data-space": "regular",
       "data-type": "mono",
       "data-scheme": "light",
     });
     // Closed again: the next save applies.
-    await call(saver, `preferences.save(${JSON.stringify({ ...next, color: "primer" })})`);
-    await until(page, `document.documentElement.getAttribute("data-palette") === "primer"`);
+    await call(saver, `preferences.save(${JSON.stringify({ ...next, color: "zenwritten" })})`);
+    await until(page, `document.documentElement.getAttribute("data-palette") === "zenwritten"`);
   });
 });
 
@@ -516,7 +516,14 @@ describe("preferences: the menu", () => {
       arrows: ["◀", "▶"],
     });
     assert.deepEqual(menu.rows, [
-      row("color", "Color", ["github", "primer", "catppuccin", "everforest"]),
+      row("color", "Color", [
+        "github",
+        "zenwritten",
+        "everforest",
+        "kanagawa",
+        "catppuccin",
+        "tokyo-night",
+      ]),
       row("scheme", "Scheme", ["system", "light", "dark"]),
       row("space", "Space", ["regular", "compact"]),
       row("type", "Type", ["mono", "sans"]),
@@ -545,7 +552,7 @@ describe("preferences: the menu", () => {
   test("opens on what applies: the stored choice checked, the preview carrying it", async () => {
     const page = await openMenu(CHOICE);
     assert.deepEqual(await state(page), {
-      focus: ["color", "primer"],
+      focus: ["color", "zenwritten"],
       selection: CHOICE,
       root: APPLIED,
       preview: APPLIED,
@@ -599,9 +606,9 @@ describe("preferences: the menu", () => {
     await press(page, "k");
     await press(page, "h");
     now = await state(page);
-    assert.deepEqual(now.focus, ["color", "everforest"]);
-    assert.equal(now.root["data-palette"], "everforest");
-    assert.equal(now.preview["data-palette"], "everforest");
+    assert.deepEqual(now.focus, ["color", "tokyo-night"]);
+    assert.equal(now.root["data-palette"], "tokyo-night");
+    assert.equal(now.preview["data-palette"], "tokyo-night");
   });
 
   test("a click on a row's arrow steps it", async () => {
@@ -654,12 +661,12 @@ describe("preferences: the menu", () => {
       if (accept === "t") await press(page, "t");
       else await page.evaluate(`document.querySelector("[data-action=save]").click()`);
       await closed(page);
-      const choice = { color: "primer", scheme: "light", space: "regular", type: "mono" };
+      const choice = { color: "zenwritten", scheme: "light", space: "regular", type: "mono" };
       assert.deepEqual(await stored(page), choice, accept);
       assert.equal(await page.evaluate("window.writes"), 1, accept);
       assert.deepEqual(await rooted(page), {
         ...DEFAULT_STATE,
-        "data-palette": "primer",
+        "data-palette": "zenwritten",
         "data-scheme": "light",
       });
       assert.equal(await call(page, "preferences.isOpen()"), false);
@@ -698,7 +705,7 @@ describe("preferences: the menu", () => {
     );
     assert.equal(await call(page, "preferences.isOpen()"), true);
     assert.equal(await page.evaluate("window.writes"), 0);
-    assert.equal((await rooted(page))["data-palette"], "primer");
+    assert.equal((await rooted(page))["data-palette"], "zenwritten");
   });
 
   test("a backdrop click does nothing", async () => {
@@ -746,7 +753,7 @@ describe("preferences: the menu", () => {
         }
       return { count, tokens: Object.keys(tokens(preview)).length, mismatches };
     })()`);
-    assert.equal(result.count, 4 * 3 * 2 * 2);
+    assert.equal(result.count, 6 * 3 * 2 * 2);
     assert.ok(result.tokens > 30, `${result.tokens} tokens`);
     assert.deepEqual(result.mismatches, []);
   });
@@ -826,7 +833,7 @@ describe("preferences: units and extensions", () => {
 
   const units = [
     ["preferences-extension.html", "extension", "light-dark(#fdf6fd, #120a12)"],
-    ["preferences-unit.html", "primer", "light-dark(#ffffff, #1c2128)"],
+    ["preferences-unit.html", "zenwritten", "light-dark(#eeeeee, #191919)"],
   ];
   for (const [name, color, bg] of units) {
     test(`on ${name}, the menu lists github and ${color} alone, beside the lean defaults`, async () => {
@@ -876,26 +883,26 @@ describe("preferences: demo/theme.html", () => {
     await press(page, "l");
     await press(page, "t");
     await closed(page);
-    assert.equal((await rooted(page))["data-palette"], "primer");
-    await until(other, `document.documentElement.getAttribute("data-palette") === "primer"`);
+    assert.equal((await rooted(page))["data-palette"], "zenwritten");
+    await until(other, `document.documentElement.getAttribute("data-palette") === "zenwritten"`);
     await page.goto(demo());
-    assert.equal((await rooted(page))["data-palette"], "primer");
+    assert.equal((await rooted(page))["data-palette"], "zenwritten");
   });
 });
 
 describe("preferences: demo/unit.html", () => {
-  test("its menu lists the lean defaults and the Primer unit, and applies primer", async () => {
+  test("its menu lists the lean defaults and the Zenwritten unit, and applies zenwritten", async () => {
     await seed(null);
     const page = await open(`${server.origin}/demo/unit.html`);
     await clickTheme(page);
     const colors = await page.evaluate(`[...document.querySelectorAll(
       'sl-theme-menu [data-section="color"] input')].map((radio) => radio.value)`);
-    assert.deepEqual(colors, ["github", "primer"]);
+    assert.deepEqual(colors, ["github", "zenwritten"]);
     await press(page, "l");
     await press(page, "t");
     await closed(page);
-    assert.equal((await rooted(page))["data-palette"], "primer");
-    // Primer's own --bg; its light value alone is github's too, canvas.default.
-    assert.equal((await style(page, ":root", "--bg")).trim(), "light-dark(#ffffff, #1c2128)");
+    assert.equal((await rooted(page))["data-palette"], "zenwritten");
+    // Zenwritten's own --bg, Normal's background.
+    assert.equal((await style(page, ":root", "--bg")).trim(), "light-dark(#eeeeee, #191919)");
   });
 });

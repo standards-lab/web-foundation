@@ -1,23 +1,12 @@
-/* From spike-html-apps-foundation (07ba39a): src/profiles/color/catppuccin.css. */
-/* Adapted from spike-html-design (fe75220): layers/tokens/color/catppuccin.css */
-
-/*
- * The content is upstream's but for the block that wraps it in the foundation.tokens.color layer,
- * the layer names its comments give, spike-html-design.* upstream and foundation.* here, and the
- * paragraph on how a page takes the unit, written for this package. The port is this repository's
- * own code: Prettier formats it, and the browser tier holds what it computes, not its text, to
- * upstream's.
- */
-
 /*
  * Colors from Catppuccin (MIT, Catppuccin), https://github.com/catppuccin/palette, at v1.8.0: latte
  * in light and mocha in dark, from palette.json.
  *
- * layers/tokens/color/catppuccin.css, the Catppuccin profile of the color facet: one
- * zero-specificity block, applied by data-palette="catppuccin" on any element to its subtree,
- * declaring the sixteen color tokens as light-dark() pairs, latte / mocha, and nothing else. The
- * tokens' roles and how a profile is selected are the facet's, in layers/tokens/color.css. Each
- * value's comment names its upstream swatch, latte / mocha, or the one name both share.
+ * profiles/color/catppuccin.css, the Catppuccin profile of the color facet: one zero-specificity
+ * block, applied by data-palette="catppuccin" on any element to its subtree, declaring the sixteen
+ * color tokens as light-dark() pairs, latte / mocha. Each value's comment names its upstream
+ * swatch, the one name both flavors share. The tokens' roles and how a profile is selected are the
+ * facet's, in baseline/tokens/color.css.
  *
  * The package exports this file as ./profiles/color/catppuccin.css, and its registration module as
  * ./profiles/color/catppuccin.js: together, the Catppuccin unit. A page that links the lean entry,
@@ -40,10 +29,10 @@
   :where([data-palette="catppuccin"]) {
     /* Surfaces: the base, the first elevated surface, the element surface, the border and the
        control boundary. */
-    --bg: light-dark(#eff1f5, #181825); /* base / mantle */
-    --bg-1: light-dark(#e6e9ef, #1e1e2e); /* mantle / base */
-    --bg-2: light-dark(#ccd0da, #313244); /* surface0 */
-    --border: light-dark(#bcc0cc, #45475a); /* surface1 */
+    --bg: light-dark(#eff1f5, #1e1e2e); /* base */
+    --bg-1: light-dark(#ccd0da, #313244); /* surface0 */
+    --bg-2: light-dark(#bcc0cc, #45475a); /* surface1 */
+    --border: light-dark(#acb0be, #585b70); /* surface2 */
     --border-2: light-dark(#9ca0b0, #6c7086); /* overlay0 */
 
     /* Text, from the strongest down. */

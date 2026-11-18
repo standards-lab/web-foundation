@@ -12,9 +12,11 @@
 
 @import url(./baseline/tokens/color.css);
 @import url(./profiles/color/github.css);
-@import url(./profiles/color/primer.css);
-@import url(./profiles/color/catppuccin.css);
+@import url(./profiles/color/zenwritten.css);
 @import url(./profiles/color/everforest.css);
+@import url(./profiles/color/kanagawa.css);
+@import url(./profiles/color/catppuccin.css);
+@import url(./profiles/color/tokyo-night.css);
 @import url(./baseline/tokens/space.css);
 @import url(./profiles/space/regular.css);
 @import url(./profiles/space/compact.css);

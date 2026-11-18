@@ -1,28 +1,15 @@
-/* From spike-html-apps-foundation (07ba39a): src/profiles/color/everforest.css. */
-/* Adapted from spike-html-design (fe75220): layers/tokens/color/everforest.css */
-
 /*
- * The content is upstream's but for the block that wraps it in the foundation.tokens.color layer,
- * the layer names its comments give, spike-html-design.* upstream and foundation.* here, and the
- * paragraph on how a page takes the unit, written for this package. The port is this repository's
- * own code: Prettier formats it, and the browser tier holds what it computes, not its text, to
- * upstream's.
- */
-
-/*
- * Colors from Everforest (MIT, sainnhe), https://github.com/sainnhe/everforest, at v0.3.0: hard in
- * light and hard in dark, its hard-background variants, from the palette in
+ * Colors from Everforest (MIT, sainnhe), https://github.com/sainnhe/everforest, at v0.3.0: medium
+ * in light and medium in dark, its medium-contrast backgrounds, from the palette in
  * autoload/everforest.vim.
  *
- * layers/tokens/color/everforest.css, the Everforest profile of the color facet: one
- * zero-specificity block, applied by data-palette="everforest" on any element to its subtree,
- * declaring the sixteen color tokens as light-dark() pairs, hard light / hard dark, and nothing
- * else. The tokens' roles and how a profile is selected are the facet's, in
- * layers/tokens/color.css. Each value's comment names its upstream swatch, light / dark, or the
- * one name both share. Everforest has no magenta of its own: its purple is a pink-magenta and
- * fills the terminal's magenta slot, so --purple and --magenta both take it.
- * The surfaces step toward the text in lightness order: in light, bg1 is lighter than bg_dim, so
- * --bg, --bg-1 and --bg-2 take bg0, bg1 and bg_dim; in dark, bg_dim, bg0 and bg1.
+ * profiles/color/everforest.css, the Everforest profile of the color facet: one zero-specificity
+ * block, applied by data-palette="everforest" on any element to its subtree, declaring the sixteen
+ * color tokens as light-dark() pairs, medium light / medium dark. Each value's comment names its
+ * upstream swatch, the one name both schemes share. Everforest has no magenta of its own: its
+ * purple is a pink-magenta and fills the terminal's magenta slot, so --purple and --magenta both
+ * take it. The tokens' roles and how a profile is selected are the facet's, in
+ * baseline/tokens/color.css.
  *
  * The package exports this file as ./profiles/color/everforest.css, and its registration module as
  * ./profiles/color/everforest.js: together, the Everforest unit. A page that links the lean entry,
@@ -45,11 +32,11 @@
   :where([data-palette="everforest"]) {
     /* Surfaces: the base, the first elevated surface, the element surface, the border and the
        control boundary. */
-    --bg: light-dark(#fffbef, #1e2326); /* bg0 / bg_dim */
-    --bg-1: light-dark(#f8f5e4, #272e33); /* bg1 / bg0 */
-    --bg-2: light-dark(#f2efdf, #2e383c); /* bg_dim / bg1 */
-    --border: light-dark(#edeada, #374145); /* bg3 / bg2 */
-    --border-2: light-dark(#bec5b2, #4f5b58); /* bg5 */
+    --bg: light-dark(#fdf6e3, #2d353b); /* bg0 */
+    --bg-1: light-dark(#f4f0d9, #343f44); /* bg1 */
+    --bg-2: light-dark(#efebd4, #3d484d); /* bg2 */
+    --border: light-dark(#e6e2cc, #475258); /* bg3 */
+    --border-2: light-dark(#bdc3af, #56635f); /* bg5 */
 
     /* Text, from the strongest down. */
     --fg: light-dark(#5c6a72, #d3c6aa); /* fg */
