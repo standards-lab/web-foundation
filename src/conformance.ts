@@ -331,7 +331,10 @@ const TOKENS: Readonly<Record<Facet, (probes: Probes, fail: Fail) => () => void>
 /** The contrast ratio --fg on --bg must reach in each scheme: WCAG's AA for body text. */
 const CONTRAST = 4.5;
 
-/** The color tokens rule, reading each token in each scheme; returns paints, surfaces, and contrast. */
+/**
+ * The color tokens rule, reading each token in each scheme; returns paints, surfaces, and
+ * contrast.
+ */
 function colorTokens({ scopes }: Probes, fail: Fail): () => void {
   // Each scheme's computed color per token, or null when the token is unset or no color there.
   const colors = scopes.map(({ scheme, probe }) => {

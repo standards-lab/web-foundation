@@ -49,8 +49,8 @@ modules by their `.js` subpaths. The lean entry, `page.css`, carries the default
   registration module. Color has `github` (the default), `zenwritten`, `everforest`,
   `kanagawa`, `catppuccin`, and `tokyo-night`; space has `regular` (the default) and `compact`;
   type has `mono` (the default) and `sans`. A page adds a unit by linking its sheet after
-  `page.css` and importing its module beside `register.js`. `page-full.css` and `register-full.js` import every unit, in place of
-  `page.css` and `register.js`.
+  `page.css` and importing its module beside `register.js`. `page-full.css` and
+  `register-full.js` import every unit, in place of `page.css` and `register.js`.
 - `./*.js`: the modules, with their `.d.ts`: `dom.js`, `registry.js`, `keys.js`, `keys-help.js`,
   `keys-grammar.js`, `register.js`, `register-full.js`, `preferences.js`, `theme-menu.js`,
   `conformance.js`, and `format.js`.
@@ -117,15 +117,17 @@ mise run currency     # report every tool, package, action pin, and tooling tag 
 ```
 
 The demo pages, in `demo/`, are `tools.html` (every tool class), `profiles.html` (the tools page
-switched through every profile), `theme.html` (the theme menu on `page-full.css`), `unit.html`
-(`page.css` with the Zenwritten unit), `keys.html` (bindings and the help dialog), `format.html` (each
-formatter on sample values), and `hooks.html` (the two color hooks, at their fallbacks and
+switched through every profile), `specimen.html` (each color profile light and dark, beside its
+backup from `demo/backups/`), `theme.html` (the theme menu on `page-full.css`), `unit.html`
+(`page.css` with the Zenwritten unit), `keys.html` (bindings and the help dialog), `format.html`
+(each formatter on sample values), and `hooks.html` (the two color hooks, at their fallbacks and
 overridden). Page layout belongs to the consumer, so each page links `demo.css`, a `demo` layer of
 its own that lays out the column and its sections. `mise run demo` serves the repository on the
 loopback address and prints each page's URL; the pages load `dist/`, which the task builds first.
 
 `mise run screenshots` captures the tools page, the keys help open, the theme menu open at a wide
-and a narrow width, and the hooks page, each light and dark, on `page-full.css`. It runs the
+and a narrow width, the hooks page, and the specimen narrowed to the color profile and its backup,
+each light and dark, on `page-full.css`. It runs the
 `web-screenshots` bin of [web-tooling](https://github.com/standards-lab/web-tooling), the
 devDependency the browser tier's driver and server also come from, over the capture description
 in `scripts/screenshots.config.ts`, and passes its arguments on. With none it captures the default profile; `--palette`, `--space`,

@@ -14,7 +14,7 @@ const KEY = Symbol.for("web-foundation.registry");
 /** The global object, with the store at its key, as the registry reaches it. */
 const scope = globalThis as typeof globalThis & Record<symbol, Store | undefined>;
 
-/** The names v0.7.0's lean and full registration modules list, per facet, in order. */
+/** The names the lean and full registration modules list, per facet, in order. */
 const LEAN = { color: ["github"], space: ["regular"], type: ["mono"] };
 const FULL = {
   color: ["github", "zenwritten", "everforest", "kanagawa", "catppuccin", "tokyo-night"],
@@ -34,14 +34,14 @@ async function page() {
   return { registry: await copy(name), copy: (suffix: string) => copy(`${name}&${suffix}`) };
 }
 
-/** Registers what v0.7.0's modules/register.js does, through the registry given. */
+/** Registers what register.js does, through the registry given. */
 function registerLean({ register }: typeof Registry) {
   register("color", "github");
   register("space", "regular");
   register("type", "mono");
 }
 
-/** Registers what v0.7.0's modules/register-full.js does, through the registry given. */
+/** Registers what register-full.js does, through the registry given. */
 function registerFull({ register }: typeof Registry) {
   for (const name of FULL.color) register("color", name);
   for (const name of ["regular", "compact"]) register("space", name);

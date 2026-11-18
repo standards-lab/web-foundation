@@ -6,12 +6,12 @@
  * profiles/color/kanagawa.css, the Kanagawa profile of the color facet: one zero-specificity block,
  * applied by data-palette="kanagawa" on any element to its subtree, declaring the sixteen color
  * tokens as light-dark() pairs, lotus / dragon. Each value's comment names its upstream swatch,
- * lotus / dragon. The surfaces and text take the themes' ui and syn roles: ui.bg, ui.bg_p1,
- * ui.bg_p2, ui.nontext, ui.float.fg_border, ui.fg, ui.fg_dim and syn.comment. Each hue takes the
- * swatch the theme's terminal colors give that hue, and orange and purple, which the terminal has
- * no slot for, the swatch syn.constant and syn.keyword take: lotusBlue4 and dragonBlue2 for blue,
- * dragonGreen2 for dragon's green. The tokens' roles and how a profile is selected are the facet's,
- * in baseline/tokens/color.css.
+ * lotus / dragon. The surfaces and text take the themes' ui and syn roles, in the tokens' order:
+ * ui.bg, ui.bg_p1, ui.bg_p2, ui.nontext, ui.float.fg_border, ui.fg, ui.fg_dim and syn.comment.
+ * Six hues take the swatch the theme's terminal colors give them, which for blue is lotusBlue4 and
+ * dragonBlue2, and for dragon's green dragonGreen2. The terminal has no orange or purple: --orange
+ * takes syn.constant's swatch, and --purple syn.keyword's. The tokens' roles and how a profile is
+ * selected are the facet's, in baseline/tokens/color.css.
  *
  * The package exports this file as ./profiles/color/kanagawa.css, and its registration module as
  * ./profiles/color/kanagawa.js: together, the Kanagawa unit. A page that links the lean entry,
