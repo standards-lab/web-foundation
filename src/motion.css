@@ -1,3 +1,6 @@
+/* Adapted from web-components (a659353): src/chat-thread.css's pulse, src/stage-timeline.css's
+   ring, and src/upload-dropzone.css's and src/drawer.css's transition durations, behind reduced
+   motion. */
 /*
  * The foundation's motion sheet, opt-in: neither page entry imports it. A page links it after its
  * entry, whose layer statement names foundation.motion last, so the sheet orders after the
@@ -14,10 +17,6 @@
  * nothing. Every animation is behind prefers-reduced-motion: no-preference; under reduce nothing
  * here animates, and what is in progress reads by its color and its text alone. A component that
  * animates in its own sheet keeps to the same media query.
- *
- * After spike-html-apps-components (10dde51): context/foundation-candidates.md, its motion behind
- * reduced motion; web-components (a659353): src/chat-thread.css's pulse, src/stage-timeline.css's
- * ring, and the durations of src/upload-dropzone.css's and src/drawer.css's transitions.
  */
 
 @layer foundation.motion {
