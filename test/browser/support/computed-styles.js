@@ -148,7 +148,7 @@ export function differences(a, b) {
 }
 
 /** A declaration list split at the semicolons outside parentheses. */
-function declarations(cssText) {
+export function declarations(cssText) {
   const out = [];
   let depth = 0;
   let start = 0;

@@ -44,7 +44,7 @@ modules by their `.js` subpaths. The lean entry, `page.css`, carries the default
 
 - `./*.css`: the stylesheets, each self-layered so a shadow root adopts it alone: the page
   entries `page.css` and `page-full.css`, `baseline.css`, the tool sheets (`meta.css`,
-  `structure.css`, and `utilities.css`).
+  `structure.css`, and `utilities.css`), and the opt-in `motion.css`, which neither entry imports.
 - `./profiles/<facet>/<name>.{css,js}`: the built-in profiles, each a unit of a sheet and a
   registration module. Color has `zen` (the default), `github`, `catppuccin`, and
   `everforest`; space has `regular` (the default) and `compact`; type has `mono` (the default)
@@ -96,6 +96,32 @@ offset), `--focus-reach` (the outline's width plus its offset), and `--tint` (12
 surface strength: `color-mix(in srgb, var(--color-accent, var(--magenta)) var(--tint),
 transparent)`).
 
+`utilities.css`, which both entries import and a shadow root adopts alone, adds to the scroll and
+table classes the patterns components restate:
+
+- `.list-bare`: a list of items, with no markers, no indent, and no step between items.
+- `.text-nowrap` keeps a value on one line; `.text-numeric` also gives its digits one width.
+- `.text-break`: an unbroken value, an id or a path, that moves to the next line whole and breaks
+  inside only when it alone is wider than the line.
+- `.text-truncate`: one line, cut with an ellipsis, on a block or a flex or grid item.
+- `.scroll-frame`, inside a host that is a flex column (`display: flex; flex-direction:
+  column`): as tall as its content, scrolling inside once the host is held shorter, filling a host
+  held taller, and as wide as its content in a shrink-to-fit parent, never wider than the parent.
+- `.alternatives`: a cell as wide as its widest child, each stacked in one place; a child marked
+  `aria-hidden="true"` keeps its space but isn't shown.
+- `.head-row` around `.head-name` and `.head-end`: the name grows to its own width, the label sits
+  at the line's end, and wraps under the name only when the two don't fit.
+- `.text-quiet-s` and `.text-quiet-xs`: `--text-s` or `--text-xs`, in `--fg-2`.
+- `.status-line`, on one `<p role="status">` rendered in every state: the quiet type, a line tall
+  when blank.
+- `.visually-hidden`: a label kept for assistive technology that takes no space.
+
+`motion.css` is opt-in: a page links it after its entry, and a shadow root adopts it. Its layer,
+`foundation.motion`, is named in both entries' layer statement, after the utilities. It declares
+`--duration-s` (120ms) and `--duration-m` (200ms) on the root and on an adopting host, and the
+keyframes `pulse` and `ring`; `.motion-pulse` and `.motion-ring` run them only under
+`prefers-reduced-motion: no-preference`, and under `reduce` nothing animates.
+
 A package outside the foundation adds a profile as a built-in unit does: a sheet that declares
 its facet's tokens in one `:where([data-<attribute>="<name>"])` block inside that facet's layer,
 `foundation.tokens.<facet>`, and a registration module that calls `register(facet, name)` from
@@ -132,12 +158,14 @@ foundation adds to v0.7.0: disabled fields, progress and meter), `profiles.html`
 switched through every profile), `specimen.html` (each color profile light and dark, beside its
 backup from `demo/backups/`), `theme.html` (the stored choice on `page-full.css`, switched by the demo's own controls), `unit.html`
 (`page.css` with the GitHub unit), `keys.html` (bindings, and a help dialog the page fills from `bindings()`), `format.html`
-(each formatter on sample values), and `hooks.html` (the two color hooks, at their fallbacks and
-overridden). Page layout belongs to the consumer, so each page links `demo.css`, a `demo` layer of
+(each formatter on sample values), `hooks.html` (the two color hooks, at their fallbacks and
+overridden), and `utilities.html` (each utility class the foundation adds to v0.7.0's, and the
+motion sheet). Page layout belongs to the consumer, so each page links `demo.css`, a `demo` layer of
 its own that lays out the column and its sections. `mise run demo` serves the repository on the
 loopback address and prints each page's URL; the pages load `dist/`, which the task builds first.
 
-`mise run screenshots` captures the tools page, the hooks page, and the specimen narrowed to the color profile and its backup,
+`mise run screenshots` captures the tools page, the hooks page, the utilities page with its motion
+held midway and under reduced motion, and the specimen narrowed to the color profile and its backup,
 each light and dark, on `page-full.css`. It runs the `web-screenshots` bin of
 [web-tooling](https://github.com/standards-lab/web-tooling), the devDependency the browser tier's
 driver and server also come from, over the capture description in

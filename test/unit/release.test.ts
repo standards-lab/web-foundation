@@ -69,6 +69,16 @@ describe("release pack", () => {
     );
   });
 
+  test("the pack holds the opt-in motion sheet, which page.css doesn't import", () => {
+    const packed = listFiles(pack);
+    assert.ok(packed.includes("dist/motion.css"), "the pack has no dist/motion.css");
+    assert.doesNotMatch(readFileSync(join(pack, "dist/page.css"), "utf8"), /@import[^;]*motion/);
+    assert.doesNotMatch(
+      readFileSync(join(pack, "dist/page-full.css"), "utf8"),
+      /@import[^;]*motion/,
+    );
+  });
+
   test("the pack is the release that files and exports declare", () => {
     assert.deepEqual(releaseProblems(pack, src), []);
   });

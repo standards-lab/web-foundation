@@ -2,8 +2,8 @@
 // @standards-lab/web-tooling and its web-screenshots bin, with the registry's key renamed
 // web-foundation.registry.
 // mise run screenshots' capture description, which the tooling's web-screenshots bin runs: the
-// tools page whole, the hooks page whole, and the color specimen narrowed to the profile's color
-// theme and its backup, each with the stylesheet pointed at page-full.css, its registration module
+// tools page whole, the hooks page whole, the utilities page whole with motion and with reduced
+// motion, and the color specimen narrowed to the profile's color theme and its backup, each with the stylesheet pointed at page-full.css, its registration module
 // imported, and the profile's attributes set on the root, as demo/profiles.html does, so no demo
 // page changes; the profiles each page then registers, from the registry. The bin's flags choose
 // the profiles, pages, schemes, and output.
@@ -56,6 +56,24 @@ const narrowSpecimen: Step = (page) =>
     }
   })()`);
 
+/**
+ * Emulates the reader's prefers-reduced-motion, and holds every animation still at the middle of
+ * its loop, so a capture shows the pulse faded and the ring grown where they run.
+ */
+const motion =
+  (value: "no-preference" | "reduce"): Step =>
+  async (page) => {
+    await page.cdp("Emulation.setEmulatedMedia", {
+      features: [{ name: "prefers-reduced-motion", value }],
+    });
+    await page.evaluate(`(() => {
+      for (const animation of document.getAnimations()) {
+        animation.pause();
+        animation.currentTime = animation.effect.getComputedTiming().duration / 2;
+      }
+    })()`);
+  };
+
 const description: Description = {
   pages: [
     // One full-page capture, the bin's default state.
@@ -63,6 +81,26 @@ const description: Description = {
     // One full-page capture; the bin focuses the page's data-focus-start range and presses Tab,
     // which reaches the field and selects its text.
     { name: "hooks", caption: "the color hooks", path: "demo/hooks.html" },
+    // Two full-page captures: the motion sheet's loops held midway, and under reduced motion.
+    {
+      name: "utilities",
+      caption: "the utilities",
+      path: "demo/utilities.html",
+      states: [
+        {
+          name: "utilities",
+          caption: "the utilities, motion running",
+          full: true,
+          open: motion("no-preference"),
+        },
+        {
+          name: "utilities-reduced",
+          caption: "the utilities, motion reduced",
+          full: true,
+          open: motion("reduce"),
+        },
+      ],
+    },
     // One full-page capture of the profile's color theme beside its backup, in the one scheme.
     {
       name: "specimen",

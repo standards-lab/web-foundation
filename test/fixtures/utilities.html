@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>utilities fixture</title>
+    <!-- The utility classes and the motion sheet the foundation adds, from dist/, for
+         test/browser/utilities.test.ts: the lean page entry with motion.css linked after it.
+         #light takes test/browser/support/utilities.js's cases, which it also lays out in a
+         shadow root, in #shadow. #motion holds a pulse and a ring; #app, the classes under the
+         page's own later layer, which overrides them. -->
+    <link rel="stylesheet" href="../../dist/page.css" />
+    <link rel="stylesheet" href="../../dist/motion.css" />
+    <style>
+      @layer foundation, app;
+      @layer app {
+        .ring {
+          display: inline-block;
+          inline-size: 1rem;
+          block-size: 1rem;
+          border: 2px solid;
+          border-radius: 50%;
+        }
+        .app-still {
+          animation: none;
+        }
+        .app-wraps {
+          white-space: normal;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="light"></div>
+    <!-- The shadow root's host goes in here, where the durations are another value, so the host
+         reads the sheet's only by its own :host declaration. -->
+    <div id="shadow" style="--duration-s: 1s; --duration-m: 1s"></div>
+    <p id="motion">
+      <span class="motion-pulse" data-part="pulse">In progress</span>
+      <span class="motion-ring ring" data-part="ring"></span>
+    </p>
+    <div id="app" style="inline-size: 10ch">
+      <span class="motion-pulse app-still" data-part="still">Still</span>
+      <span class="text-nowrap app-wraps" data-part="wraps">several short words that wrap</span>
+    </div>
+  </body>
+</html>
