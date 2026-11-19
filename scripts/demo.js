@@ -19,6 +19,7 @@ for (const page of [
   "format",
   "hooks",
   "utilities",
+  "dialogs",
 ]) {
   console.log(`${server.origin}/demo/${page}.html`);
 }

@@ -69,14 +69,18 @@ describe("release pack", () => {
     );
   });
 
-  test("the pack holds the opt-in motion sheet, which page.css doesn't import", () => {
+  test("the pack holds the opt-in sheets, which neither page entry imports", () => {
     const packed = listFiles(pack);
-    assert.ok(packed.includes("dist/motion.css"), "the pack has no dist/motion.css");
-    assert.doesNotMatch(readFileSync(join(pack, "dist/page.css"), "utf8"), /@import[^;]*motion/);
-    assert.doesNotMatch(
-      readFileSync(join(pack, "dist/page-full.css"), "utf8"),
-      /@import[^;]*motion/,
-    );
+    for (const sheet of ["glyph-button", "dialog", "motion"]) {
+      assert.ok(packed.includes(`dist/${sheet}.css`), `the pack has no dist/${sheet}.css`);
+      for (const entry of ["page", "page-full"]) {
+        assert.doesNotMatch(
+          readFileSync(join(pack, `dist/${entry}.css`), "utf8"),
+          new RegExp(`@import[^;]*${sheet}`),
+          `dist/${entry}.css imports ${sheet}.css`,
+        );
+      }
+    }
   });
 
   test("the pack is the release that files and exports declare", () => {

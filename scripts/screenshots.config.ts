@@ -3,14 +3,15 @@
 // web-foundation.registry.
 // mise run screenshots' capture description, which the tooling's web-screenshots bin runs: the
 // tools page whole, the hooks page whole, the utilities page whole with motion and with reduced
-// motion, and the color specimen narrowed to the profile's color theme and its backup, each with the stylesheet pointed at page-full.css, its registration module
+// motion, the dialogs page at 390px and 1280px with the Help hint shown and each dialog open, and the color specimen narrowed to the profile's color theme and its backup, each with the stylesheet pointed at page-full.css, its registration module
 // imported, and the profile's attributes set on the root, as demo/profiles.html does, so no demo
 // page changes; the profiles each page then registers, from the registry. The bin's flags choose
 // the profiles, pages, schemes, and output.
 // Adapted from spike-html-apps-foundation (9c15b8d): scripts/screenshots.js, its states, profiles,
 // and open steps as a Description.
 
-import type { Description, Step } from "@standards-lab/web-tooling/screenshots.js";
+import { until } from "@standards-lab/web-tooling/browser.js";
+import type { Description, DescribedState, Step } from "@standards-lab/web-tooling/screenshots.js";
 
 /**
  * Points the page's stylesheet link at the full entry, unless it links it, and waits for it, and
@@ -74,6 +75,44 @@ const motion =
     })()`);
   };
 
+/** Points the mouse at the Help glyph button, as a reader does, and waits for its hint. */
+const helpHint: Step = async (page) => {
+  const { x, y }: { x: number; y: number } = await page.evaluate(`(() => {
+    const { left, top, width, height } = document.querySelector('[commandfor="help"]').getBoundingClientRect();
+    return { x: left + width / 2, y: top + height / 2 };
+  })()`);
+  await page.cdp("Input.dispatchMouseEvent", { type: "mouseMoved", x, y });
+  await until(page, `document.querySelector("#help-hint").matches(":popover-open")`);
+};
+
+/** Opens the dialog of the id through its opener, as a click does. */
+const openDialog =
+  (id: string): Step =>
+  async (page) => {
+    await page.evaluate(
+      `document.querySelector('[commandfor="${id}"][command="show-modal"]').click()`,
+    );
+    await until(page, `document.querySelector("#${id}").open`);
+  };
+
+/** The dialogs page's captures, by name, caption and step: the Help hint shown, then each dialog
+ * open. */
+const DIALOG_STATES: [string, string, Step][] = [
+  ["hint", "the Help hint shown", helpHint],
+  ["help", "Help, a .dialog-fit, open", openDialog("help")],
+  ["settings", "Settings, a .dialog-wide, open", openDialog("settings")],
+];
+
+/** The dialogs page's captures at one viewport width. */
+const dialogStates = (suffix: string, width: number): DescribedState[] =>
+  DIALOG_STATES.map(([name, caption, open]) => ({
+    name: `dialogs-${name}-${suffix}`,
+    caption: `${caption}, ${suffix}`,
+    viewport: { width, height: 720 },
+    full: false,
+    open,
+  }));
+
 const description: Description = {
   pages: [
     // One full-page capture, the bin's default state.
@@ -100,6 +139,13 @@ const description: Description = {
           open: motion("reduce"),
         },
       ],
+    },
+    // Viewport captures at 390px and 1280px: the Help hint shown, and each dialog open.
+    {
+      name: "dialogs",
+      caption: "the glyph buttons and dialogs",
+      path: "demo/dialogs.html",
+      states: [...dialogStates("390px", 390), ...dialogStates("wide", 1280)],
     },
     // One full-page capture of the profile's color theme beside its backup, in the one scheme.
     {

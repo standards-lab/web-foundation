@@ -1,0 +1,54 @@
+/* Adapted from spike-html-hosting-components (9fa5850): src/glyph-button.css, layered. */
+/*
+ * The foundation's glyph-button sheet, opt-in: neither page entry imports it. A page links it after
+ * its entry, whose layer statement names foundation.glyph after the utilities, so the sheet orders
+ * there wherever it is linked from; a component adopts it into its shadow root after the reset and
+ * elements sheets (baseline/reset.css and baseline/elements.css), before its own. Self-layered and
+ * importing nothing; it reads the baseline's tokens, which a shadow root inherits from the page.
+ * Unlike its source, which was unlayered, it sits in its layer, so a page's own later layer wins.
+ *
+ * The glyph button, a control of its own beside the text button: the class glyph-button on a
+ * native <button>, showing a glyph, an svg 1em a side (a block in the reset), and, when the
+ * control has one, its key hint, a kbd, in one row centered on the text's line. It keeps the
+ * native button the elements layer draws, its border, radius, surface, hover and focus ring, and
+ * sets only the row and the padding: --space-3xs block and --space-2xs inline, a quarter and a
+ * half of the text button's --space-s, which would spend a glyph's width on padding either side.
+ * --space-3xs separates the glyph from its hint.
+ *
+ * A 1em glyph and the block padding make the smallest glyph button, the glyph alone in the compact
+ * space profile on the narrowest display, 24 CSS px a side with the border: WCAG 2.5.8's target
+ * size.
+ *
+ * Each glyph button shows its name on hover and keyboard focus through an interest invoker:
+ * interestfor on the button names an element of popover="hint", in the same tree, whose text is
+ * the button's name. The browser shows and hides it, Escape dismisses it, and no script runs;
+ * where interestfor isn't supported the hint never shows, and the button keeps its name. The class
+ * glyph-hint places the hint below the button, flipped above it where the viewport's foot would
+ * cut it, by the implicit anchor its invoker gives it, and draws it as a small label in the page's
+ * colors reversed, the text color its fill, so it stands apart from any surface with no border.
+ * Under position-area the popover's own inset: 0 and auto margins place it as the source's inset:
+ * auto and margin: 0 did, and the area spans the viewport's width, so the name never wraps short
+ * of it; the source's three declarations are left out, as dropping each changed nothing.
+ */
+
+@layer foundation.glyph {
+  .glyph-button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3xs);
+    padding: var(--space-3xs) var(--space-2xs);
+  }
+
+  .glyph-hint {
+    position-area: block-end;
+    position-try-fallbacks: flip-block;
+    margin-block-start: var(--space-3xs);
+    padding: var(--space-3xs) var(--space-2xs);
+    border-style: none;
+    background-color: var(--fg);
+    color: var(--bg);
+    font-family: var(--font-ui);
+    font-size: var(--text-s);
+    line-height: var(--leading-ui);
+  }
+}

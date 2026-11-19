@@ -44,7 +44,8 @@ modules by their `.js` subpaths. The lean entry, `page.css`, carries the default
 
 - `./*.css`: the stylesheets, each self-layered so a shadow root adopts it alone: the page
   entries `page.css` and `page-full.css`, `baseline.css`, the tool sheets (`meta.css`,
-  `structure.css`, and `utilities.css`), and the opt-in `motion.css`, which neither entry imports.
+  `structure.css`, and `utilities.css`), and the opt-in `glyph-button.css`, `dialog.css` and
+  `motion.css`, which neither entry imports.
 - `./profiles/<facet>/<name>.{css,js}`: the built-in profiles, each a unit of a sheet and a
   registration module. Color has `zen` (the default), `github`, `catppuccin`, and
   `everforest`; space has `regular` (the default) and `compact`; type has `mono` (the default)
@@ -122,6 +123,26 @@ table classes the patterns components restate:
 keyframes `pulse` and `ring`; `.motion-pulse` and `.motion-ring` run them only under
 `prefers-reduced-motion: no-preference`, and under `reduce` nothing animates.
 
+`glyph-button.css` and `dialog.css` are opt-in too: a page links them after its entry, and a
+component adopts them into its shadow root after `baseline/reset.css` and `baseline/elements.css`.
+Their layers, `foundation.glyph` and `foundation.dialog`, are named in both entries' layer
+statement after the utilities, before `foundation.motion`.
+
+- `.glyph-button`, on a native `<button>`: its glyph, an svg 1em a side, and an optional key hint,
+  a `kbd`, in one centered row, on the native button's border, surface, hover and focus ring. The
+  glyph alone is at least 24x24 CSS px in every profile. Name it by `aria-label`.
+- `.glyph-hint`, on a `popover="hint"` element the button's `interestfor` names, holding the
+  button's name: shown below the button on hover and keyboard focus, above it where the viewport's
+  foot would cut it, in the page's colors reversed; Escape dismisses it, and no script runs. Mark
+  it `aria-hidden="true"`, and give the button `aria-description=""`, so the name is read once.
+- `.dialog-header`, a dialog's first child: its heading at the inline start and a Close glyph
+  button (`commandfor` the dialog, `command="close"`) at the end, `--space-m` above the content. A
+  heading with `tabindex="-1"` that takes focus as the dialog opens draws no outline.
+- `.dialog-wide` is the viewport less `--space-s` each side, up to 56rem; `.dialog-fit` is as wide
+  as its content, up to the same cap.
+
+Close and Escape close a dialog opened by `command="show-modal"` with no script.
+
 A package outside the foundation adds a profile as a built-in unit does: a sheet that declares
 its facet's tokens in one `:where([data-<attribute>="<name>"])` block inside that facet's layer,
 `foundation.tokens.<facet>`, and a registration module that calls `register(facet, name)` from
@@ -159,13 +180,15 @@ switched through every profile), `specimen.html` (each color profile light and d
 backup from `demo/backups/`), `theme.html` (the stored choice on `page-full.css`, switched by the demo's own controls), `unit.html`
 (`page.css` with the GitHub unit), `keys.html` (bindings, and a help dialog the page fills from `bindings()`), `format.html`
 (each formatter on sample values), `hooks.html` (the two color hooks, at their fallbacks and
-overridden), and `utilities.html` (each utility class the foundation adds to v0.7.0's, and the
-motion sheet). Page layout belongs to the consumer, so each page links `demo.css`, a `demo` layer of
+overridden), `utilities.html` (each utility class the foundation adds to v0.7.0's, and the
+motion sheet), and `dialogs.html` (Help and Settings glyph buttons opening a `.dialog-fit` and a
+`.dialog-wide` dialog). Page layout belongs to the consumer, so each page links `demo.css`, a `demo` layer of
 its own that lays out the column and its sections. `mise run demo` serves the repository on the
 loopback address and prints each page's URL; the pages load `dist/`, which the task builds first.
 
 `mise run screenshots` captures the tools page, the hooks page, the utilities page with its motion
-held midway and under reduced motion, and the specimen narrowed to the color profile and its backup,
+held midway and under reduced motion, the dialogs page at 390px and wide with the Help hint shown
+and each dialog open, and the specimen narrowed to the color profile and its backup,
 each light and dark, on `page-full.css`. It runs the `web-screenshots` bin of
 [web-tooling](https://github.com/standards-lab/web-tooling), the devDependency the browser tier's
 driver and server also come from, over the capture description in

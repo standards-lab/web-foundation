@@ -79,6 +79,8 @@ const LAYER_ORDER = [
   "foundation.meta",
   "foundation.structure",
   "foundation.utilities",
+  "foundation.glyph",
+  "foundation.dialog",
   "foundation.motion",
 ];
 
