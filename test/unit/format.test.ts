@@ -2,8 +2,8 @@
 // package as @standards-lab/web-foundation.
 // The formatters as a consumer imports them: the package's ./format.js export, which resolves to
 // the dist/ mise run build wrote. Every case pins its locale, en-US, and a date's time zone, UTC.
-// The JSON formatter's cases, in node rather than a page, adapted from web-components (a659353):
-// test/browser/json.test.ts: keys in their order, integer-like keys and duplicates included;
+// Adapted from web-components (a659353): test/browser/json.test.ts, its cases run in node rather
+// than a page: keys in their order, integer-like keys and duplicates included;
 // number literals and strings with their escapes as written; minified and oddly spaced text
 // re-indented; empty, nested, scalar, and array documents; whitespace between tokens the only
 // difference from the text; a document of about 1 MB formatted without a stall; and containers
@@ -224,6 +224,9 @@ describe("formatDuration", () => {
 const tokensOf = (text: string): string =>
   text.replace(/("(?:[^"\\]|\\.)*")|[ \t\n\r]+/g, (_, string?: string) => string ?? "");
 
+/** The deepest level formatJson indents. */
+const MAX = JSON_MAX_DEPTH;
+
 /** Two spaces a level, as formatJson indents. */
 const indent = (depth: number): string => "  ".repeat(depth);
 
@@ -313,60 +316,64 @@ describe("formatJson", () => {
     assert.ok(ms < 250, `formatting took ${ms} ms`);
   });
 
-  test("indents every level of text nested JSON_MAX_DEPTH deep, which is 64", () => {
-    assert.equal(JSON_MAX_DEPTH, 64);
-    const text = "[".repeat(64) + "1" + "]".repeat(64);
-    const opening = Array.from({ length: 64 }, (_, depth) => `${indent(depth)}[`);
-    const closing = Array.from({ length: 64 }, (_, depth) => `${indent(63 - depth)}]`);
-    const expected = [...opening, `${indent(64)}1`, ...closing].join("\n");
+  test("indents every level of text nested JSON_MAX_DEPTH deep", () => {
+    const text = "[".repeat(MAX) + "1" + "]".repeat(MAX);
+    const opening = Array.from({ length: MAX }, (_, depth) => `${indent(depth)}[`);
+    const closing = Array.from({ length: MAX }, (_, depth) => `${indent(MAX - 1 - depth)}]`);
+    const expected = [...opening, `${indent(MAX)}1`, ...closing].join("\n");
     const output = formatJson(text);
     assert.equal(output, expected);
     assert.equal(tokensOf(output), tokensOf(text), "only whitespace between tokens changed");
   });
 
-  test("keeps a container that would open at depth 65 as written, on its line", () => {
-    // 63 arrays, an object at depth 64, and in it an array at 65, spaced oddly, a string with
-    // brackets in it, and a member after it, where the formatting resumes.
+  test("keeps a container that would open past JSON_MAX_DEPTH as written, on its line", () => {
+    // Arrays to one level short of the cap, an object at the cap, and in it an array past it,
+    // spaced oddly, a string with brackets in it, and a member after it, where the formatting
+    // resumes.
     const inner = '[ 1 ,{"b" : "] }"} ,\t[ ] ]';
-    const text = "[".repeat(63) + `{"a":${inner} , "c":3}` + "]".repeat(63);
-    const opening = Array.from({ length: 63 }, (_, depth) => `${indent(depth)}[`);
-    const closing = Array.from({ length: 63 }, (_, depth) => `${indent(62 - depth)}]`);
-    const object = [`${indent(63)}{`, `${indent(64)}"a": ${inner},`, `${indent(64)}"c": 3`];
-    const expected = [...opening, ...object, `${indent(63)}}`, ...closing].join("\n");
+    const text = "[".repeat(MAX - 1) + `{"a":${inner} , "c":3}` + "]".repeat(MAX - 1);
+    const opening = Array.from({ length: MAX - 1 }, (_, depth) => `${indent(depth)}[`);
+    const closing = Array.from({ length: MAX - 1 }, (_, depth) => `${indent(MAX - 2 - depth)}]`);
+    const object = [`${indent(MAX - 1)}{`, `${indent(MAX)}"a": ${inner},`, `${indent(MAX)}"c": 3`];
+    const expected = [...opening, ...object, `${indent(MAX - 1)}}`, ...closing].join("\n");
     const output = formatJson(text);
     assert.equal(output, expected);
     assert.equal(tokensOf(output), tokensOf(text), "only whitespace between tokens changed");
   });
 
-  test("keeps a container at depth 65 whole when its strings hold quotes and brackets", () => {
-    // At depth 65, an object whose key holds an opening brace, an escaped quote before closing
-    // brackets, and an escaped backslash before a string's real end; then, back at 64, a string
-    // holding the brackets that would close it. A count fooled by any of them ends the kept
+  test("keeps a container past JSON_MAX_DEPTH whole when its strings hold quotes and brackets", () => {
+    // Past the cap, an object whose key holds an opening brace, an escaped quote before closing
+    // brackets, and an escaped backslash before a string's real end; then, back at the cap, a
+    // string holding the brackets that would close it. A count fooled by any of them ends the kept
     // container early or late, and the text after it shows indented differently or not at all.
     const kept = String.raw`{"{k\"": [ "\"]}", "\\", {"[" :"}]"} ] }`;
     const after = String.raw`"]]}\"["`;
-    const text = "[".repeat(64) + `${kept},${after}` + "]".repeat(64);
-    const opening = Array.from({ length: 64 }, (_, depth) => `${indent(depth)}[`);
-    const closing = Array.from({ length: 64 }, (_, depth) => `${indent(63 - depth)}]`);
-    const inner = [`${indent(64)}${kept},`, `${indent(64)}${after}`];
+    const text = "[".repeat(MAX) + `${kept},${after}` + "]".repeat(MAX);
+    const opening = Array.from({ length: MAX }, (_, depth) => `${indent(depth)}[`);
+    const closing = Array.from({ length: MAX }, (_, depth) => `${indent(MAX - 1 - depth)}]`);
+    const inner = [`${indent(MAX)}${kept},`, `${indent(MAX)}${after}`];
     const output = formatJson(text);
     assert.equal(output, [...opening, ...inner, ...closing].join("\n"));
     assert.equal(tokensOf(output), tokensOf(text), "only whitespace between tokens changed");
   });
 
   test("formats text nested 20,000 deep in output linear in its length, without a stall", (t) => {
-    // The 64 levels formatted add a line break and at most 128 spaces of indent at each of their
-    // opening and closing brackets; the 19,936 below them are kept as written.
+    // The JSON_MAX_DEPTH levels formatted add a line break and at most 2 * JSON_MAX_DEPTH spaces
+    // of indent at each of their opening and closing brackets; the levels below are kept as
+    // written.
     const text = "[".repeat(20000) + " 1 " + "]".repeat(20000);
     formatJson(text);
     const start = performance.now();
     const output = formatJson(text);
     const ms = performance.now() - start;
-    const kept = "[".repeat(20000 - 64) + " 1 " + "]".repeat(20000 - 64);
+    const kept = "[".repeat(20000 - MAX) + " 1 " + "]".repeat(20000 - MAX);
     t.diagnostic(`${text.length} characters to ${output.length} in ${ms.toFixed(1)} ms`);
-    assert.ok(output.length <= text.length + 4 * 64 * 64, `${output.length} from ${text.length}`);
+    assert.ok(output.length <= text.length + 4 * MAX * MAX, `${output.length} from ${text.length}`);
     assert.equal(output.replace(/[ \n]+/g, ""), text.replace(/ /g, ""));
-    assert.ok(output.includes(`\n${indent(64)}${kept}\n`), "levels past 64 kept, on their line");
+    assert.ok(
+      output.includes(`\n${indent(MAX)}${kept}\n`),
+      "levels past the cap kept, on their line",
+    );
     assert.ok(ms < 50, `formatting took ${ms} ms`);
   });
 });
@@ -397,9 +404,11 @@ describe("tryFormatJson", () => {
   });
 
   test("gives the text unchanged when its formatting would pass the longest string", () => {
-    // About 8.4 MB of ones in an array at depth 64: each element formats to a line break and 128
-    // spaces of indent, past V8's longest string, so formatJson throws a RangeError.
-    const text = "[".repeat(63) + "[" + "1,".repeat(4_200_000) + "1]" + "]".repeat(63);
+    // Ones in an array at JSON_MAX_DEPTH, about 8 MB: each element formats to a comma, a line
+    // break and 2 * JSON_MAX_DEPTH spaces of indent, past V8's longest string, 2 ** 29 - 24
+    // characters, so formatJson throws a RangeError.
+    const ones = Math.ceil(2 ** 29 / (2 * MAX + 3));
+    const text = "[".repeat(MAX) + "1,".repeat(ones) + "1" + "]".repeat(MAX);
     assert.throws(() => formatJson(text), RangeError);
     assert.deepEqual(tryFormatJson(text), { ok: true, text });
   });
