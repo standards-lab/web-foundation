@@ -2,36 +2,15 @@
 // @standards-lab/web-tooling and its web-screenshots bin, with the registry's key renamed
 // web-foundation.registry.
 // mise run screenshots' capture description, which the tooling's web-screenshots bin runs: the
-// tools page whole, keys help open, the theme menu open wide and narrow, the hooks page whole, and
-// the color specimen narrowed to the profile's color theme and its backup, each with the
-// stylesheet pointed at page-full.css, its registration module imported, and the profile's
-// attributes set on the root, as demo/profiles.html does, so no demo page changes; the profiles
-// each page then registers, from the registry. The bin's flags choose the profiles, pages,
-// schemes, and output.
+// tools page whole, the hooks page whole, and the color specimen narrowed to the profile's color
+// theme and its backup, each with the stylesheet pointed at page-full.css, its registration module
+// imported, and the profile's attributes set on the root, as demo/profiles.html does, so no demo
+// page changes; the profiles each page then registers, from the registry. The bin's flags choose
+// the profiles, pages, schemes, and output.
 // Adapted from spike-html-apps-foundation (9c15b8d): scripts/screenshots.js, its states, profiles,
 // and open steps as a Description.
 
-import { until, type Page } from "@standards-lab/web-tooling/browser.js";
-import type { Description, Step, Viewport } from "@standards-lab/web-tooling/screenshots.js";
-
-// Below the theme menu's 48rem breakpoint: a phone's width.
-const NARROW: Viewport = { width: 390, height: 844 };
-
-/** Sends ? as a US keyboard types it, Shift held, to the page's keys.js. */
-async function pressHelp(page: Page): Promise<void> {
-  const event = { key: "?", code: "Slash", modifiers: 8, windowsVirtualKeyCode: 191 };
-  await page.cdp("Input.dispatchKeyEvent", { type: "keyDown", ...event, text: "?" });
-  await page.cdp("Input.dispatchKeyEvent", { type: "keyUp", ...event });
-}
-
-/**
- * Opens the theme menu: the Theme button's command="--open", as a click sends it to
- * <sl-theme-menu>.
- */
-const openThemeMenu: Step = async (page) => {
-  await page.evaluate(`document.querySelector("button[commandfor=theme]").click()`);
-  await until(page, `document.querySelector("sl-theme-menu dialog")?.open`);
-};
+import type { Description, Step } from "@standards-lab/web-tooling/screenshots.js";
 
 /**
  * Points the page's stylesheet link at the full entry, unless it links it, and waits for it, and
@@ -81,46 +60,6 @@ const description: Description = {
   pages: [
     // One full-page capture, the bin's default state.
     { name: "tools", caption: "the tools page", path: "demo/tools.html" },
-    {
-      name: "keys",
-      caption: "keys help open",
-      path: "demo/keys.html",
-      states: [
-        {
-          name: "keys-help",
-          caption: "keys help open",
-          full: false,
-          async open(page) {
-            await pressHelp(page);
-            // keys-help.js replaces the placeholder with the list and its note once it has loaded.
-            await until(
-              page,
-              `document.getElementById("help").open && !!document.querySelector("[data-keys-note]")`,
-            );
-          },
-        },
-      ],
-    },
-    {
-      name: "theme",
-      caption: "the theme menu open",
-      path: "demo/theme.html",
-      states: [
-        {
-          name: "theme-menu-wide",
-          caption: "the theme menu open, wide",
-          full: false,
-          open: openThemeMenu,
-        },
-        {
-          name: "theme-menu-narrow",
-          caption: "the theme menu open, narrow",
-          viewport: NARROW,
-          full: false,
-          open: openThemeMenu,
-        },
-      ],
-    },
     // One full-page capture; the bin focuses the page's data-focus-start range and presses Tab,
     // which reaches the field and selects its text.
     { name: "hooks", caption: "the color hooks", path: "demo/hooks.html" },

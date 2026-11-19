@@ -1,5 +1,6 @@
 <!doctype html>
-<!-- From spike-html-apps-foundation (07ba39a): test/fixtures/keys-modal.html. -->
+<!-- Adapted from spike-html-apps-foundation (07ba39a): test/fixtures/keys-modal.html, its help
+     dialog without [data-keys-list]. -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -32,7 +33,6 @@
     </x-nest>
     <dialog id="help" aria-labelledby="help-title">
       <h2 id="help-title">Keyboard shortcuts</h2>
-      <div data-keys-list></div>
       <button type="button" commandfor="help" command="close" data-keys="?">Close <kbd>?</kbd></button>
     </dialog>
     <script type="module">

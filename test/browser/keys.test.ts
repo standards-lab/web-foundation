@@ -1,13 +1,11 @@
 // Adapted from spike-html-apps-foundation (07ba39a): test/browser/keys.test.ts, importing the
 // tooling and the package as @standards-lab/web-tooling and @standards-lab/web-foundation, and with
 // the store and settings keys renamed web-foundation.keys.
-// The keys runtime and its help dialog from the package's dist/, pressed with real keys
-// through the DevTools Protocol on test/fixtures/keys*.html.
+// The keys runtime from the package's dist/, pressed with real keys through the DevTools Protocol
+// on test/fixtures/keys*.html.
 // Adapted from spike-html-packages-foundation (5dd8a58): test/browser/keys.test.js, in TypeScript.
 
 import assert from "node:assert/strict";
-import { mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { after, afterEach, before, describe, test } from "node:test";
 
@@ -973,341 +971,128 @@ describe("keys: aria-keyshortcuts", () => {
   });
 });
 
-// The help dialog: keys loads keys-help.js the first time a dialog holding
-// [data-keys-list] opens, and it fills the dialog.
-describe("keys: the help dialog", () => {
-  const HELP = "keys-help.html";
-  const ESCAPE = ["[Esc]", "Leave a field"];
-  // The fixture's rows, with j registered after the elements.
-  const ROWS = [
-    ["[?]", "Help"],
-    ["[T]", "Theme"],
-    ["[A]", "Archive the thread"],
-    ["[F]", "First"],
-    ["[G] then [C]", "Contents"],
-    ["[Control]+[K]", "Command"],
-    ["[/]", "Search"],
-    ["[J]", "Next section"],
-  ];
-
-  /** Whether the page has fetched the help module. */
-  const fetchedHelp = (page: Page) =>
-    page.evaluate(
-      `performance.getEntriesByType("resource").some(({ name }) => name.endsWith("/keys-help.js"))`,
-    );
-
-  /** Resolves once the help dialog is open and filled. */
-  const filled = (page: Page) =>
-    until(
-      page,
-      `document.getElementById("help").open && !!document.querySelector("#help [data-keys-list] [data-keys-table]")`,
-    );
-
-  /** Opens the dialog from its Help button, a show-modal invoker. */
-  const clickHelp = (page: Page) =>
-    page.evaluate(`document.querySelector("button[command=show-modal]").click()`);
-
-  /** Opens the dialog from its Help button and waits for it to fill. */
-  async function openHelp(page: Page) {
-    await clickHelp(page);
-    await filled(page);
-  }
-
-  const closeHelp = (page: Page) => page.evaluate(`document.getElementById("help").close()`);
+// bindings(): the list a page's own help shows. keys writes nothing into any dialog: a dialog
+// holding [data-keys-list], which 0.3.0 filled with its help, opens as the page wrote it.
+describe("keys: bindings() and the help dialog", () => {
+  const BINDINGS = "keys-bindings.html";
 
   /**
-   * The table's rows as [keys, action]: each kbd drawn as [name], an off row's keys ending " off",
-   * and the action the row button's text, or the fixed Escape row's cell text.
+   * bindings(), passed the help dialog or null, as [keys, label, element, sequences, off]: the
+   * element by its data-log, else its tag, and each sequence's presses as stringify writes them.
    */
-  const rows = (page: Page): Promise<[string, string][]> =>
-    page.evaluate(`[...document.querySelectorAll("#help [data-keys-table] tbody tr")].map((row) => {
-      const [keys, action] = row.cells;
-      const drawn = [...keys.childNodes].map((node) =>
-        node.localName === "kbd" ? "[" + node.textContent + "]" : node.textContent).join("");
-      return [drawn, (action.querySelector("button") ?? action).textContent];
-    })`);
-
-  /** Clicks the row button whose text is the action. */
-  const clickRow = (page: Page, action: string) =>
-    page.evaluate(`[...document.querySelectorAll("#help [data-keys-table] button")]
-      .find((button) => button.textContent === ${JSON.stringify(action)}).click()`);
-
-  /** Sets one of the dialog's settings controls as the reader would. */
-  const choose = (page: Page, name: string, value: unknown) =>
-    page.evaluate(`(() => {
-      const control = document.querySelector("#help [data-keys-settings] [name=${name}]");
-      if (control.type === "checkbox") control.checked = ${JSON.stringify(value)};
-      else control.value = ${JSON.stringify(String(value))};
-      control.dispatchEvent(new Event("change", { bubbles: true }));
-    })()`);
+  const listed = (page: Page, dialog = true) =>
+    call(
+      page,
+      `keys.bindings(${dialog ? `document.getElementById("help")` : "null"}).map((binding) => [
+        binding.keys,
+        binding.label,
+        binding.element && (binding.element.dataset.log ?? binding.element.localName),
+        binding.sequences.length,
+        binding.off,
+      ])`,
+    );
 
   /** Registers j, and a second f the first element's f shadows. */
   const registerJ = (page: Page) =>
     call(
       page,
-      `(keys.register("j", "Next section", (event) => window.log.push("j " + JSON.stringify(event.detail))),
+      `(keys.register("j", "Next section", () => window.log.push("j")),
       keys.register("f", "Shadowed f", () => window.log.push("f registered")))`,
     );
 
-  /** Answers every request for the help module with a 404, resolving to a count of them. */
-  async function refuseHelp(page: Page) {
-    let requests = 0;
-    page.on("Fetch.requestPaused", ({ requestId }: { requestId: string }) => {
-      requests++;
-      page.cdp("Fetch.fulfillRequest", { requestId, responseCode: 404 });
-    });
-    await page.cdp("Fetch.enable", { patterns: [{ urlPattern: "*/keys-help.js" }] });
-    return () => requests;
-  }
+  // The fixture's bindings, with j registered after the elements.
+  const LISTED = [
+    ["?", null, "button", 1, false],
+    ["t", null, "t", 1, false],
+    ["a", null, "a", 1, false],
+    ["f", null, "f first", 1, false],
+    ["g c", null, "g c", 1, false],
+    ["Control+k", null, "Control+k", 1, false],
+    ["/", null, "input", 1, false],
+    ["j", "Next section", null, 1, false],
+  ];
 
-  test("keys-help.js loads on the first open by the show-modal button, not before", async () => {
-    const page = await open(HELP);
-    await sleep(page, 100);
-    assert.equal(await fetchedHelp(page), false);
-    assert.equal(
-      await page.evaluate(`document.querySelector("[data-keys-list]").childElementCount`),
-      0,
-    );
-    await openHelp(page);
-    assert.equal(await fetchedHelp(page), true);
-    assert.equal(await isModal(page), true);
-    assert.deepEqual(await rows(page), [...ROWS.slice(0, -1), ESCAPE]);
-  });
-
-  test("a failed load leaves the dialog usable, warns, and imports again at the next open", async () => {
-    const page = await open(HELP);
-    const requests = await refuseHelp(page);
-    await page.evaluate(`(() => {
-      window.unhandled = [];
-      window.warned = [];
-      addEventListener("unhandledrejection", (event) => window.unhandled.push(String(event.reason)));
-      const warn = console.warn;
-      console.warn = (...args) => (window.warned.push(String(args[0])), warn(...args));
-    })()`);
-    // The dialog opens as the page wrote it, and its own Close closes it.
-    const attempt = async () => {
-      await clickHelp(page);
-      await sleep(page, 200);
-      assert.equal(await isModal(page), true);
-      assert.equal(
-        await page.evaluate(`document.querySelector("#help [data-keys-list]").childElementCount`),
-        0,
-      );
-      await page.evaluate(`document.querySelector("#help [command=close]").click()`);
-      assert.equal(await isOpen(page), false);
-    };
-    await attempt();
-    await attempt();
-    const failed = "keys: the help module failed to load";
-    assert.deepEqual(await page.evaluate("window.warned"), [failed, failed]);
-    // Chromium 156 keeps no failed module fetch in the module map, so each import requests the
-    // module again, and so does a document loaded later.
-    assert.equal(requests(), 2);
-    assert.deepEqual(await page.evaluate("window.unhandled"), []);
-    await page.goto(fixture(HELP));
-    await attempt();
-    assert.equal(requests(), 3);
-  });
-
-  test("of two copies at two URLs, the first installs the listener and loads the help beside it", async () => {
-    // a/ and b/ both link to the package's dist/, so the page holds two copies of keys.js at
-    // two URLs.
-    const tree = await mkdtemp(join(tmpdir(), "keys-copies-"));
-    await symlink(join(root, "dist"), join(tree, "a"));
-    await symlink(join(root, "dist"), join(tree, "b"));
-    await writeFile(
-      join(tree, "copies.html"),
-      `<!doctype html>
-      <html lang="en">
-        <head>
-          <meta charset="utf-8" />
-          <title>keys help copies</title>
-          <script type="module">
-            import * as a from "./a/keys.js";
-            import * as b from "./b/keys.js";
-            window.copies = a.register !== b.register;
-          </script>
-        </head>
-        <body>
-          <button type="button" commandfor="help" command="show-modal">Help</button>
-          <dialog id="help"><div data-keys-list></div></dialog>
-        </body>
-      </html>`,
-    );
-    const copies = await serve({ root: tree });
-    try {
-      const page = await browser.open(`${copies.origin}/copies.html`);
-      pages.push(page);
-      assert.equal(await page.evaluate("window.copies"), true);
-      await openHelp(page);
-      // A second listener would load b's help too.
-      assert.deepEqual(
-        await page.evaluate(`performance.getEntriesByType("resource").map(({ name }) => name)
-          .filter((name) => name.endsWith("/keys-help.js"))`),
-        [`${copies.origin}/a/keys-help.js`],
-      );
-    } finally {
-      await copies.stop();
-      await rm(tree, { recursive: true });
+  test("a dialog holding [data-keys-list] opens with nothing written into it and no module loaded", async () => {
+    const page = await open(BINDINGS);
+    const list = `document.querySelector("#help [data-keys-list]").outerHTML`;
+    const written = await page.evaluate(list);
+    const loaded = `performance.getEntriesByType("resource").map(({ name }) => name)`;
+    const before = await page.evaluate(loaded);
+    // By its show-modal button, by showModal() from script, and by the ? key.
+    const opens = [
+      `document.querySelector("button[command=show-modal]").click()`,
+      `document.getElementById("help").showModal()`,
+    ];
+    for (const opening of opens) {
+      await page.evaluate(opening);
+      assert.equal(await isModal(page), true, opening);
+      await sleep(page, 100);
+      assert.equal(await page.evaluate(list), written, opening);
+      await page.evaluate(`document.getElementById("help").close()`);
     }
+    await pressHelp(page);
+    assert.equal(await isModal(page), true);
+    await sleep(page, 100);
+    assert.equal(await page.evaluate(list), written);
+    assert.deepEqual(await page.evaluate(loaded), before);
   });
 
-  test("showModal() from script, or the ? key, opens and fills it too", async () => {
-    const page = await open(HELP);
-    await page.evaluate(`document.getElementById("help").showModal()`);
-    await filled(page);
-    assert.equal(await fetchedHelp(page), true);
-    // Its own Close carries ? inside the modal.
-    await pressHelp(page);
-    assert.equal(await isOpen(page), false);
-    await page.evaluate(`document.querySelector("[data-keys-list]").replaceChildren()`);
-    await pressHelp(page);
-    await filled(page);
-    assert.deepEqual(await rows(page), [...ROWS.slice(0, -1), ESCAPE]);
-  });
-
-  test("lists each active binding once, as the one that fires, with its label by the rule", async () => {
-    const page = await open(HELP);
+  test("lists each active binding once, as the one that fires, with no run", async () => {
+    const page = await open(BINDINGS);
     await registerJ(page);
-    await openHelp(page);
-    // Second F and the registered f lose to First; Disabled, Inert, Hidden, and the dialog's own
-    // Close are left out; A's label is its aria-label, Search's its <label>'s text.
-    assert.deepEqual(await rows(page), [...ROWS, ESCAPE]);
-    // Each open lists the page as it is then.
-    await closeHelp(page);
+    // Second F and the registered f lose to First; Disabled, Inert, and Hidden are left out, and
+    // so is the closed dialog's own Close.
+    assert.deepEqual(await listed(page), LISTED);
+    assert.equal(
+      await call(page, `keys.bindings(null).some((binding) => "run" in binding)`),
+      false,
+    );
+    // Each call lists the page as it is then.
     await page.evaluate(`(document.querySelector("[data-keys=d]").disabled = false,
       document.querySelector("[data-log='f first']").remove())`);
-    await openHelp(page);
-    const listed = await rows(page);
-    assert.ok(listed.some(([keys, action]) => keys === "[D]" && action === "Disabled"));
-    assert.ok(listed.some(([keys, action]) => keys === "[F]" && action === "Second"));
+    const now = await listed(page);
+    assert.ok(now.some(([keys, , element]: unknown[]) => keys === "d" && element === "d"));
+    assert.ok(now.some(([keys, , element]: unknown[]) => keys === "f" && element === "f second"));
   });
 
-  test("a row button closes the dialog and runs its binding: click, focus, or the handler", async () => {
-    const page = await open(HELP);
+  test("with the dialog open, bindings(dialog) lists the page as if it were closed", async () => {
+    const page = await open(BINDINGS);
     await registerJ(page);
-    for (const action of ["Theme", "Next section", "Search"]) {
-      await openHelp(page);
-      await clickRow(page, action);
-      assert.equal(await isOpen(page), false);
-    }
-    assert.deepEqual(await log(page), [
-      "t",
-      `j ${JSON.stringify({ binding: "j", keys: [], label: "Next section" })}`,
-    ]);
-    // Running a row is no key press: keys-fire is not dispatched.
-    assert.deepEqual(await fired(page), []);
-    assert.equal(await active(page), "search");
+    await page.evaluate(`document.getElementById("help").showModal()`);
+    assert.deepEqual(await listed(page), LISTED);
+    // Without the dialog, the open modal scopes the list to its own Close.
+    assert.deepEqual(await listed(page, false), [["?", null, "button", 1, false]]);
   });
 
-  test("the settings are stored through changeSettings and change what fires", async () => {
-    const page = await open(HELP);
-    await openHelp(page);
-    const shown = await page.evaluate(`(() => {
-      const fieldset = document.querySelector("#help [data-keys-settings]");
-      return {
-        legend: fieldset.querySelector("legend").textContent,
-        controls: [...fieldset.querySelectorAll("input, select")].map((el) => el.type === "checkbox"
-          ? [el.name, el.checked, null]
-          : [el.name, el.value, [...el.options].map((o) => o.value)]),
-      };
-    })()`);
-    assert.deepEqual(shown, {
-      legend: "Settings",
-      controls: [
-        ["enabled", true, null],
-        // The tests' store wait, WAIT, is the page's own: the empty first option.
-        ["wait", "", ["", "1000", "1500", "3000", "5000"]],
-      ],
-    });
-    await choose(page, "wait", 3000);
-    assert.deepEqual(await saved(page), { wait: 3000 });
-    assert.deepEqual(await call(page, "keys.settings()"), { enabled: true, wait: 3000 });
-    // The page's own wait removes the reader's from storage.
-    await choose(page, "wait", "");
-    assert.equal(await saved(page), null);
-    await choose(page, "enabled", false);
-    assert.deepEqual(await saved(page), { enabled: false });
-    await closeHelp(page);
-    await press(page, "t");
-    await press(page, "k", { ctrl: true });
-    assert.deepEqual(await log(page), ["Control+k"]);
-  });
-
-  test("the off switch marks character-key rows off while combinations still fire", async () => {
-    const page = await open(HELP);
-    await openHelp(page);
-    await choose(page, "enabled", false);
-    assert.deepEqual(await saved(page), { enabled: false });
-    const offs =
-      await page.evaluate(`[...document.querySelectorAll("#help [data-keys-table] tbody tr")]
-      .map((row) => [row.cells[1].textContent, row.hasAttribute("data-keys-off")])`);
-    assert.deepEqual(offs, [
-      ["Help", true],
-      ["Theme", true],
-      ["Archive the thread", true],
-      ["First", true],
-      ["Contents", true],
-      ["Command", false],
-      ["Search", true],
-      // The fixed Escape row is no binding: the off switch never covers it.
-      ["Leave a field", false],
-    ]);
-    assert.deepEqual((await rows(page))[1], ["[T] off", "Theme"]);
-    // An off row's button still runs its action: a click is no character-key shortcut.
-    await clickRow(page, "Theme");
-    assert.deepEqual(await log(page), ["t"]);
-    for (const key of ["t", "g", "c"]) await press(page, key);
-    await press(page, "k", { ctrl: true });
-    assert.deepEqual(await log(page), ["t", "Control+k"]);
-  });
-
-  test("lists Escape's fixed row last, never off, and Escape on its controls closes it natively", async () => {
-    const page = await open(HELP);
-    await openHelp(page);
-    await choose(page, "enabled", false);
-    const fixed = await page.evaluate(`(() => {
-      const row = document.querySelector("#help [data-keys-table] tbody tr:last-child");
-      return [row.hasAttribute("data-keys-fixed"), row.hasAttribute("data-keys-off"),
-        row.cells[0].innerHTML, row.cells[1].textContent, row.querySelector("button")];
-    })()`);
-    assert.deepEqual(fixed, [true, false, "<kbd>Esc</kbd>", "Leave a field", null]);
-    await page.evaluate(`document.querySelector("#help [data-keys-settings] [name=wait]").focus()`);
-    await pressEscape(page);
-    assert.equal(await isOpen(page), false);
-  });
-
-  test("carries the screen-reader note", async () => {
-    const page = await open(HELP);
-    await openHelp(page);
-    const note = await page.evaluate(
-      `document.querySelector("#help [data-keys-note]").textContent`,
-    );
-    for (const text of ["NVDA+F2", "JAWS+3", "Narrator+3", "VO+Tab"])
-      assert.ok(note.includes(text), text);
-  });
-
-  test("another tab's change shows in the dialog on the next open, and changes what fires", async () => {
-    const one = await open(HELP);
-    const two = await open(HELP);
-    await openHelp(two);
-    await closeHelp(two);
-    await openHelp(one);
-    await choose(one, "wait", 5000);
-    await choose(one, "enabled", false);
-    await sleep(two, 50);
-    await openHelp(two);
-    assert.deepEqual((await rows(two))[1], ["[T] off", "Theme"]);
-    const controls = `[...document.querySelectorAll("#help [data-keys-settings] :is(input, select)")]`;
+  test("with the off switch on, character-key bindings are marked off and combinations aren't", async () => {
+    const page = await open(BINDINGS);
+    await registerJ(page);
+    await call(page, "keys.changeSettings({ enabled: false })");
+    const off = (await listed(page)).map(([keys, , , , isOff]: unknown[]) => [keys, isOff]);
     assert.deepEqual(
-      await two.evaluate(
-        `${controls}.map((el) => (el.type === "checkbox" ? el.checked : el.value))`,
-      ),
-      [false, "5000"],
+      off,
+      LISTED.map(([keys]) => [keys, keys !== "Control+k"]),
     );
-    await closeHelp(two);
-    await press(two, "t");
-    await press(two, "k", { ctrl: true });
-    assert.deepEqual(await log(two), ["Control+k"]);
+  });
+
+  test("demo/keys.html fills its help dialog's plain list from bindings() as it opens", async () => {
+    const page = await browser.open(`${server.origin}/demo/keys.html`);
+    pages.push(page);
+    await pressHelp(page);
+    await until(page, `document.getElementById("help").open`);
+    assert.deepEqual(
+      await page.evaluate(
+        `[...document.querySelectorAll("#help-list li")].map((item) => item.textContent)`,
+      ),
+      [
+        "?: Help ?",
+        "t: Theme T",
+        "g c: Contents G then C",
+        "g: Top G",
+        "Mod+k: Command Mod+K",
+        "/: Search /",
+        "j: Say j, a register() binding",
+      ],
+    );
   });
 });

@@ -44,24 +44,24 @@ modules by their `.js` subpaths. The lean entry, `page.css`, carries the default
 
 - `./*.css`: the stylesheets, each self-layered so a shadow root adopts it alone: the page
   entries `page.css` and `page-full.css`, `baseline.css`, the tool sheets (`meta.css`,
-  `structure.css`, and `utilities.css`), and the menu's `theme-menu.css`.
+  `structure.css`, and `utilities.css`).
 - `./profiles/<facet>/<name>.{css,js}`: the built-in profiles, each a unit of a sheet and a
   registration module. Color has `zen` (the default), `github`, `catppuccin`, and
   `everforest`; space has `regular` (the default) and `compact`; type has `mono` (the default)
   and `sans`. A page adds a unit by linking its sheet after `page.css` and importing its module
   beside `register.js`. `page-full.css` and `register-full.js` import every unit, in place of
   `page.css` and `register.js`.
-- `./*.js`: the modules, with their `.d.ts`: `dom.js`, `registry.js`, `keys.js`, `keys-help.js`,
-  `keys-grammar.js`, `register.js`, `register-full.js`, `preferences.js`, `theme-menu.js`,
-  `conformance.js`, and `format.js`.
+- `./*.js`: the modules, with their `.d.ts`: `dom.js`, `registry.js`, `keys.js`,
+  `keys-grammar.js`, `register.js`, `register-full.js`, `preferences.js`, `conformance.js`, and
+  `format.js`.
 - `./preferences.js`: applies the reader's stored theme choice to the root before first paint and
-  follows other tabs' saves. Its `<sl-theme-menu>` opens on the invoker command `--open` and loads
-  `theme-menu.js` on first open; the menu's sheet sits in the layer `foundation.theme-menu`. A
-  page loads it with `blocking="render"` after its registration modules.
+  applies each save another tab makes. `read()`, `apply(choice, el)`, and `save(choice)` are a
+  settings UI's to call. A page loads it with `blocking="render"` after its registration modules.
 - `./keys.js`: the page's keyboard shortcuts. An element with `data-keys` is clicked or focused by
-  its keys, and `register(keys, label, handler)` binds a handler and returns its removal. A
-  `<dialog>` holding a `data-keys-list` element is the help dialog: as it opens, `keys-help.js`,
-  loaded on the first open, fills each such element with every binding and the reader's settings.
+  its keys, and `register(keys, label, handler)` binds a handler and returns its removal.
+  `bindings(dialog)` lists the bindings active were the dialog closed, for a page's own help;
+  `settings()` and `changeSettings(change)` read and store the reader's settings, the off switch
+  for character keys and the wait between presses, one of `WAITS`.
 - `./conformance.js`: `check(facet, name)` reads a registered profile's computed values and
   resolves to a failure, a rule from `RULES` and a message, for each rule the profile breaks; an
   empty list conforms.
@@ -88,8 +88,8 @@ with the CSS property: `accent-color` follows `--interaction-color` on every ele
 A package outside the foundation adds a profile as a built-in unit does: a sheet that declares
 its facet's tokens in one `:where([data-<attribute>="<name>"])` block inside that facet's layer,
 `foundation.tokens.<facet>`, and a registration module that calls `register(facet, name)` from
-`registry.js`. The page links the sheet after its entry and imports the module, and the theme menu
-then lists the profile. The profile must pass `check(facet, name)`.
+`registry.js`. The page links the sheet after its entry and imports the module, and the registry's
+`profiles(facet)` then lists the profile. The profile must pass `check(facet, name)`.
 
 ### Storage and global keys
 
@@ -118,15 +118,14 @@ mise run currency     # report every tool, package, action pin, and tooling tag 
 
 The demo pages, in `demo/`, are `tools.html` (every tool class), `profiles.html` (the tools page
 switched through every profile), `specimen.html` (each color profile light and dark, beside its
-backup from `demo/backups/`), `theme.html` (the theme menu on `page-full.css`), `unit.html`
-(`page.css` with the GitHub unit), `keys.html` (bindings and the help dialog), `format.html`
+backup from `demo/backups/`), `theme.html` (the stored choice on `page-full.css`, switched by the demo's own controls), `unit.html`
+(`page.css` with the GitHub unit), `keys.html` (bindings, and a help dialog the page fills from `bindings()`), `format.html`
 (each formatter on sample values), and `hooks.html` (the two color hooks, at their fallbacks and
 overridden). Page layout belongs to the consumer, so each page links `demo.css`, a `demo` layer of
 its own that lays out the column and its sections. `mise run demo` serves the repository on the
 loopback address and prints each page's URL; the pages load `dist/`, which the task builds first.
 
-`mise run screenshots` captures the tools page, the keys help open, the theme menu open at a wide
-and a narrow width, the hooks page, and the specimen narrowed to the color profile and its backup,
+`mise run screenshots` captures the tools page, the hooks page, and the specimen narrowed to the color profile and its backup,
 each light and dark, on `page-full.css`. It runs the `web-screenshots` bin of
 [web-tooling](https://github.com/standards-lab/web-tooling), the devDependency the browser tier's
 driver and server also come from, over the capture description in

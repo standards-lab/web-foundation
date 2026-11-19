@@ -1,15 +1,13 @@
 // Adapted from spike-html-apps-foundation (07ba39a): src/preferences.ts, its storage key renamed
 // web-foundation.preferences.
 // The reader's theme choice, applied to the root before first paint, kept in localStorage, and
-// followed across tabs; and <sl-theme-menu>, the thin element that loads the menu on first open. A
-// page loads it with blocking="render" after its registration module, so the registry is full when
-// it runs and no default flashes; its bytes delay first paint, so it holds nothing more.
+// followed across tabs. A page loads it with blocking="render" after its registration module, so
+// the registry is full when it runs and no default flashes; its bytes delay first paint, so it
+// holds nothing more.
 // Adapted from spike-html-design (fe75220): modules/preferences.js.
 
-import { define } from "./dom.ts";
 import { DEFAULTS, FACETS, profiles } from "./registry.ts";
 import type { Facet } from "./registry.ts";
-import type * as Menu from "./theme-menu.ts";
 
 /** A key of a choice: each facet, and the scheme. */
 export type Key = Facet | "scheme";
@@ -33,8 +31,6 @@ export const ATTRIBUTES: Readonly<Record<Key, string>> = Object.freeze({
 
 /** The scheme's values, system (the default) first. */
 export const SCHEMES: readonly string[] = Object.freeze(["system", "light", "dark"]);
-
-let open = false;
 
 /** The stored choice, or null when nothing is stored, it isn't a choice, or storage is blocked. */
 export function read(): Loose | null {
@@ -76,59 +72,14 @@ export function save(choice: Partial<Choice> | null): boolean {
   }
 }
 
-/** Marks the menu open or closed: while it is open, the menu settles another tab's save. */
-export function setOpen(value: boolean): void {
-  open = Boolean(value);
-}
-
-/** Whether the menu is open. */
-export function isOpen(): boolean {
-  return open;
-}
-
 // Before first paint: the stored choice, if any. With nothing stored the root keeps whatever the
 // page wrote on it.
 const stored = read();
 if (stored) apply(stored);
 
-// Another tab's save fires storage here, never in the tab that saved. The open menu ignores it: its
-// Save overwrites it, and its Cancel restores read(), the other tab's choice included. A cleared
-// key (newValue null) restores the defaults.
+// Another tab's save fires storage here, never in the tab that saved, and applies every time. A
+// cleared key (newValue null) restores the defaults.
 addEventListener("storage", (event) => {
-  if (open || (event.key !== KEY && event.key !== null)) return;
+  if (event.key !== KEY && event.key !== null) return;
   apply(read() ?? {});
 });
-
-let menu: Promise<typeof Menu | null> | null = null;
-
-/** Imports theme-menu.ts once, resolving to it, or to null after a failure the next call retries. */
-function load(): Promise<typeof Menu | null> {
-  menu ??= import("./theme-menu.ts").catch((error: unknown) => {
-    // Forgotten, so the next open retries, and the browser requests the module again.
-    menu = null;
-    console.warn("preferences: the theme menu module failed to load", error);
-    return null;
-  });
-  return menu;
-}
-
-/** <sl-theme-menu>: opens the menu on the invoker command "--open", fetching it the first time. */
-export class ThemeMenu extends HTMLElement {
-  // It binds no key: a page binds T by giving its --open button data-keys="t" and loading keys.js,
-  // which clicks it.
-  constructor() {
-    super();
-    this.addEventListener("command", (event) => {
-      if ((event as CommandEvent).command === "--open") this.show();
-    });
-  }
-
-  /** Opens the menu, loading its module on the first call. */
-  show(): void {
-    // A second call while the module loads opens one menu: open() ignores an element already open.
-    if (open) return;
-    load().then((module) => module?.open(this));
-  }
-}
-
-define("sl-theme-menu", ThemeMenu);

@@ -75,7 +75,6 @@ const LAYER_ORDER = [
   "foundation.meta",
   "foundation.structure",
   "foundation.utilities",
-  "foundation.theme-menu",
 ];
 
 const FACETS: Facet[] = ["color", "space", "type"];
