@@ -6,8 +6,10 @@
 // --focus-offset, and --focus-reach is its width plus that offset. A disabled field, select and
 // text area take --border, --bg-1 and --fg-2, and hovered keep them. A progress bar's and a
 // meter's track paints --bg-2 in every palette and scheme, never near white in dark, and the
-// progress bar's fill paints --color-accent. The paint is read from a screenshot's pixels, which
-// the page decodes on a canvas: chromium reports no computed style for a bar's track.
+// progress bar's fill paints --color-accent. An indeterminate progress bar shows a segment in
+// --color-accent over that track, which sweeps under prefers-reduced-motion: no-preference and
+// stands still at the track's middle under reduce. The paint is read from a screenshot's pixels,
+// which the page decodes on a canvas: chromium reports no computed style for a bar's track.
 
 import assert from "node:assert/strict";
 import { join } from "node:path";
@@ -132,6 +134,36 @@ async function pixel(page: Page, selector: string, along: number): Promise<RGB> 
     return [...context.getImageData(0, 0, 1, 1).data.slice(0, 3)];
   })()`);
 }
+
+/** A screenshot of the element's middle line, its whole inline size, as base64 PNG. */
+async function line(page: Page, selector: string): Promise<string> {
+  const box: { x: number; y: number; width: number; height: number } = await page.evaluate(`(() => {
+    const { x, y, width, height } = document.querySelector(${JSON.stringify(selector)})
+      .getBoundingClientRect();
+    return { x, y, width, height };
+  })()`);
+  const { data }: { data: string } = await page.cdp("Page.captureScreenshot", {
+    format: "png",
+    clip: {
+      x: box.x,
+      y: Math.floor(box.y + box.height / 2),
+      width: box.width,
+      height: 1,
+      scale: 1,
+    },
+  });
+  return data;
+}
+
+/** Emulates prefers-reduced-motion, or clears the emulation when null. */
+const motion = (page: Page, value: "reduce" | "no-preference" | null) =>
+  page.cdp("Emulation.setEmulatedMedia", {
+    features: value === null ? [] : [{ name: "prefers-reduced-motion", value }],
+  });
+
+/** Waits the given milliseconds in the page. */
+const wait = (page: Page, ms: number) =>
+  page.evaluate(`new Promise((resolve) => setTimeout(resolve, ${ms}))`);
 
 describe("foundation control tokens and element rules", () => {
   let server: Server;
@@ -315,6 +347,60 @@ describe("foundation control tokens and element rules", () => {
         assert.deepEqual(await pixel(page, "#accented", 0.2), ACCENT_SET, "the hook's fill");
         assert.notDeepEqual(await pixel(page, "#optimum", 0.4), track, "the meter shows no fill");
       });
+
+      test(`${palette} ${scheme}: an indeterminate progress bar shows --color-accent over a --bg-2 track`, async () => {
+        await page.evaluate(ATTRIBUTES({ "data-palette": palette, "data-scheme": scheme }));
+        // Under reduce the segment stands still at the middle, two fifths of the track wide.
+        await motion(page, "reduce");
+        try {
+          await page.evaluate(
+            `new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))`,
+          );
+          const track = channels(await page.evaluate(TOKEN_COLOR("--bg-2")));
+          const accent = channels(
+            await page.evaluate(TOKEN_COLOR("--color-accent, var(--magenta)")),
+          );
+          assert.deepEqual(
+            {
+              start: await pixel(page, "#indeterminate", 0.1),
+              middle: await pixel(page, "#indeterminate", 0.5),
+              end: await pixel(page, "#indeterminate", 0.9),
+            },
+            { start: track, middle: accent, end: track },
+          );
+          if (scheme === "dark") {
+            assert.ok(luminance(track) < 0.3, `the dark track ${track} is near white`);
+          }
+          assert.deepEqual(
+            await pixel(page, "#accented-indeterminate", 0.5),
+            ACCENT_SET,
+            "the hook's segment",
+          );
+        } finally {
+          await motion(page, null);
+        }
+      });
     }
+  }
+
+  for (const [preference, moves] of [
+    ["no-preference", true],
+    ["reduce", false],
+  ] as const) {
+    test(`under prefers-reduced-motion: ${preference}, an indeterminate progress bar ${moves ? "moves" : "stands still"}`, async () => {
+      await page.evaluate(ATTRIBUTES({ "data-palette": null, "data-scheme": null }));
+      await motion(page, preference);
+      try {
+        // Two frames 300ms apart, a fraction of the sweep: a moving segment can't stand at the
+        // same place in both.
+        const first = await line(page, "#indeterminate");
+        await wait(page, 300);
+        const second = await line(page, "#indeterminate");
+        if (moves) assert.notEqual(second, first, "the segment stood still");
+        else assert.equal(second, first, "the segment moved");
+      } finally {
+        await motion(page, null);
+      }
+    });
   }
 });

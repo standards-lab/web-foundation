@@ -52,16 +52,20 @@
       <textarea rows="1" aria-label="disabled text area" disabled>text area</textarea>
       <input class="enabled" type="text" value="enabled" aria-label="enabled field" />
     </p>
-    <!-- A progress bar at 40%, a meter at 80% and one at 50%, and a progress bar under a subtree
-         that sets --color-accent. -->
+    <!-- A progress bar at 40%, an indeterminate one, a meter at 80% and one at 50%, and a progress
+         bar at 40% and an indeterminate one under a subtree that sets --color-accent. -->
     <div id="bars">
       <progress id="progress" value="40" max="100" aria-label="progress">40%</progress>
+      <progress id="indeterminate" aria-label="indeterminate progress">Working</progress>
       <meter id="optimum" value="0.8" aria-label="optimum meter">80%</meter>
       <meter id="low" value="0.5" low="0.6" high="0.8" optimum="0.9" aria-label="low meter">
         50%
       </meter>
       <div class="accented">
         <progress id="accented" value="40" max="100" aria-label="accented progress">40%</progress>
+        <progress id="accented-indeterminate" aria-label="accented indeterminate progress">
+          Working
+        </progress>
       </div>
     </div>
     <!-- A compact scope inside the page, which the test names its root profile around. -->

@@ -15,10 +15,10 @@ hooks take the five role names. No alias or shim maps a removed or renamed name.
 
 ### Breaking
 
-- `<sl-theme-menu>`, `theme-menu.js`, and `theme-menu.css` are removed, with the
-  `foundation.theme-menu` layer in both entries' layer statement: use web-components'
-  `sl-settings`, from web-components v0.2.0, or a page's own settings that call `preferences.js`'
-  `read()`, `apply()`, and `save()`.
+- `<sl-theme-menu>`, `theme-menu.js`, `theme-menu.css`, and `preferences.js`' `ThemeMenu` export
+  are removed, with the `foundation.theme-menu` layer in both entries' layer statement: use
+  web-components' `sl-settings`, from web-components v0.2.0, or a page's own settings that call
+  `preferences.js`' `read()`, `apply()`, and `save()`.
 - `preferences.js`' `setOpen` and `isOpen` are removed, with no replacement: `preferences.js` now
   applies every save another tab makes.
 - `keys-help.js` is removed, and `keys.js` no longer fills a dialog's `[data-keys-list]` element

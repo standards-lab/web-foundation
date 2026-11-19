@@ -21,9 +21,10 @@
  * other element; the veil goes on a modal dialog's ::backdrop alone, where upstream's bare
  * ::backdrop veils every top-layer element's, a popover's or a fullscreen element's, too; a
  * disabled text field, select or text area reads as disabled, where upstream's keeps the enabled
- * look; progress and meter paint their track on --bg-2 and progress its fill in --color-accent,
- * where upstream's keep chromium's native look; and a one-line select's block size is
- * --control-block-size, where upstream's is the select's own.
+ * look; progress and meter paint their track on --bg-2 and progress its fill, or an
+ * indeterminate one's sweeping segment, in --color-accent, where upstream's keep chromium's
+ * native look; and a one-line select's block size is --control-block-size, where upstream's is
+ * the select's own.
  */
 
 /*
@@ -42,7 +43,8 @@
  *   :where(), so a rule for one alone carries the pseudo-element's own (0,0,1).
  * - Paint, type, border, radius, margin and padding only: colors and backgrounds, font and text
  *   properties, borders and outlines (a table's border-collapse and border-spacing among them),
- *   border-radius, margins and paddings, accent-color and caret-color. Nothing that changes an
+ *   border-radius, margins and paddings, accent-color and caret-color, and one animation of
+ *   paint, an indeterminate progress bar's segment, behind reduced motion. Nothing that changes an
  *   element's layout or behavior: no display, position, float, overflow, visibility, sizes, flex
  *   or grid, white-space, list-style-position, appearance, pointer-events or user-select. A test
  *   holds every element's layout properties to chromium's defaults. Changing layout is the tools
@@ -486,6 +488,34 @@
 
   :where(progress)::-webkit-progress-value {
     background-color: var(--color-accent, var(--magenta));
+  }
+
+  /* An indeterminate progress bar has no fill element once its native look is gone, so its track
+     paints the indication: a segment two fifths of the track wide, in the accent hook, over
+     --bg-2. The segment is a one-color image, flat as the fill. Under reduce it stands still at
+     the track's middle, apart from any value's fill, which starts at the track's start; under
+     no-preference it sweeps across the track and out, as chromium's native bar does. */
+  :where(progress:indeterminate)::-webkit-progress-bar {
+    background: linear-gradient(var(--color-accent, var(--magenta)) 0 0) 50% / 40% 100% no-repeat
+      var(--bg-2);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :where(progress:indeterminate)::-webkit-progress-bar {
+      animation: progress-indeterminate 1.6s ease-in-out infinite;
+    }
+  }
+
+  /* From wholly before the track's start to wholly past its end: a 40% image's position runs
+     over the other 60%, so -67% and 167% place it a segment's width outside either edge. */
+  @keyframes progress-indeterminate {
+    from {
+      background-position-x: -67%;
+    }
+
+    to {
+      background-position-x: 167%;
+    }
   }
 
   :where(meter)::-webkit-meter-bar {
