@@ -81,6 +81,7 @@ const LAYER_ORDER = [
   "foundation.utilities",
   "foundation.glyph",
   "foundation.dialog",
+  "foundation.layout",
   "foundation.motion",
 ];
 

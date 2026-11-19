@@ -20,6 +20,8 @@ for (const page of [
   "hooks",
   "utilities",
   "dialogs",
+  "app",
+  "prose",
 ]) {
   console.log(`${server.origin}/demo/${page}.html`);
 }

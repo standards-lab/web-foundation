@@ -3,14 +3,15 @@
 // web-foundation.registry.
 // mise run screenshots' capture description, which the tooling's web-screenshots bin runs: the
 // tools page whole, the hooks page whole, the utilities page whole with motion and with reduced
-// motion, the dialogs page at 390px and 1280px with the Help hint shown and each dialog open, and the color specimen narrowed to the profile's color theme and its backup, each with the stylesheet pointed at page-full.css, its registration module
+// motion, the dialogs page at 390px and 1280px with the Help hint shown and each dialog open, the
+// application page's screen and the reading page whole at 390px with 200% text and at 1280px, and the color specimen narrowed to the profile's color theme and its backup, each with the stylesheet pointed at page-full.css, its registration module
 // imported, and the profile's attributes set on the root, as demo/profiles.html does, so no demo
 // page changes; the profiles each page then registers, from the registry. The bin's flags choose
 // the profiles, pages, schemes, and output.
 // Adapted from spike-html-apps-foundation (9c15b8d): scripts/screenshots.js, its states, profiles,
 // and open steps as a Description.
 
-import { until } from "@standards-lab/web-tooling/browser.js";
+import { SETTLED, until } from "@standards-lab/web-tooling/browser.js";
 import type { Description, DescribedState, Step } from "@standards-lab/web-tooling/screenshots.js";
 
 /**
@@ -113,6 +114,36 @@ const dialogStates = (suffix: string, width: number): DescribedState[] =>
     open,
   }));
 
+/** Sets the reader's text to the scale of the browser's default sizes, 16px and the monospace
+ * 13px, as a reader's text size setting does, and waits for the page to lay out again. */
+const textScale =
+  (scale: number): Step =>
+  async (page) => {
+    await page.cdp("Page.setFontSizes", {
+      fontSizes: { standard: 16 * scale, fixed: 13 * scale },
+    });
+    await page.evaluate(SETTLED);
+  };
+
+/** A page type's captures: at 390px with the text at 200%, and at 1280px with the text at its
+ * size; the whole page or the viewport alone. */
+const layoutStates = (name: string, caption: string, full: boolean): DescribedState[] => [
+  {
+    name: `${name}-390px`,
+    caption: `${caption}, 390px, text at 200%`,
+    viewport: { width: 390, height: 720 },
+    full,
+    open: textScale(2),
+  },
+  {
+    name: `${name}-wide`,
+    caption: `${caption}, wide`,
+    viewport: { width: 1280, height: 720 },
+    full,
+    open: textScale(1),
+  },
+];
+
 const description: Description = {
   pages: [
     // One full-page capture, the bin's default state.
@@ -146,6 +177,20 @@ const description: Description = {
       caption: "the glyph buttons and dialogs",
       path: "demo/dialogs.html",
       states: [...dialogStates("390px", 390), ...dialogStates("wide", 1280)],
+    },
+    // The application page in the viewport, its one screen, and the reading page whole, each at
+    // 390px with the text at 200% and at 1280px.
+    {
+      name: "app",
+      caption: "the application page",
+      path: "demo/app.html",
+      states: layoutStates("app", "the application page", false),
+    },
+    {
+      name: "prose",
+      caption: "the reading page",
+      path: "demo/prose.html",
+      states: layoutStates("prose", "the reading page", true),
     },
     // One full-page capture of the profile's color theme beside its backup, in the one scheme.
     {

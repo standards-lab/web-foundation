@@ -44,8 +44,10 @@ The architecture pages that apply, in the architecture repository:
   one.
 - The baseline is open for extension, closed for modification: a consumer extends it in its own
   layers, and a new profile joins as a unit beside the built-in ones.
-- Page layout is the consumer's: the foundation's sheets set no page column, gutters, or section
-  spacing, and the demo pages take theirs from their own layer, `demo/demo.css`.
+- Page layout is the foundation's opt-in layout sheet or the consumer's own: no other foundation
+  sheet sets a page column, gutters, or section spacing; `layout.css`'s two page types set them
+  where a page links it, and the other demo pages take theirs from their own layer,
+  `demo/demo.css`.
 
 ## Conformance
 

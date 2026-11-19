@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>layout fixture</title>
+    <!-- The page-layout sheet the foundation adds, from dist/, for test/browser/layout.test.ts:
+         the full page entry, so a profile's attribute on the root selects it, with
+         glyph-button.css and layout.css linked after it. test/browser/support/layout.js fills the
+         body with its case, a header of a name and four glyph buttons over a main, and switches
+         the body's page type. The page's own later layer places one of main's children on the
+         full lines, as a page does, and, under .app-gutter, sets the gutter's hook. -->
+    <link rel="stylesheet" href="../../dist/page-full.css" />
+    <link rel="stylesheet" href="../../dist/glyph-button.css" />
+    <link rel="stylesheet" href="../../dist/layout.css" />
+    <style>
+      @layer foundation, app;
+      @layer app {
+        .app-full {
+          grid-column: full;
+        }
+        body.app-gutter {
+          --page-gutter: var(--space-xl);
+        }
+      }
+    </style>
+  </head>
+  <body class="page-app"></body>
+</html>

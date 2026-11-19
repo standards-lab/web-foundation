@@ -71,7 +71,7 @@ describe("release pack", () => {
 
   test("the pack holds the opt-in sheets, which neither page entry imports", () => {
     const packed = listFiles(pack);
-    for (const sheet of ["glyph-button", "dialog", "motion"]) {
+    for (const sheet of ["glyph-button", "dialog", "layout", "motion"]) {
       assert.ok(packed.includes(`dist/${sheet}.css`), `the pack has no dist/${sheet}.css`);
       for (const entry of ["page", "page-full"]) {
         assert.doesNotMatch(
