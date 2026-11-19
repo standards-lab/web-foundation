@@ -41,7 +41,10 @@ export function defined() {
   return out;
 }
 
-/** Points the page's stylesheet link at the URL, resolving once it and its imports have loaded. */
+/**
+ * Points the page's stylesheet link at the URL, resolving once it and its imports have loaded,
+ * and returns every select to its own block size (see ADDED_TOKENS).
+ */
 export async function useSheets(href) {
   const link = document.querySelector('link[rel="stylesheet"]');
   const loaded = new Promise((resolve, reject) => {
@@ -52,6 +55,9 @@ export async function useSheets(href) {
   await loaded;
   const missing = allRules().filter((rule) => rule instanceof CSSImportRule && !rule.styleSheet);
   if (missing.length > 0) throw new Error(`no sheet for ${missing.map((r) => r.href).join(", ")}`);
+  const own = new CSSStyleSheet();
+  own.replaceSync(SELECT_OWN_SIZE);
+  document.adoptedStyleSheets = [...document.adoptedStyleSheets, own];
 }
 
 /**
@@ -85,14 +91,38 @@ export function pin(declarations) {
   document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
 }
 
-/** Every element's computed properties, each element named by its position, tag, and classes. */
+/**
+ * What the foundation adds to v0.7.0, which no comparison with v0.7.0 reads, so each reads only
+ * what the two share; test/browser/controls.test.ts holds each. The reading leaves out the five
+ * tokens the space facet adds, and the elements of demo/tools.html's #elements section, which
+ * shows the elements rules the foundation departs on. A one-line select's block size, which the
+ * elements layer sets to the control block size, also moves the lines and blocks around it, the
+ * tools page's .button select's among them: useSheets() returns every select to its own, by an
+ * unlayered adopted sheet that beats every layer, on both sides of a comparison alike.
+ */
+const ADDED_TOKENS = [
+  "--control-edge",
+  "--control-block-size",
+  "--focus-offset",
+  "--focus-reach",
+  "--tint",
+];
+const DEPARTED_ELEMENTS = "#elements *";
+const SELECT_OWN_SIZE = "select { block-size: auto; }";
+
+/**
+ * Every element's computed properties, each element named by its position, tag, and classes, but
+ * for what the foundation adds to v0.7.0.
+ */
 export function reading() {
   const out = {};
   for (const [i, element] of [...document.querySelectorAll("*")].entries()) {
     const name = `${i} ${element.localName}${[...element.classList].map((c) => `.${c}`).join("")}`;
+    if (element.matches(DEPARTED_ELEMENTS)) continue;
     const style = getComputedStyle(element);
     const values = {};
     for (const property of style) {
+      if (ADDED_TOKENS.includes(property)) continue;
       const value = style.getPropertyValue(property);
       // A custom property keeps its source's whitespace, which is formatting, not style.
       values[property] = property.startsWith("--") ? value.trim().replace(/\s+/g, " ") : value;

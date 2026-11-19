@@ -15,10 +15,15 @@
  * Prettier formats it, and no test holds it to upstream.
  *
  * The color hooks take the foundation's role names, --color-primary and --color-accent below,
- * where upstream has one hook named for interaction. Two rules are the foundation's own: progress
- * takes --color-accent, where upstream's progress takes the interaction color with every other
- * element; and the veil goes on a modal dialog's ::backdrop alone, where upstream's bare
- * ::backdrop veils every top-layer element's, a popover's or a fullscreen element's, too.
+ * where upstream has one hook named for interaction. The focus outline's offset reads the space
+ * facet's --focus-offset, 2px as upstream writes it. Five rules are the foundation's own:
+ * progress takes --color-accent, where upstream's progress takes the interaction color with every
+ * other element; the veil goes on a modal dialog's ::backdrop alone, where upstream's bare
+ * ::backdrop veils every top-layer element's, a popover's or a fullscreen element's, too; a
+ * disabled text field, select or text area reads as disabled, where upstream's keeps the enabled
+ * look; progress and meter paint their track on --bg-2 and progress its fill in --color-accent,
+ * where upstream's keep chromium's native look; and a one-line select's block size is
+ * --control-block-size, where upstream's is the select's own.
  */
 
 /*
@@ -41,7 +46,9 @@
  *   element's layout or behavior: no display, position, float, overflow, visibility, sizes, flex
  *   or grid, white-space, list-style-position, appearance, pointer-events or user-select. A test
  *   holds every element's layout properties to chromium's defaults. Changing layout is the tools
- *   layer's work: a pre that must scroll takes .scroll-x.
+ *   layer's work: a pre that must scroll takes .scroll-x. One size is the foundation's exception,
+ *   a one-line select's block size, below: chromium locks a select's line-height to normal, which
+ *   no paint can reach, so the select alone would stand a pixel off its row.
  *
  * Fonts and leadings read the type facet's role tokens, spacing reads the space scale, and
  * border and outline widths read the line tokens. Colors read tiers and hues by name, apart from
@@ -59,7 +66,8 @@
  *                    of text fields, selects, text areas and neutral buttons (meta.css's .button
  *                    reads it too); by default --blue.
  *   --color-accent   what is current, active, or in progress, emphasis that reports state rather
- *                    than inviting interaction: progress's accent-color; by default --magenta.
+ *                    than inviting interaction: progress's accent-color and fill; by default
+ *                    --magenta.
  *   --code-color     inline code's text; by default --green.
  *   --kbd-color      kbd's border and text; by default --border-2 for the border and --fg for
  *                    the text.
@@ -104,7 +112,7 @@
 
   /* Progress reports state rather than inviting interaction, so its accent-color follows the
      accent hook instead. It comes after the rule above, at the same zero specificity, and wins by
-     order. */
+     order. The bar's own paint, its track and fill, is with the forms below. */
   :where(progress) {
     accent-color: var(--color-accent, var(--magenta));
   }
@@ -119,7 +127,7 @@
      An outline takes no space, so it changes no layout. */
   :where(:focus-visible) {
     outline: var(--line-m) solid var(--color-primary, var(--blue));
-    outline-offset: 2px;
+    outline-offset: var(--focus-offset);
   }
 
   /* Whitespace by proximity. The reset zeroes every margin, and these rules space the flow from
@@ -381,9 +389,11 @@
   }
 
   /* Forms. Text fields, selects and text areas share one outlined look; checkboxes, radios,
-     ranges, color wells, progress and meter keep their native look. Checkboxes, radios and ranges
-     take the accent-color every element sets from --color-primary; progress takes its own,
-     from --color-accent; accent-color doesn't reach a color well or meter. */
+     ranges and color wells keep their native look. Checkboxes, radios and ranges take the
+     accent-color every element sets from --color-primary; accent-color doesn't reach a color
+     well. Progress and meter paint their own track, and progress its fill, below. A field's block
+     padding and border are the space facet's --control-edge, which a button's match: a one-line
+     field, select and button stand --control-block-size tall. */
 
   :where(
     input:not(
@@ -426,8 +436,60 @@
     border-color: var(--color-primary, var(--blue));
   }
 
+  /* Disabled, a field reads as one: on the first elevated surface inside a divider's boundary, its
+     text a tier quieter, so a disabled value still reads apart from the placeholder's --fg-3. It
+     takes no hover change, as the hover rule above reads :enabled. */
+  :where(
+    input:not(
+      [type="checkbox"],
+      [type="radio"],
+      [type="range"],
+      [type="color"],
+      [type="file"],
+      [type="image"],
+      [type="button"],
+      [type="submit"],
+      [type="reset"]
+    ),
+    select,
+    textarea
+  ):where(:disabled) {
+    border-color: var(--border);
+    background-color: var(--bg-1);
+    color: var(--fg-2);
+  }
+
+  /* A one-line select is a control's height. chromium locks a select's line-height to normal,
+     whatever the cascade gives it, so its box would follow the interface font's own metrics, a
+     pixel off a field or button beside it; its 1lh still reads the interface leading, so the
+     token sizes it as the others. A list box, multiple or sized past one row, keeps its own. */
+  :where(select:not([multiple], [size]:not([size="0"], [size="1"]))) {
+    block-size: var(--control-block-size);
+  }
+
   ::placeholder {
     color: var(--fg-3);
+  }
+
+  /* A progress bar and a meter paint their track on the element surface, --bg-2, in both schemes:
+     chromium's native track in a dark scheme is its own gray, and the fallback it paints once a
+     page styles the bar is near white. A progress bar drops its native look when its background is
+     set, so its fill is painted too, in the accent hook, as its accent-color reads it. A meter's
+     fill keeps chromium's native look, which colors it by the value's region. */
+  :where(progress) {
+    background-color: var(--bg-2);
+  }
+
+  :where(progress)::-webkit-progress-bar {
+    background-color: var(--bg-2);
+  }
+
+  :where(progress)::-webkit-progress-value {
+    background-color: var(--color-accent, var(--magenta));
+  }
+
+  :where(meter)::-webkit-meter-bar {
+    background: var(--bg-2);
   }
 
   /* The native button, the button-type inputs and the file input's button are neutral: text on

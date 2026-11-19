@@ -23,13 +23,19 @@ The architecture pages that apply, in the architecture repository:
 ## Design
 
 - spike-html-design v0.7.0 is the frozen visual reference: native elements keep its styling, and
-  the tool classes and the space and type profiles render as they do there. Three deliberate
+  the tool classes and the space and type profiles render as they do there. Six deliberate
   exceptions: the color profiles' values follow their upstream themes, not v0.7.0's palettes,
   because a theme a reader recognises should look as its authors made it; native `progress` takes
-  `--accent-color`, magenta by default, where v0.7.0's takes the interaction color, because
-  progress reports state rather than inviting interaction; and only a modal dialog's backdrop is
+  `--color-accent`, magenta by default, where v0.7.0's takes the interaction color, because
+  progress reports state rather than inviting interaction; only a modal dialog's backdrop is
   veiled, where v0.7.0 veils every top-layer backdrop, because a popover or a fullscreen element
-  covers nothing it should shade.
+  covers nothing it should shade; a disabled text field, select or textarea takes the `--border`
+  boundary, the `--bg-1` surface and `--fg-2` text with no hover change, where v0.7.0's keeps the
+  enabled look, because a form that disables a field must show it; `progress` and `meter` paint
+  their track on `--bg-2` in both schemes, and `progress` its fill in `--color-accent`, where
+  v0.7.0's keep chromium's native bar, because chromium's styled track is near white in a dark
+  scheme; and a one-line `select` is `--control-block-size` tall, where v0.7.0's is a pixel off
+  the field and button beside it, because chromium locks a select's line-height to normal.
 - A sheet is finished in every profile the baseline carries, light and dark.
 - Focus is always visible, motion is brief and honours reduced motion, and nothing shifts layout.
 - Density, alignment, and spacing in the tool sheets come from the tokens, never a literal.

@@ -1,7 +1,9 @@
 // Adapted from spike-html-apps-foundation (07ba39a): test/browser/tools.test.ts, importing the
 // tooling and the package as @standards-lab/web-tooling and @standards-lab/web-foundation.
 // The tool sheets in the package's dist/ against v0.7.0's: every element of demo/tools.html
-// computes the same, at rest and hovered, and dropping any one declaration shows. The page entry's
+// computes the same, at rest and hovered, and dropping any one declaration shows; what the
+// foundation adds to v0.7.0's elements and tokens, which controls.test.ts holds, computed-styles.js
+// leaves out of every reading. The page entry's
 // layer order and default profiles are read from the same page. The full page entry's space and
 // type profiles compute as v0.7.0's full entry's, in light and in dark, and dropping any one
 // declaration of one it adds shows. The color profiles are the package's own, not v0.7.0's: every

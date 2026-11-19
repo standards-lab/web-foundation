@@ -88,6 +88,14 @@ unset hook resolves to the hue in the element's own palette and scheme. The hues
 no role. `accent-color`, the CSS property, follows `--color-primary` on every element except
 `progress`, where it follows `--color-accent`.
 
+Five tokens size and space a component against the controls and the focus outline, declared on
+the root and every `data-space` scope: `--control-edge` (a control's block padding and border,
+both sides), `--control-block-size` (`1lh` plus the edge: a one-line field, select or button's
+height, read where the line is the interface's), `--focus-offset` (2px, the focus outline's
+offset), `--focus-reach` (the outline's width plus its offset), and `--tint` (12%, a hook's
+surface strength: `color-mix(in srgb, var(--color-accent, var(--magenta)) var(--tint),
+transparent)`).
+
 A package outside the foundation adds a profile as a built-in unit does: a sheet that declares
 its facet's tokens in one `:where([data-<attribute>="<name>"])` block inside that facet's layer,
 `foundation.tokens.<facet>`, and a registration module that calls `register(facet, name)` from
@@ -119,7 +127,8 @@ mise run screenshots  # capture the demo pages light and dark, shown inline in k
 mise run currency     # report every tool, package, action pin, and tooling tag behind its latest
 ```
 
-The demo pages, in `demo/`, are `tools.html` (every tool class), `profiles.html` (the tools page
+The demo pages, in `demo/`, are `tools.html` (every tool class, and the elements rules the
+foundation adds to v0.7.0: disabled fields, progress and meter), `profiles.html` (the tools page
 switched through every profile), `specimen.html` (each color profile light and dark, beside its
 backup from `demo/backups/`), `theme.html` (the stored choice on `page-full.css`, switched by the demo's own controls), `unit.html`
 (`page.css` with the GitHub unit), `keys.html` (bindings, and a help dialog the page fills from `bindings()`), `format.html`

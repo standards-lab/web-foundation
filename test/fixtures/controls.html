@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>controls fixture</title>
+    <!-- The space facet's control, focus and tint tokens, and the elements rules the foundation
+         adds to v0.7.0, on the full page entry, for test/browser/controls.test.ts. Each group is
+         read by its id; the bars are wide and tall enough to sample a track and a fill away from
+         their edges. -->
+    <link rel="stylesheet" href="../../dist/page-full.css" />
+    <style>
+      @layer foundation, app;
+      @layer app {
+        progress,
+        meter {
+          display: block;
+          inline-size: 20rem;
+          block-size: 2rem;
+        }
+        .accented {
+          --color-accent: rgb(153, 51, 102);
+        }
+        .offset {
+          --focus-offset: 5px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>controls fixture</h1>
+    <!-- A one-line field, select and button. -->
+    <p id="controls">
+      <input type="text" value="field" aria-label="field" />
+      <select aria-label="select">
+        <option>select</option>
+      </select>
+      <button type="button">button</button>
+    </p>
+    <!-- A field whose focus outline reads the default offset, and one under a subtree that sets
+         --focus-offset, which the test makes a data-space scope of the root's profile. -->
+    <p id="focus">
+      <input type="text" value="default" aria-label="default offset" />
+      <span class="offset"><input type="text" value="set" aria-label="offset set" /></span>
+    </p>
+    <!-- The disabled field, select and text area, and an enabled field beside them, whose hover
+         change shows that the forced hover took. -->
+    <p id="disabled">
+      <input type="text" value="field" aria-label="disabled field" disabled />
+      <select aria-label="disabled select" disabled>
+        <option>select</option>
+      </select>
+      <textarea rows="1" aria-label="disabled text area" disabled>text area</textarea>
+      <input class="enabled" type="text" value="enabled" aria-label="enabled field" />
+    </p>
+    <!-- A progress bar at 40%, a meter at 80% and one at 50%, and a progress bar under a subtree
+         that sets --color-accent. -->
+    <div id="bars">
+      <progress id="progress" value="40" max="100" aria-label="progress">40%</progress>
+      <meter id="optimum" value="0.8" aria-label="optimum meter">80%</meter>
+      <meter id="low" value="0.5" low="0.6" high="0.8" optimum="0.9" aria-label="low meter">
+        50%
+      </meter>
+      <div class="accented">
+        <progress id="accented" value="40" max="100" aria-label="accented progress">40%</progress>
+      </div>
+    </div>
+    <!-- A compact scope inside the page, which the test names its root profile around. -->
+    <div id="scope" data-space="compact"><i class="probe"></i></div>
+    <i id="probe" class="probe"></i>
+  </body>
+</html>
