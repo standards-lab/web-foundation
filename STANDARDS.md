@@ -36,6 +36,11 @@ The architecture pages that apply, in the architecture repository:
   v0.7.0's keep chromium's native bar, because chromium's styled track is near white in a dark
   scheme; and a one-line `select` is `--control-block-size` tall, where v0.7.0's is a pixel off
   the field and button beside it, because chromium locks a select's line-height to normal.
+- What v0.7.0 lacks has no reference there, so it departs from nothing: the success, warning and
+  danger hooks, the control, focus and tint tokens, the utility classes v0.4.0 adds to
+  `utilities.css`, and the opt-in `glyph-button.css`, `dialog.css`, `layout.css` and `motion.css`.
+  Each follows the source its provenance line names, and the architect's design review holds its
+  look.
 - A sheet is finished in every profile the baseline carries, light and dark.
 - Focus is always visible, motion is brief and honours reduced motion, and nothing shifts layout.
 - Density, alignment, and spacing in the tool sheets come from the tokens, never a literal.

@@ -4,10 +4,12 @@
 // mise run screenshots' capture description, which the tooling's web-screenshots bin runs: the
 // tools page whole, the hooks page whole, the utilities page whole with motion and with reduced
 // motion, the dialogs page at 390px and 1280px with the Help hint shown and each dialog open, the
-// application page's screen and the reading page whole at 390px with 200% text and at 1280px, and the color specimen narrowed to the profile's color theme and its backup, each with the stylesheet pointed at page-full.css, its registration module
-// imported, and the profile's attributes set on the root, as demo/profiles.html does, so no demo
-// page changes; the profiles each page then registers, from the registry. The bin's flags choose
-// the profiles, pages, schemes, and output.
+// application page's screen and the reading page whole at 390px with 200% text and at 1280px, the
+// formatters page whole, and the color specimen narrowed to the profile's color theme and its
+// backup, each with the stylesheet pointed at page-full.css, its registration module imported,
+// and the profile's attributes set on the root, as demo/profiles.html does, so no demo page
+// changes; the profiles each page then registers, from the registry. The bin's flags choose the
+// profiles, pages, schemes, and output.
 // Adapted from spike-html-apps-foundation (9c15b8d): scripts/screenshots.js, its states, profiles,
 // and open steps as a Description.
 
@@ -192,6 +194,8 @@ const description: Description = {
       path: "demo/prose.html",
       states: layoutStates("prose", "the reading page", true),
     },
+    // One full-page capture: the Intl formatters' outputs and tryFormatJson's on its samples.
+    { name: "format", caption: "the formatters", path: "demo/format.html" },
     // One full-page capture of the profile's color theme beside its backup, in the one scheme.
     {
       name: "specimen",

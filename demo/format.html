@@ -6,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>foundation formatters</title>
     <!-- Each Intl formatter from dist/format.js, called on sample values in the browser's own
-         locale and time zone, with what it printed. Its module runs served only: mise run demo. -->
+         locale and time zone, with what it printed; then tryFormatJson on minified JSON, on text
+         that doesn't parse, and on text nested past JSON_MAX_DEPTH. Its module runs served only:
+         mise run demo. -->
     <link rel="stylesheet" href="../dist/page.css" />
     <link rel="stylesheet" href="demo.css" />
     <script type="module">
@@ -16,6 +18,8 @@
         formatDateTime,
         formatDuration,
         formatRelative,
+        JSON_MAX_DEPTH,
+        tryFormatJson,
       } from "../dist/format.js";
 
       // One now for every call, so formatRelative's offsets land on their units exactly.
@@ -50,14 +54,56 @@
         row.insertCell().append(code);
         row.insertCell().textContent = output;
       }
+
+      // Each JSON sample, in a section of its own after the JSON section: its text as given, then
+      // what tryFormatJson made of it, the formatted text or the parser's reason. The nested
+      // sample shows only its lines around depth JSON_MAX_DEPTH, where the formatting stops.
+      const nested = "[".repeat(JSON_MAX_DEPTH + 2) + "1" + "]".repeat(JSON_MAX_DEPTH + 2);
+      const samples = [
+        ["Minified: keys in their order, duplicates and literals as written", '{"id":"run-1","10":2,"2":3,"n":1.50E+3,"stages":[{"name":"classify","ok":true,"err":null},{}],"id":"again"}'],
+        ["Not JSON: a trailing comma", '{"a":1,}'],
+        [`Nested ${JSON_MAX_DEPTH + 2} deep: the levels past ${JSON_MAX_DEPTH} kept as written`, nested, JSON_MAX_DEPTH - 3],
+      ];
+      const main = document.querySelector("main");
+      // A pre that scrolls sideways itself, as elements.css asks, so a long line never widens the
+      // page, under a quiet label.
+      const block = (label, text) => {
+        const caption = document.createElement("p");
+        caption.className = "text-quiet-s";
+        caption.textContent = label;
+        const pre = document.createElement("pre");
+        pre.className = "scroll-x";
+        pre.textContent = text;
+        return [caption, pre];
+      };
+      for (const [name, text, from] of samples) {
+        const result = tryFormatJson(text);
+        const section = document.createElement("section");
+        const heading = document.createElement("h3");
+        heading.textContent = name;
+        section.append(heading, ...block("Given", text));
+        if (!result.ok) {
+          section.append(...block("tryFormatJson: not JSON", result.reason));
+        } else if (from === undefined) {
+          section.append(...block("tryFormatJson", result.text));
+        } else {
+          // The excerpt's common indent comes off, so its lines show without scrolling.
+          const lines = result.text.split("\n");
+          const excerpt = lines.slice(from, lines.length - from);
+          const cut = Math.min(...excerpt.map((line) => line.length - line.trimStart().length));
+          const label = `tryFormatJson, lines ${from + 1} to ${lines.length - from} of ${lines.length}, less their common ${cut} spaces of indent`;
+          section.append(...block(label, excerpt.map((line) => line.slice(cut)).join("\n")));
+        }
+        main.append(section);
+      }
     </script>
   </head>
   <body>
     <main>
       <h1>Foundation formatters</h1>
       <p>
-        <code>format.js</code>'s five formatters, on Intl alone, in this browser's locale and time
-        zone.
+        <code>format.js</code>'s five Intl formatters, in this browser's locale and time zone, and
+        its JSON formatter.
       </p>
       <div class="scroll-x">
         <table class="table-striped">
@@ -73,6 +119,13 @@
           <tbody id="calls"></tbody>
         </table>
       </div>
+      <section>
+        <h2>JSON</h2>
+        <p>
+          <code>tryFormatJson</code> on each sample below: the text given, then the text
+          re-indented from its own tokens, or the parser's reason.
+        </p>
+      </section>
     </main>
   </body>
 </html>
