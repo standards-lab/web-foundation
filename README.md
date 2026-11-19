@@ -87,7 +87,7 @@ with a hue of the palette as its fallback:
   caret, selected text, the hover border of fields, neutral buttons and `meta.css`'s `.button`,
   and `accent-color`, which tints checkboxes, radios, and ranges, follow it.
 - `--color-accent`, by default `--magenta`: what is current, active, or in progress. Native
-  `progress` follows it.
+  `progress`'s fill, and an indeterminate bar's segment, follow it.
 - `--color-success` (`--green`), `--color-warning` (`--orange`), and `--color-danger` (`--red`):
   what went well, what needs care, and what fails or destroys. No baseline rule reads them yet.
 
@@ -105,6 +105,18 @@ height, read where the line is the interface's), `--focus-offset` (2px, the focu
 offset), `--focus-reach` (the outline's width plus its offset), and `--tint` (12%, a hook's
 surface strength: `color-mix(in srgb, var(--color-accent, var(--magenta)) var(--tint),
 transparent)`).
+
+The elements sheet keeps spike-html-design v0.7.0's look for native elements but for these rules
+(STANDARDS.md, "Design", gives each reason):
+
+- A disabled text field, select, or textarea takes the `--border` boundary, the `--bg-1` surface,
+  and `--fg-2` text, and shows no hover change.
+- `progress` and `meter` paint their track on `--bg-2` in both schemes. `progress` paints its
+  fill in `--color-accent`, and an indeterminate `progress` paints a `--color-accent` segment, two
+  fifths of the track wide, that sweeps across under `prefers-reduced-motion: no-preference` and
+  stands in the middle under `reduce`. A meter's fill keeps the native color of its value's region.
+- A one-line `select` is `--control-block-size` tall, the height of a field or button beside it.
+- Only a modal dialog's `::backdrop` is veiled.
 
 `utilities.css`, which both entries import and a shadow root adopts alone, adds to the scroll and
 table classes the patterns components restate:
@@ -277,8 +289,9 @@ the tag's tree to the pack, file for file; and creates the GitHub release from t
 The package is seeded by copy from spike-html-apps-foundation at 07ba39a, its v0.3.1, itself
 copied from spike-html-packages-foundation at 5dd8a58 with profiles, registration modules, the
 preferences module, the theme menu, the conformance check, and the full entry ported from
-spike-html-design at fe75220, its v0.7.0. Each copied file that takes comments names its source in
-a provenance line.
+spike-html-design at fe75220, its v0.7.0. v0.4.0 removed the theme menu and the keys help, which
+web-components' `sl-settings` and `sl-shortcuts` replace. Each copied file that takes comments
+names its source in a provenance line.
 
 ## License
 

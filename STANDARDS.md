@@ -38,8 +38,8 @@ The architecture pages that apply, in the architecture repository:
   `--control-block-size` tall, where v0.7.0's is a pixel off the field and button beside it,
   because chromium locks a select's line-height to normal.
 - What v0.7.0 lacks has no reference there, so it departs from nothing: the success, warning and
-  danger hooks, the control, focus and tint tokens, the utility classes v0.4.0 adds to
-  `utilities.css`, and the opt-in `glyph-button.css`, `dialog.css`, `layout.css` and `motion.css`.
+  danger hooks, the control, focus and tint tokens, the classes `utilities.css` holds beyond
+  v0.7.0's, and the opt-in `glyph-button.css`, `dialog.css`, `layout.css` and `motion.css`.
   Each follows the source its provenance line names, and the architect's design review holds its
   look.
 - A sheet is finished in every profile the baseline carries, light and dark.
@@ -52,7 +52,7 @@ The architecture pages that apply, in the architecture repository:
   layers, and a new profile joins as a unit beside the built-in ones.
 - Page layout is the foundation's opt-in layout sheet or the consumer's own: no other foundation
   sheet sets a page column, gutters, or section spacing; `layout.css`'s two page types set them
-  where a page links it, and the other demo pages take theirs from their own layer,
+  where a page links it, and the demo pages that don't link it take theirs from their own layer,
   `demo/demo.css`.
 
 ## Conformance

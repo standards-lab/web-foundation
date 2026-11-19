@@ -22,9 +22,9 @@ hooks take the five role names. No alias or shim maps a removed or renamed name.
 - `preferences.js`' `setOpen` and `isOpen` are removed, with no replacement: `preferences.js` now
   applies every save another tab makes.
 - `keys-help.js` is removed, and `keys.js` no longer fills a dialog's `[data-keys-list]` element
-  as it opens: use web-components' `sl-shortcuts`, from web-components v0.2.0, or a page's own help listing
-  `bindings()`. A
-  dialog holding `[data-keys-list]` opens as the page wrote it, and no module loads.
+  as it opens: use web-components' `sl-shortcuts`, from web-components v0.2.0, or a page's own
+  help listing `bindings()`. A dialog holding `[data-keys-list]` opens as the page wrote it, and no
+  module loads.
 - `Listed`, the binding `bindings()` lists, loses `run`, with no replacement: a help lists the
   bindings as text.
 - `--interaction-color` is renamed `--color-primary`.
@@ -43,7 +43,9 @@ over.
   `--focus-offset` (2px, which the focus outline reads), `--focus-reach`, and `--tint` (12%).
 - Element rules: a disabled text field, select, or textarea takes the `--border` boundary, the
   `--bg-1` surface and `--fg-2` text, with no hover change; `progress` and `meter` paint their
-  track on `--bg-2` in both schemes; a one-line `select` is `--control-block-size` tall.
+  track on `--bg-2` in both schemes; an indeterminate `progress` paints a `--color-accent`
+  segment, which sweeps only under `prefers-reduced-motion: no-preference`; a one-line `select` is
+  `--control-block-size` tall.
 - Utility classes in `utilities.css`: `.list-bare`, `.text-nowrap`, `.text-numeric`,
   `.text-break`, `.text-truncate`, `.scroll-frame`, `.alternatives`, `.head-row` with
   `.head-name` and `.head-end`, `.text-quiet-s`, `.text-quiet-xs`, `.status-line`, and
