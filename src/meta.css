@@ -21,7 +21,7 @@
   }
 
   .button:hover:where(:not(:disabled)) {
-    border-color: var(--interaction-color, var(--blue));
+    border-color: var(--color-primary, var(--blue));
     background-color: var(--border);
   }
 

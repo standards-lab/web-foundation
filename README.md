@@ -70,20 +70,23 @@ modules by their `.js` subpaths. The lean entry, `page.css`, carries the default
 - `./css`: the ambient `*.css` declaration for CSS module scripts,
   `import sheet from "./x.css" with { type: "css" }`, for a project's `types`.
 
-The primary interaction color is the hook `--interaction-color`, which the baseline and
-`meta.css` read with `--blue` as its fallback and no profile declares. Links, the focus outline,
-the caret, selected text, the hover border of fields and neutral buttons, and `accent-color`, which
-tints checkboxes, radios, and ranges, all follow it. A page sets it on any element, in its own
-layer, and that subtree follows: `.danger-zone { --interaction-color: var(--red); }`.
+Colors carry roles through five hooks, custom properties that no profile declares, each read
+with a hue of the palette as its fallback:
 
-Beside it, the accent color is the hook `--accent-color`, which the baseline reads the same way,
-with `--magenta` as its fallback, and no profile declares. Where `--interaction-color` marks what
-you can act on, `--accent-color` marks what is current, active, or in progress: emphasis that
-reports state rather than inviting interaction. In the baseline, native `progress` follows it. A
-page sets it on any element in its own layer, and per palette if it wants:
-`:where([data-palette="everforest"]) { --accent-color: var(--cyan); }`. The hook shares its name
-with the CSS property: `accent-color` follows `--interaction-color` on every element except
-`progress`, where it follows `--accent-color`.
+- `--color-primary`, by default `--blue`: what you can act on. Links, the focus outline, the
+  caret, selected text, the hover border of fields, neutral buttons and `meta.css`'s `.button`,
+  and `accent-color`, which tints checkboxes, radios, and ranges, follow it.
+- `--color-accent`, by default `--magenta`: what is current, active, or in progress. Native
+  `progress` follows it.
+- `--color-success` (`--green`), `--color-warning` (`--orange`), and `--color-danger` (`--red`):
+  what went well, what needs care, and what fails or destroys. No baseline rule reads them yet.
+
+A page sets a hook on any element, in its own layer, and that subtree alone follows:
+`.danger-zone { --color-primary: var(--color-danger, var(--red)); }`. A page or component that
+reads a hook writes its fallback where it reads it, `var(--color-success, var(--green))`, so an
+unset hook resolves to the hue in the element's own palette and scheme. The hues themselves carry
+no role. `accent-color`, the CSS property, follows `--color-primary` on every element except
+`progress`, where it follows `--color-accent`.
 
 A package outside the foundation adds a profile as a built-in unit does: a sheet that declares
 its facet's tokens in one `:where([data-<attribute>="<name>"])` block inside that facet's layer,

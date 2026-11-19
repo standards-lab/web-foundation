@@ -14,10 +14,11 @@
  * nothing, and the foundation's baseline.css imports it. The port is this repository's own code:
  * Prettier formats it, and no test holds it to upstream.
  *
- * Two rules are the foundation's own: progress takes the --accent-color hook below, where upstream's
- * progress takes the interaction color with every other element; and the veil goes on a modal
- * dialog's ::backdrop alone, where upstream's bare ::backdrop veils every top-layer element's, a
- * popover's or a fullscreen element's, too.
+ * The color hooks take the foundation's role names, --color-primary and --color-accent below,
+ * where upstream has one hook named for interaction. Two rules are the foundation's own: progress
+ * takes --color-accent, where upstream's progress takes the interaction color with every other
+ * element; and the veil goes on a modal dialog's ::backdrop alone, where upstream's bare
+ * ::backdrop veils every top-layer element's, a popover's or a fullscreen element's, too.
  */
 
 /*
@@ -53,24 +54,25 @@
  * a fallback and never declares, nor does any profile, so a consumer sets one on any element, in
  * its own layer or a style attribute, and everything that reads it in that subtree follows:
  *
- *   --interaction-color  what you can act on: links, the focus outline, the caret,
- *                        accent-color on every element but progress, selected text's 30% mix,
- *                        and the hover border of text fields, selects, text areas and neutral
- *                        buttons (the tools layer's .button reads it too); by default --blue.
- *   --accent-color       what is current, active, or in progress, emphasis that reports state
- *                        rather than inviting interaction: progress's accent-color; by default
- *                        --magenta.
- *   --code-color         inline code's text; by default --green.
- *   --kbd-color          kbd's border and text; by default --border-2 for the border and --fg
- *                        for the text.
+ *   --color-primary  what you can act on: links, the focus outline, the caret, accent-color on
+ *                    every element but progress, selected text's 30% mix, and the hover border
+ *                    of text fields, selects, text areas and neutral buttons (meta.css's .button
+ *                    reads it too); by default --blue.
+ *   --color-accent   what is current, active, or in progress, emphasis that reports state rather
+ *                    than inviting interaction: progress's accent-color; by default --magenta.
+ *   --code-color     inline code's text; by default --green.
+ *   --kbd-color      kbd's border and text; by default --border-2 for the border and --fg for
+ *                    the text.
  *
  *   @layer foundation, app;
  *   @layer app {
- *     .danger-zone { --interaction-color: var(--red); }
+ *     .danger-zone { --color-primary: var(--color-danger, var(--red)); }
  *   }
  *
- * The --accent-color hook shares its name with the CSS property accent-color, which follows
- * --interaction-color on every element except progress, where it follows --accent-color.
+ * The other three color roles, --color-success (by default --green), --color-warning (--orange)
+ * and --color-danger (--red), are hooks of the same contract that no rule here reads yet: a
+ * consumer reads one with its hue as the fallback, var(--color-danger, var(--red)), and sets it
+ * on any subtree like the two above. layers/tokens/color.css lists all five.
  *
  * A hook is read on the element that uses it, never inherited as a resolved color from the body,
  * so it resolves in that element's own palette and scheme, inside a data-palette or data-scheme
@@ -91,32 +93,32 @@
     color: var(--fg);
   }
 
-  /* Every element sets its own caret and accent from the interaction hook, so every text field's
+  /* Every element sets its own caret and accent from the primary hook, so every text field's
      caret and every checkbox, radio and range takes it. Both properties inherit, but as a resolved
      color: set once on the body, they would keep the page's palette and scheme inside a scope, and
      ignore a hook set on an element below the body. */
   :where(*) {
-    caret-color: var(--interaction-color, var(--blue));
-    accent-color: var(--interaction-color, var(--blue));
+    caret-color: var(--color-primary, var(--blue));
+    accent-color: var(--color-primary, var(--blue));
   }
 
   /* Progress reports state rather than inviting interaction, so its accent-color follows the
      accent hook instead. It comes after the rule above, at the same zero specificity, and wins by
      order. */
   :where(progress) {
-    accent-color: var(--accent-color, var(--magenta));
+    accent-color: var(--color-accent, var(--magenta));
   }
 
-  /* Selected text sits on a translucent mix of the interaction color, so the text keeps its own
+  /* Selected text sits on a translucent mix of the primary color, so the text keeps its own
      color and stays legible in either scheme. */
   ::selection {
-    background-color: color-mix(in srgb, var(--interaction-color, var(--blue)) 30%, transparent);
+    background-color: color-mix(in srgb, var(--color-primary, var(--blue)) 30%, transparent);
   }
 
   /* Every focusable element, not only links, shows the same outline when the keyboard reaches it.
      An outline takes no space, so it changes no layout. */
   :where(:focus-visible) {
-    outline: var(--line-m) solid var(--interaction-color, var(--blue));
+    outline: var(--line-m) solid var(--color-primary, var(--blue));
     outline-offset: 2px;
   }
 
@@ -242,7 +244,7 @@
     margin-block-start: var(--space-3xs);
   }
 
-  /* A quotation's start edge is a neutral rule, the control boundary's step: the interaction color
+  /* A quotation's start edge is a neutral rule, the control boundary's step: the primary color
      marks only what can be acted on. */
   :where(blockquote) {
     padding-inline-start: var(--space-s);
@@ -277,7 +279,7 @@
   /* Text-level. */
 
   :where(a) {
-    color: var(--interaction-color, var(--blue));
+    color: var(--color-primary, var(--blue));
     text-decoration: underline;
     text-underline-offset: 0.2em;
   }
@@ -380,8 +382,8 @@
 
   /* Forms. Text fields, selects and text areas share one outlined look; checkboxes, radios,
      ranges, color wells, progress and meter keep their native look. Checkboxes, radios and ranges
-     take the accent-color every element sets from --interaction-color; progress takes its own,
-     from --accent-color; accent-color doesn't reach a color well or meter. */
+     take the accent-color every element sets from --color-primary; progress takes its own,
+     from --color-accent; accent-color doesn't reach a color well or meter. */
 
   :where(
     input:not(
@@ -405,7 +407,7 @@
     color: var(--fg);
   }
 
-  /* Hovered, an enabled field's boundary takes the interaction color. Focus keeps its outline. */
+  /* Hovered, an enabled field's boundary takes the primary color. Focus keeps its outline. */
   :where(
     input:not(
       [type="checkbox"],
@@ -421,7 +423,7 @@
     select,
     textarea
   ):where(:enabled:hover) {
-    border-color: var(--interaction-color, var(--blue));
+    border-color: var(--color-primary, var(--blue));
   }
 
   ::placeholder {
@@ -430,7 +432,7 @@
 
   /* The native button, the button-type inputs and the file input's button are neutral: text on
      the element surface, --bg-2, an outline in the control boundary, --border-2, and on hover a
-     fill one tier up, --border, and a boundary in the interaction color. */
+     fill one tier up, --border, and a boundary in the primary color. */
   :where(button, input[type="button"], input[type="submit"], input[type="reset"]),
   ::file-selector-button {
     padding: var(--space-3xs) var(--space-s);
@@ -445,7 +447,7 @@
     input:is([type="button"], [type="submit"], [type="reset"]):enabled:hover
   ),
   :where(input[type="file"]:enabled:hover)::file-selector-button {
-    border-color: var(--interaction-color, var(--blue));
+    border-color: var(--color-primary, var(--blue));
     background-color: var(--border);
   }
 
