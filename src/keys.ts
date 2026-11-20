@@ -5,7 +5,6 @@
 // the first copy to load installs the one listener, so a key never fires twice.
 // Adapted from spike-html-packages-foundation (5dd8a58): src/keys.ts.
 
-import type * as Help from "./keys-help.ts";
 import { keyshortcuts, matches, normalize, parse, problem, stringify } from "./keys-grammar.ts";
 import type { Binding, KeyLike, Press, Sequence } from "./keys-grammar.ts";
 
@@ -49,14 +48,13 @@ export interface SequenceDetail {
   reason?: "fired" | "timeout" | "dropped";
 }
 
-/** A binding the help dialog lists, with `run` to act as a press would. */
+/** A binding as bindings() lists it, for a page's own help to show. */
 export interface Listed {
   keys: string;
   label: string | null;
   element: HTMLElement | null;
   sequences: Sequence[];
   off: boolean;
-  run: () => void;
 }
 
 type Active =
@@ -428,36 +426,9 @@ export function bindings(dialog: Element | null): Listed[] {
       element: binding.el ?? null,
       sequences,
       off: !current.enabled && sequences.every((sequence) => sequence.every(isCharacter)),
-      run: () => act(binding, fireEvent(binding, [])),
     });
   }
   return listed;
-}
-
-let help: typeof Help | null = null;
-let loading: Promise<typeof Help | null> | null = null;
-
-/** Imports keys-help.ts once, resolving to it, or to null after a failure the next call retries. */
-function loadHelp(): Promise<typeof Help | null> {
-  loading ??= import("./keys-help.ts").then(
-    (module) => (help = module),
-    (error: unknown) => {
-      // Forgotten, so the next open retries, and the browser requests the module again.
-      loading = null;
-      console.warn("keys: the help module failed to load", error);
-      return null;
-    },
-  );
-  return loading;
-}
-
-/** Fills a help dialog as it opens, loading keys-help.ts on the first open. */
-function onbeforetoggle(event: ToggleEvent): void {
-  const dialog = event.target;
-  if (event.newState !== "open" || !(dialog instanceof HTMLDialogElement)) return;
-  if (!dialog.querySelector("[data-keys-list]")) return;
-  if (help) help.fill(dialog);
-  else loadHelp().then((module) => module?.fill(dialog));
 }
 
 /** Matches a press, after those pending, and fires, waits for a longer binding, or drops. */
@@ -536,8 +507,6 @@ if (!store.listening) {
   // compositionend is composed, so the document sees it from a field in a shadow root; captured,
   // so a listener that stops it doesn't hide it.
   document.addEventListener("compositionend", oncompositionend, true);
-  // beforetoggle doesn't bubble.
-  document.addEventListener("beforetoggle", onbeforetoggle, true);
   observe();
 }
 // The copy that created the modal list tracks it, even beside an older copy holding the listener.

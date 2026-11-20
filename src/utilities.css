@@ -1,8 +1,11 @@
 /* From spike-html-apps-foundation (07ba39a): src/utilities.css. */
 /*
- * The foundation's utilities sheet: scroll and table classes. Self-layered and importing nothing,
- * so a shadow root adopts it alone.
+ * The foundation's utilities sheet: scroll, table, list, text, frame, cell, row, quiet type and
+ * hidden-label classes. Self-layered and importing nothing, so a shadow root adopts it alone.
  * From spike-html-packages-foundation (5dd8a58): src/utilities.css.
+ *
+ * The classes after the table's are the patterns web-components' sheets each restated; each names
+ * the local copies it is adapted from.
  */
 
 @layer foundation.utilities {
@@ -25,5 +28,144 @@
   /* --table-stripe is a public hook for the striped rows' surface. */
   .table-striped > tbody > tr:nth-child(even) {
     background-color: var(--table-stripe, color-mix(in srgb, var(--bg-2) 50%, var(--bg)));
+  }
+
+  /* A list that lists items, not prose: no markers, no indent, and no step between items. The
+     list keeps its own step from the block before it, as any block does.
+     Adapted from web-components (a659353): src/document-list.css's .documents, and the lists of
+     src/chat-thread.css, src/event-log.css and src/search-results.css. */
+  .list-bare {
+    padding: 0;
+    list-style: none;
+  }
+
+  .list-bare > li {
+    margin: 0;
+  }
+
+  /* A value kept on one line: a size, a count, a time, an id, a label.
+     Adapted from web-components (a659353): src/entry.css's .size, src/search-results.css's
+     .field. */
+  .text-nowrap {
+    white-space: nowrap;
+  }
+
+  /* A number kept whole whose digits share one width, so a changing value moves nothing beside it.
+     Adapted from web-components (a659353): src/upload-dropzone.css's .bytes. */
+  .text-numeric {
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* An unbroken value, an id, a path, a content type: one box, so it moves to the next line whole
+     rather than break at its hyphens or slashes, and breaks inside, anywhere, only when it alone is
+     wider than the line. Its box is never wider than the line.
+     Adapted from web-components (a659353): src/chat-thread.css's inline code,
+     src/event-log.css's .meta dd. */
+  .text-break {
+    display: inline-block;
+    overflow-wrap: anywhere;
+  }
+
+  /* One line, cut with an ellipsis where it runs past its box: on a block, or a flex or grid item.
+     Adapted from web-components (a659353): src/event-log.css's .meta dd.cut. */
+  .text-truncate {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  /* The scrolling frame, inside a host that is a flex column (display: flex; flex-direction:
+     column): as tall as its content, and once the host's block size is held below that, as tall
+     as the host, scrolling inside; held taller, it fills the host, its content at the top. Its
+     one column is minmax(0, 1fr), zero under a min-content constraint and its content's widest
+     line under a max-content one, so in a shrink-to-fit parent it is as wide as its content up to
+     the parent's width, and a longer line scrolls rather than widen it. The frame's border and
+     padding are the consumer's.
+     Adapted from web-components (a659353): src/chat-thread.css's .frame, src/artifact-viewer.css's
+     region. */
+  .scroll-frame {
+    flex: 1 1 auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    overflow: auto;
+  }
+
+  /* A cell as wide and tall as its widest alternative, so a change between them moves nothing:
+     each child stacks in the one grid area, and a child the markup marks aria-hidden="true" keeps
+     its space but is not shown, nor read.
+     Adapted from web-components (a659353): src/composer.css's .action. */
+  .alternatives {
+    display: inline-grid;
+  }
+
+  .alternatives > * {
+    grid-area: 1 / 1;
+  }
+
+  .alternatives > [aria-hidden="true"] {
+    visibility: hidden;
+  }
+
+  /* The head row: a name growing to its own width, and a label at the line's end, on the name's
+     line or, only when the two don't fit side by side, on its own line under it. The name keeps
+     16ch before the label wraps, or its own width when that is less, so a short name never wraps
+     the label, and it may shrink below its content, so a long one wraps inside the row's box.
+     Adapted from web-components (a659353): src/entry.css's .head, src/artifact-viewer.css's
+     .header, src/search-results.css's .head. */
+  .head-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-3xs) var(--space-xs);
+  }
+
+  .head-name {
+    flex: 1 1 16ch;
+    max-inline-size: max-content;
+    min-inline-size: 0;
+  }
+
+  .head-end {
+    margin-inline-start: auto;
+  }
+
+  /* Quiet type, the small step and the smallest, muted: a time, a detail line, a summary, a label
+     beside its value.
+     Adapted from web-components (a659353): src/entry.css's .status, src/pagination.css's
+     .page-indicator, src/search-results.css's .snippet. */
+  .text-quiet-s {
+    font-size: var(--text-s);
+    color: var(--fg-2);
+  }
+
+  .text-quiet-xs {
+    font-size: var(--text-xs);
+    color: var(--fg-2);
+  }
+
+  /* The status line: one polite paragraph, <p class="status-line" role="status">, rendered in
+     every state so its changes are read and never replaced, in the quiet type, and a line tall
+     when blank, so its text coming or going moves nothing below it.
+     Adapted from web-components (a659353): src/document-list.css's and src/search-results.css's
+     .status. */
+  .status-line {
+    min-block-size: 1lh;
+    font-size: var(--text-s);
+    color: var(--fg-2);
+  }
+
+  /* Kept for assistive technology, taking no space and showing nothing: out of the flow, a 1px
+     box clipped to nothing, its text on one line inside it.
+     Adapted from web-components (a659353): src/composer.css's .label, src/entry.css's .kind,
+     src/drawer.css's .hidden. */
+  .visually-hidden {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 }

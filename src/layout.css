@@ -1,0 +1,110 @@
+/* Adapted from spike-html-go-wasm (f026de3): web/pages/page.css's body.app and its main. */
+/* Adapted from spike-html-hosting-sdk (f49087e): src/site.css's header row, .header-actions and
+   main. */
+/*
+ * The foundation's page-layout sheet, opt-in: neither page entry imports it. A page links it after
+ * its entry, whose layer statement names foundation.layout after foundation.dialog, so the sheet
+ * orders there wherever it is linked from. Self-layered and importing nothing. It lays out a page's
+ * body, so a component has no use for it: a shadow root's tree has no body.
+ *
+ * A page chooses one of two page types by the body's class, and a page with neither keeps the
+ * flow the elements layer leaves it, its layout its own:
+ * - body.page-app, an application page, a workspace rather than an article: one screen, the header
+ *   row over main, at least the dynamic viewport tall, the viewport as it is, which the page fills
+ *   exactly when its content is shorter; main takes every row the header leaves. One gutter,
+ *   --page-gutter, spaces the inline sides and the block end alike, so main ends a gutter above the
+ *   viewport's foot, its every edge in view. Main is a grid of named column lines: content, the
+ *   reading width, at most 80ch and centered between two equal side tracks, and full, the content
+ *   and both sides, the whole width between the gutters. Every child of main sits on content; a
+ *   page places a child on full itself, grid-column: full, in its own layer. Main's rows pack at
+ *   the top, each as tall as its child; a page that gives a child the rest of main's height, as a
+ *   tool fills the screen, sets main's rows itself, grid-template-rows: auto 1fr.
+ * - body.page-prose, a reading page: main a centered 80ch reading column inside the gutters, its
+ *   sections --space-xl apart, and --space-2xl below it, so the page's end isn't flush with the
+ *   viewport's foot.
+ *
+ * In both, the body's header, body > header, is a row: the page's name, or the site's nav, at the
+ * inline start, and a .header-actions group of glyph buttons at the inline end, each centered on
+ * the row. Where the group doesn't fit beside the rest, as at 200% text in a 390px viewport, it
+ * takes a line of its own, at the inline end still, and its buttons wrap onto more lines where
+ * they don't fit on one, so the header never scrolls the page sideways (WCAG 1.4.4 and 1.4.10).
+ *
+ * Nothing here is measured by script: every size is a token, the viewport's, or the reading width.
+ * --page-gutter is the gutter's one hook, --space-m by default, set on the body, which a page
+ * changes in its own layer. Every length but the reading width and the viewport is a --space-*
+ * step, so the reader's space profile changes it; the sheet sets no color, so every palette and
+ * scheme draws it the same.
+ */
+
+@layer foundation.layout {
+  /* Both page types: the gutter, the body's inline padding. */
+  body:is(.page-app, .page-prose) {
+    --page-gutter: var(--space-m);
+    padding-inline: var(--page-gutter);
+  }
+
+  /* The header row: wrapping, so the actions take a line of their own where they don't fit beside
+     the page's name, --space-2xs under it, and --space-s between the row's items otherwise. */
+  body:is(.page-app, .page-prose) > header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2xs) var(--space-s);
+    padding-block: var(--space-s);
+  }
+
+  /* The header's glyph buttons, one group, at the row's inline end by its auto start margin,
+     which takes whatever room the rest leaves, on its own line too. Its buttons wrap where they
+     don't fit on one line, and every line keeps the inline end. */
+  .header-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: end;
+    gap: var(--space-2xs);
+    margin-inline-start: auto;
+  }
+
+  /* The application page: one column of two rows, the header's own height and the rest, held at
+     least the dynamic viewport tall, the gutter below it. The reset's 100svh, the smallest
+     viewport's, would leave a strip below main whenever the browser's bars retract. The column is
+     the grid's implicit one, unlike the source's minmax(0, 1fr): main's tracks' least sizes are
+     zero, so nothing in main widens it, and the header's widest item, a word or a button, never
+     reaches the viewport's width. */
+  body.page-app {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    min-block-size: 100dvh;
+    padding-block-end: var(--page-gutter);
+  }
+
+  /* Main's named lines: content, the middle track, at most 80ch, and full, its edges. The side
+     tracks share what the content leaves, equally, and shrink to nothing below 80ch, as the
+     content's own track does below its width, so no line holds main wider than the viewport. */
+  body.page-app > main {
+    display: grid;
+    grid-template-columns:
+      [full-start] minmax(0, 1fr)
+      [content-start] minmax(0, 80ch)
+      [content-end] minmax(0, 1fr)
+      [full-end];
+    align-content: start;
+  }
+
+  body.page-app > main > * {
+    grid-column: content;
+  }
+
+  /* The reading page: main the reading column, centered, sections apart, room below. */
+  body.page-prose > main {
+    max-inline-size: 80ch;
+    margin-inline: auto;
+    padding-block-end: var(--space-2xl);
+  }
+
+  /* A section opens on its heading, which the elements layer gives no top margin as its
+     container's first child: the section takes the space between sections instead. */
+  body.page-prose > main > section {
+    margin-block-start: var(--space-xl);
+  }
+}

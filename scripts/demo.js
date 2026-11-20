@@ -9,7 +9,20 @@ import { join } from "node:path";
 import { serve } from "@standards-lab/web-tooling/server.js";
 
 const server = await serve({ root: join(import.meta.dirname, "..") });
-for (const page of ["tools", "profiles", "specimen", "theme", "unit", "keys", "format", "hooks"]) {
+for (const page of [
+  "tools",
+  "profiles",
+  "specimen",
+  "theme",
+  "unit",
+  "keys",
+  "format",
+  "hooks",
+  "utilities",
+  "dialogs",
+  "app",
+  "prose",
+]) {
   console.log(`${server.origin}/demo/${page}.html`);
 }
 process.once("SIGINT", async () => {

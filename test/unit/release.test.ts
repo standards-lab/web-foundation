@@ -60,6 +60,29 @@ describe("release pack", () => {
     assert.deepEqual(listFiles(pack), [...built, "LICENSE", "README.md", "package.json"].sort());
   });
 
+  test("the pack holds no theme menu or keys help module, declaration, or sheet", () => {
+    const packed = listFiles(pack);
+    assert.ok(packed.includes("dist/keys.js"), "the pack has no dist/keys.js");
+    assert.deepEqual(
+      packed.filter((path) => /(^|\/)(theme-menu|keys-help)\./.test(path)),
+      [],
+    );
+  });
+
+  test("the pack holds the opt-in sheets, which neither page entry imports", () => {
+    const packed = listFiles(pack);
+    for (const sheet of ["glyph-button", "dialog", "layout", "motion"]) {
+      assert.ok(packed.includes(`dist/${sheet}.css`), `the pack has no dist/${sheet}.css`);
+      for (const entry of ["page", "page-full"]) {
+        assert.doesNotMatch(
+          readFileSync(join(pack, `dist/${entry}.css`), "utf8"),
+          new RegExp(`@import[^;]*${sheet}`),
+          `dist/${entry}.css imports ${sheet}.css`,
+        );
+      }
+    }
+  });
+
   test("the pack is the release that files and exports declare", () => {
     assert.deepEqual(releaseProblems(pack, src), []);
   });

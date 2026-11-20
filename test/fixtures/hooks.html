@@ -8,11 +8,25 @@
     <style>
       @layer foundation, app;
       @layer app {
-        .accented {
-          --accent-color: rgb(1, 2, 3);
+        .primary {
+          --color-primary: rgb(51, 102, 153);
         }
-        .interacting {
-          --interaction-color: rgb(4, 5, 6);
+        .accent {
+          --color-accent: rgb(153, 51, 102);
+        }
+        .success {
+          --color-success: rgb(102, 153, 51);
+        }
+        .warning {
+          --color-warning: rgb(204, 153, 0);
+        }
+        .danger {
+          --color-danger: rgb(153, 0, 51);
+        }
+        /* v0.3.0's names, which nothing reads any more. */
+        .retired {
+          --interaction-color: rgb(51, 102, 153);
+          --accent-color: rgb(153, 51, 102);
         }
       }
     </style>
@@ -20,34 +34,42 @@
   <body>
     <h1>hooks fixture</h1>
     <p>
-      Each group holds a progress bar, a checkbox, and a link. The first sets no hook, the second
-      sets --accent-color on its subtree, and the third sets --interaction-color on its subtree.
-      The fourth sets no hook inside a palette and scheme scope of its own. The probes read the
-      palette's --magenta and --blue as a color, at the root and inside the scope.
+      Each group holds the same readers: what follows --color-primary (a link, a checkbox, a text
+      field, a native button and a .button), what follows --color-accent (a progress bar), a span
+      for each of the other three roles reading its hook with its hue as the fallback, as a
+      consumer does, and a span for each role's hue. The first group sets no hook; each of the next
+      five sets one role's hook on its subtree; the seventh sets v0.3.0's two hook names; the last
+      sets no hook inside a palette and scheme scope of its own.
     </p>
-    <div id="plain">
+    <template id="readers">
+      <a href="#">link</a>
+      <input type="checkbox" checked aria-label="checkbox" />
+      <input type="text" value="field" aria-label="field" />
+      <button type="button">button</button>
+      <a class="button" href="#">.button</a>
       <progress value="40" max="100"></progress>
-      <input type="checkbox" checked aria-label="plain" />
-      <a href="#plain">plain</a>
-    </div>
-    <div id="accented" class="accented">
-      <progress value="40" max="100"></progress>
-      <input type="checkbox" checked aria-label="accented" />
-      <a href="#accented">accented</a>
-    </div>
-    <div id="interacting" class="interacting">
-      <progress value="40" max="100"></progress>
-      <input type="checkbox" checked aria-label="interacting" />
-      <a href="#interacting">interacting</a>
-    </div>
-    <div id="scoped">
-      <progress value="40" max="100"></progress>
-      <input type="checkbox" checked aria-label="scoped" />
-      <a href="#scoped">scoped</a>
-      <span id="scoped-magenta" style="color: var(--magenta)">magenta</span>
-      <span id="scoped-blue" style="color: var(--blue)">blue</span>
-    </div>
-    <span id="magenta" style="color: var(--magenta)">magenta</span>
-    <span id="blue" style="color: var(--blue)">blue</span>
+      <span data-role="success" style="color: var(--color-success, var(--green))">success</span>
+      <span data-role="warning" style="color: var(--color-warning, var(--orange))">warning</span>
+      <span data-role="danger" style="color: var(--color-danger, var(--red))">danger</span>
+      <span data-hue="blue" style="color: var(--blue)">blue</span>
+      <span data-hue="magenta" style="color: var(--magenta)">magenta</span>
+      <span data-hue="green" style="color: var(--green)">green</span>
+      <span data-hue="orange" style="color: var(--orange)">orange</span>
+      <span data-hue="red" style="color: var(--red)">red</span>
+    </template>
+    <div id="plain" class="group"></div>
+    <div id="primary" class="group primary"></div>
+    <div id="accent" class="group accent"></div>
+    <div id="success" class="group success"></div>
+    <div id="warning" class="group warning"></div>
+    <div id="danger" class="group danger"></div>
+    <div id="retired" class="group retired"></div>
+    <div id="scoped" class="group"></div>
+    <script>
+      const readers = document.querySelector("#readers").content;
+      for (const group of document.querySelectorAll(".group")) {
+        group.append(readers.cloneNode(true));
+      }
+    </script>
   </body>
 </html>

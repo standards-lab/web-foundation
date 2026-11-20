@@ -1,0 +1,55 @@
+/* Adapted from web-components (a659353): src/chat-thread.css's pulse, src/stage-timeline.css's
+   ring, and src/upload-dropzone.css's and src/drawer.css's transition durations, behind reduced
+   motion. */
+/*
+ * The foundation's motion sheet, opt-in: neither page entry imports it. A page links it after its
+ * entry, whose layer statement names foundation.motion last, so the sheet orders after the
+ * utilities wherever it is linked from; a shadow root adopts it alone. Self-layered and importing
+ * nothing.
+ *
+ * Two durations, for a transition a component writes itself: --duration-s (120ms), a color or a
+ * border changing, and --duration-m (200ms), a box moving in or out. They are declared on the root
+ * and, where a shadow root adopts the sheet, on its host, so the shadow tree inherits them.
+ *
+ * Two in-progress loops, the keyframes pulse (fading to a quarter and back) and ring (growing as
+ * it fades out), each with a class that runs it: .motion-pulse on a dot or a label that is in
+ * progress, and .motion-ring on a ring the consumer draws, painted over its marker so it moves
+ * nothing. Every animation is behind prefers-reduced-motion: no-preference; under reduce nothing
+ * here animates, and what is in progress reads by its color and its text alone. A component that
+ * animates in its own sheet keeps to the same media query.
+ */
+
+@layer foundation.motion {
+  :where(:root, :host) {
+    --duration-s: 120ms;
+    --duration-m: 200ms;
+  }
+
+  @keyframes pulse {
+    50% {
+      opacity: 0.25;
+    }
+  }
+
+  @keyframes ring {
+    from {
+      opacity: 0.6;
+      transform: scale(1);
+    }
+
+    to {
+      opacity: 0;
+      transform: scale(1.6);
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .motion-pulse {
+      animation: pulse 1.4s ease-in-out infinite;
+    }
+
+    .motion-ring {
+      animation: ring 1.6s ease-out infinite;
+    }
+  }
+}

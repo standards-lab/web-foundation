@@ -5,10 +5,12 @@
  */
 
 /* Comes first to fix the order. meta precedes structure and utilities so a .button that is also
-   .scroll-y or .field computes as in v0.7.0; theme-menu, last, holds the sheet theme-menu.ts adopts
-   when the menu first opens; a page's own later layer wins over the foundation. */
+   .scroll-y or .field computes as in v0.7.0; a page's own later layer wins over the foundation.
+   The opt-in sheets, which this entry doesn't import, are named last, so a page that links one
+   after it gets the layer in its place: glyph-button.css's foundation.glyph, dialog.css's
+   foundation.dialog, layout.css's foundation.layout, and motion.css's foundation.motion. */
 
-@layer foundation.tokens.color, foundation.tokens.space, foundation.tokens.type, foundation.reset, foundation.elements, foundation.meta, foundation.structure, foundation.utilities, foundation.theme-menu;
+@layer foundation.tokens.color, foundation.tokens.space, foundation.tokens.type, foundation.reset, foundation.elements, foundation.meta, foundation.structure, foundation.utilities, foundation.glyph, foundation.dialog, foundation.layout, foundation.motion;
 
 @import url(./baseline.css);
 @import url(./meta.css);

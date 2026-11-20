@@ -1,7 +1,10 @@
 // Adapted from spike-html-apps-foundation (07ba39a): test/browser/tools.test.ts, importing the
 // tooling and the package as @standards-lab/web-tooling and @standards-lab/web-foundation.
 // The tool sheets in the package's dist/ against v0.7.0's: every element of demo/tools.html
-// computes the same, at rest and hovered, and dropping any one declaration shows. The page entry's
+// computes the same, at rest and hovered, and dropping any one declaration shows; what the
+// foundation adds to v0.7.0's elements and tokens, which controls.test.ts holds, computed-styles.js
+// leaves out of every reading, and the utility classes it adds, which utilities.test.ts holds,
+// neither the demo page nor this comparison reads. The page entry's
 // layer order and default profiles are read from the same page. The full page entry's space and
 // type profiles compute as v0.7.0's full entry's, in light and in dark, and dropping any one
 // declaration of one it adds shows. The color profiles are the package's own, not v0.7.0's: every
@@ -24,6 +27,7 @@ import type { Browser, Page } from "@standards-lab/web-tooling/browser.js";
 import type { Server } from "@standards-lab/web-tooling/server.js";
 import type { Facet } from "@standards-lab/web-foundation/registry.js";
 import { concerns, differences } from "./support/computed-styles.js";
+import { ADDED_UTILITIES } from "./support/utilities.js";
 
 /** A page's computed styles, as computed-styles.js's reading() returns them: element to property
  * to value. */
@@ -75,7 +79,10 @@ const LAYER_ORDER = [
   "foundation.meta",
   "foundation.structure",
   "foundation.utilities",
-  "foundation.theme-menu",
+  "foundation.glyph",
+  "foundation.dialog",
+  "foundation.layout",
+  "foundation.motion",
 ];
 
 const FACETS: Facet[] = ["color", "space", "type"];
@@ -260,9 +267,12 @@ describe("foundation tools", () => {
 
   const upstreamClasses = classes(source("/test/fixtures/v0.7.0/layers/tools.css"));
 
-  test("the sheets hold v0.7.0's tool classes, no fewer and no more", () => {
+  test("the sheets hold v0.7.0's tool classes and the added utilities, no fewer and no more", () => {
     assert.ok(upstreamClasses.length > 0, "v0.7.0's tools layer names no class");
-    assert.deepEqual(classes(concerns.map((c) => source(sheet(c))).join("\n")), upstreamClasses);
+    assert.deepEqual(
+      classes(concerns.map((c) => source(sheet(c))).join("\n")),
+      [...upstreamClasses, ...ADDED_UTILITIES].sort(),
+    );
   });
 
   test("the demo page carries every tool class", () => {
@@ -462,8 +472,11 @@ describe("foundation tools", () => {
       .match(/^\s*-*[a-z][\w-]*\s*:[^;{]*;/gm);
     assert.ok(written, "the three sheets write no declaration");
     assert.equal(rest.length, written.length, "every declaration written is tried");
+    // The added utilities' declarations, which no element of the page carries, utilities.test.ts
+    // drops on its own cases.
+    const added = new RegExp(`\\.(${ADDED_UTILITIES.join("|")})(?![\\w-])`);
     const missed = rest
-      .filter((drop, i) => drop.differs + hover[i].differs === 0)
+      .filter((drop, i) => drop.differs + hover[i].differs === 0 && !added.test(drop.selector))
       .map(({ sheet, selector, declaration }) => `${sheet}: ${selector} { ${declaration} }`);
     assert.deepEqual(missed, [], `dropped unnoticed:\n${head(missed)}`);
   });

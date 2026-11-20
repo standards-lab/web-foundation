@@ -12,7 +12,7 @@
  * ./profiles/color/catppuccin.js: together, the Catppuccin unit. A page that links the lean entry,
  * page.css, links this sheet after it, which layers itself into foundation.tokens.color after
  * Zen, and imports the module, which registers catppuccin and loads no CSS; data-palette then
- * names it, and the theme menu lists it. <base> is where the package is served from, as a jsDelivr
+ * names it, and the registry lists it. <base> is where the package is served from, as a jsDelivr
  * tag's dist/:
  *
  *   <link rel="stylesheet" href="<base>/page.css" />

@@ -1,16 +1,17 @@
 <!doctype html>
-<!-- From spike-html-apps-foundation (07ba39a): test/fixtures/keys-help.html. -->
-<!-- From spike-html-packages-foundation (5dd8a58): test/fixtures/keys-help.html. -->
+<!-- Adapted from spike-html-apps-foundation (07ba39a): test/fixtures/keys-help.html, renamed
+     keys-bindings.html, its help dialog left as the page writes it. -->
+<!-- Adapted from spike-html-packages-foundation (5dd8a58): test/fixtures/keys-help.html. -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>keys help fixture</title>
+    <title>keys bindings fixture</title>
     <link rel="stylesheet" href="../../dist/page.css" />
     <script type="module" src="../../dist/keys.js"></script>
   </head>
   <body>
-    <h1>keys help fixture</h1>
-    <p>Help, or ?, opens the help dialog, which lists this page's bindings once each, as the binding that fires, leaving out the disabled, inert, and hidden ones and the dialog's own Close. Each row runs its binding. The dialog's settings change what fires, here and in another tab on this origin.</p>
+    <h1>keys bindings fixture</h1>
+    <p>bindings() lists this page's bindings once each, as the binding that fires, leaving out the disabled, inert, and hidden ones and the help dialog's own Close. Help, or ?, opens the help dialog, whose [data-keys-list] element keys leaves as the page wrote it.</p>
     <p>
       <button type="button" commandfor="help" command="show-modal" data-keys="?">Help <kbd>?</kbd></button>
       <button type="button" data-keys="t" data-log="t">Theme <kbd>T</kbd></button>
@@ -28,7 +29,7 @@
     <p><label>Search <kbd>/</kbd> <input type="search" id="search" data-keys="/" /></label></p>
     <dialog id="help" aria-labelledby="help-title">
       <h2 id="help-title">Keyboard shortcuts</h2>
-      <div data-keys-list></div>
+      <div data-keys-list><p>Written by the page.</p></div>
       <button type="button" commandfor="help" command="close" data-keys="?">Close <kbd>?</kbd></button>
     </dialog>
     <script type="module">

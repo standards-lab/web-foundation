@@ -23,13 +23,25 @@ The architecture pages that apply, in the architecture repository:
 ## Design
 
 - spike-html-design v0.7.0 is the frozen visual reference: native elements keep its styling, and
-  the tool classes and the space and type profiles render as they do there. Three deliberate
+  the tool classes and the space and type profiles render as they do there. Six deliberate
   exceptions: the color profiles' values follow their upstream themes, not v0.7.0's palettes,
   because a theme a reader recognises should look as its authors made it; native `progress` takes
-  `--accent-color`, magenta by default, where v0.7.0's takes the interaction color, because
-  progress reports state rather than inviting interaction; and only a modal dialog's backdrop is
+  `--color-accent`, magenta by default, where v0.7.0's takes the interaction color, because
+  progress reports state rather than inviting interaction; only a modal dialog's backdrop is
   veiled, where v0.7.0 veils every top-layer backdrop, because a popover or a fullscreen element
-  covers nothing it should shade.
+  covers nothing it should shade; a disabled text field, select or textarea takes the `--border`
+  boundary, the `--bg-1` surface and `--fg-2` text with no hover change, where v0.7.0's keeps the
+  enabled look, because a form that disables a field must show it; `progress` and `meter` paint
+  their track on `--bg-2` in both schemes, and `progress` its fill, or an indeterminate one's
+  sweeping segment, in `--color-accent`, where v0.7.0's keep chromium's native bar, because
+  chromium's styled track is near white in a dark scheme; and a one-line `select` is
+  `--control-block-size` tall, where v0.7.0's is a pixel off the field and button beside it,
+  because chromium locks a select's line-height to normal.
+- What v0.7.0 lacks has no reference there, so it departs from nothing: the success, warning and
+  danger hooks, the control, focus and tint tokens, the classes `utilities.css` holds beyond
+  v0.7.0's, and the opt-in `glyph-button.css`, `dialog.css`, `layout.css` and `motion.css`.
+  Each follows the source its provenance line names, and the architect's design review holds its
+  look.
 - A sheet is finished in every profile the baseline carries, light and dark.
 - Focus is always visible, motion is brief and honours reduced motion, and nothing shifts layout.
 - Density, alignment, and spacing in the tool sheets come from the tokens, never a literal.
@@ -38,8 +50,10 @@ The architecture pages that apply, in the architecture repository:
   one.
 - The baseline is open for extension, closed for modification: a consumer extends it in its own
   layers, and a new profile joins as a unit beside the built-in ones.
-- Page layout is the consumer's: the foundation's sheets set no page column, gutters, or section
-  spacing, and the demo pages take theirs from their own layer, `demo/demo.css`.
+- Page layout is the foundation's opt-in layout sheet or the consumer's own: no other foundation
+  sheet sets a page column, gutters, or section spacing; `layout.css`'s two page types set them
+  where a page links it, and the demo pages that don't link it take theirs from their own layer,
+  `demo/demo.css`.
 
 ## Conformance
 

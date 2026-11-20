@@ -18,7 +18,7 @@
  * ./profiles/color/github.js: together, the GitHub unit. A page that links the lean entry,
  * page.css, links this sheet after it, which layers itself into foundation.tokens.color after Zen,
  * and imports the module, which registers github and loads no CSS; data-palette then names it, and
- * the theme menu lists it. <base> is where the package is served from, as a jsDelivr tag's dist/:
+ * the registry lists it. <base> is where the package is served from, as a jsDelivr tag's dist/:
  *
  *   <link rel="stylesheet" href="<base>/page.css" />
  *   <link rel="stylesheet" href="<base>/profiles/color/github.css" />
