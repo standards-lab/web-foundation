@@ -8,6 +8,9 @@
 // re-indented; empty, nested, scalar, and array documents; whitespace between tokens the only
 // difference from the text; a document of about 1 MB formatted without a stall; and containers
 // past JSON_MAX_DEPTH kept as written, so 20,000 levels format in output linear in the text.
+// Its absolute bounds on the time taken are a ratio here instead: the time for a text four times
+// as large, of the same shape, stays well under the sixteenfold a quadratic formatter takes, on a
+// runner of any speed.
 
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
@@ -230,6 +233,27 @@ const MAX = JSON_MAX_DEPTH;
 /** Two spaces a level, as formatJson indents. */
 const indent = (depth: number): string => "  ".repeat(depth);
 
+/**
+ * The fewest milliseconds, of five samples after one to warm it, that formatJson takes over the
+ * text `calls` times: the fastest sample is the one least slowed by the runner's other work.
+ */
+const fastest = (text: string, calls = 1): number => {
+  formatJson(text);
+  let best = Infinity;
+  for (let sample = 0; sample < 5; sample++) {
+    const start = performance.now();
+    for (let call = 0; call < calls; call++) formatJson(text);
+    best = Math.min(best, performance.now() - start);
+  }
+  return best;
+};
+
+/**
+ * Below 8, twice the 4 a linear formatter's time grows by for a text four times as large, and
+ * half the 16 a quadratic one's does.
+ */
+const LINEAR_BOUND = 8;
+
 describe("formatJson", () => {
   const cases: Record<string, [string, string]> = {
     "keys in their order, integer-like keys where they stand": [
@@ -304,16 +328,19 @@ describe("formatJson", () => {
       ],
       meta: {},
     });
-    const text = JSON.stringify(Array.from({ length: 6000 }, (_, i) => record(i)));
-    formatJson(text);
-    const start = performance.now();
+    const records = (count: number) =>
+      JSON.stringify(Array.from({ length: count }, (_, i) => record(i)));
+    const text = records(6000);
+    const quarter = records(1500);
     const output = formatJson(text);
-    const ms = performance.now() - start;
     const bytes = new TextEncoder().encode(text).length;
-    t.diagnostic(`${bytes} bytes to ${output.split("\n").length} lines in ${ms.toFixed(1)} ms`);
     assert.ok(bytes > 900_000, `the document is ${bytes} bytes`);
     assert.equal(tokensOf(output), text, "only whitespace between tokens changed");
-    assert.ok(ms < 250, `formatting took ${ms} ms`);
+    const ms = fastest(text);
+    const ratio = ms / fastest(quarter);
+    t.diagnostic(`${bytes} bytes to ${output.split("\n").length} lines in ${ms.toFixed(1)} ms`);
+    t.diagnostic(`${ratio.toFixed(1)} times the time of a quarter of the records`);
+    assert.ok(ratio < LINEAR_BOUND, `four times the records took ${ratio} times as long`);
   });
 
   test("indents every level of text nested JSON_MAX_DEPTH deep", () => {
@@ -361,20 +388,23 @@ describe("formatJson", () => {
     // The JSON_MAX_DEPTH levels formatted add a line break and at most 2 * JSON_MAX_DEPTH spaces
     // of indent at each of their opening and closing brackets; the levels below are kept as
     // written.
-    const text = "[".repeat(20000) + " 1 " + "]".repeat(20000);
-    formatJson(text);
-    const start = performance.now();
+    // Its time against 80,000 levels', each sample twenty calls long, so it's measured in
+    // milliseconds rather than the timer's noise.
+    const nested = (levels: number) => "[".repeat(levels) + " 1 " + "]".repeat(levels);
+    const text = nested(20000);
     const output = formatJson(text);
-    const ms = performance.now() - start;
     const kept = "[".repeat(20000 - MAX) + " 1 " + "]".repeat(20000 - MAX);
-    t.diagnostic(`${text.length} characters to ${output.length} in ${ms.toFixed(1)} ms`);
+    const ms = fastest(text, 20);
+    const ratio = fastest(nested(80000), 20) / ms;
+    t.diagnostic(`${text.length} characters to ${output.length}; ${ms.toFixed(1)} ms for 20 calls`);
+    t.diagnostic(`${ratio.toFixed(1)} times the time at four times the depth`);
     assert.ok(output.length <= text.length + 4 * MAX * MAX, `${output.length} from ${text.length}`);
     assert.equal(output.replace(/[ \n]+/g, ""), text.replace(/ /g, ""));
     assert.ok(
       output.includes(`\n${indent(MAX)}${kept}\n`),
       "levels past the cap kept, on their line",
     );
-    assert.ok(ms < 50, `formatting took ${ms} ms`);
+    assert.ok(ratio < LINEAR_BOUND, `four times the depth took ${ratio} times as long`);
   });
 });
 
