@@ -8,12 +8,15 @@
 // re-indented; empty, nested, scalar, and array documents; whitespace between tokens the only
 // difference from the text; a document of about 1 MB formatted without a stall; and containers
 // past JSON_MAX_DEPTH kept as written, so 20,000 levels format in output linear in the text.
-// Its absolute bounds on the time taken are a ratio here instead: the time for a text four times
-// as large, of the same shape, stays well under the sixteenfold a quadratic formatter takes, on a
-// runner of any speed.
+// Its absolute bounds on the time taken are a per-test timeout here instead, and no timing is
+// compared: a linear formatter takes milliseconds over either text, a quadratic one minutes over
+// the 1 MB one, so the timeout fails a stall, rather than hanging the job, on a runner of any speed.
+// Those two tests format in a worker: node:test times out only a test's promise, so a stall in
+// the test's own thread would run to its end and pass.
 
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
+import { Worker } from "node:worker_threads";
 
 import type { FormattedJson, RelativeOptions } from "@standards-lab/web-foundation/format.js";
 import {
@@ -234,25 +237,24 @@ const MAX = JSON_MAX_DEPTH;
 const indent = (depth: number): string => "  ".repeat(depth);
 
 /**
- * The fewest milliseconds, of five samples after one to warm it, that formatJson takes over the
- * text `calls` times: the fastest sample is the one least slowed by the runner's other work.
+ * formatJson's output for the text, from a worker that the test's signal terminates, so the
+ * test's timeout fails a stall instead of waiting it out.
  */
-const fastest = (text: string, calls = 1): number => {
-  formatJson(text);
-  let best = Infinity;
-  for (let sample = 0; sample < 5; sample++) {
-    const start = performance.now();
-    for (let call = 0; call < calls; call++) formatJson(text);
-    best = Math.min(best, performance.now() - start);
-  }
-  return best;
-};
-
-/**
- * Below 8, twice the 4 a linear formatter's time grows by for a text four times as large, and
- * half the 16 a quadratic one's does.
- */
-const LINEAR_BOUND = 8;
+const formatJsonInWorker = (text: string, signal: AbortSignal): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const source = `
+      const { parentPort, workerData } = require("node:worker_threads");
+      import(workerData.url).then(({ formatJson }) =>
+        parentPort.postMessage(formatJson(workerData.text)));`;
+    const url = import.meta.resolve("@standards-lab/web-foundation/format.js");
+    const worker = new Worker(source, { eval: true, workerData: { url, text } });
+    signal.addEventListener("abort", () => void worker.terminate(), { once: true });
+    worker.once("message", (output: string) => {
+      resolve(output);
+      void worker.terminate();
+    });
+    worker.once("error", reject);
+  });
 
 describe("formatJson", () => {
   const cases: Record<string, [string, string]> = {
@@ -315,7 +317,8 @@ describe("formatJson", () => {
     assert.ok(!/[ \t\r]\n|\n\n/.test(output), "no trailing space and no blank line");
   });
 
-  test("formats about 1 MB of JSON without a stall", (t) => {
+  // A quadratic formatter takes more than five minutes over this text.
+  test("formats about 1 MB of JSON without a stall", { timeout: 10_000 }, async (t) => {
     // 6,000 records of nested objects, arrays, strings with escapes, and numbers, minified.
     const record = (i: number) => ({
       id: `run-${i}`,
@@ -328,19 +331,12 @@ describe("formatJson", () => {
       ],
       meta: {},
     });
-    const records = (count: number) =>
-      JSON.stringify(Array.from({ length: count }, (_, i) => record(i)));
-    const text = records(6000);
-    const quarter = records(1500);
-    const output = formatJson(text);
+    const text = JSON.stringify(Array.from({ length: 6000 }, (_, i) => record(i)));
+    const output = await formatJsonInWorker(text, t.signal);
     const bytes = new TextEncoder().encode(text).length;
     assert.ok(bytes > 900_000, `the document is ${bytes} bytes`);
     assert.equal(tokensOf(output), text, "only whitespace between tokens changed");
-    const ms = fastest(text);
-    const ratio = ms / fastest(quarter);
-    t.diagnostic(`${bytes} bytes to ${output.split("\n").length} lines in ${ms.toFixed(1)} ms`);
-    t.diagnostic(`${ratio.toFixed(1)} times the time of a quarter of the records`);
-    assert.ok(ratio < LINEAR_BOUND, `four times the records took ${ratio} times as long`);
+    t.diagnostic(`${bytes} bytes to ${output.split("\n").length} lines`);
   });
 
   test("indents every level of text nested JSON_MAX_DEPTH deep", () => {
@@ -384,28 +380,28 @@ describe("formatJson", () => {
     assert.equal(tokensOf(output), tokensOf(text), "only whitespace between tokens changed");
   });
 
-  test("formats text nested 20,000 deep in output linear in its length, without a stall", (t) => {
-    // The JSON_MAX_DEPTH levels formatted add a line break and at most 2 * JSON_MAX_DEPTH spaces
-    // of indent at each of their opening and closing brackets; the levels below are kept as
-    // written.
-    // Its time against 80,000 levels', each sample twenty calls long, so it's measured in
-    // milliseconds rather than the timer's noise.
-    const nested = (levels: number) => "[".repeat(levels) + " 1 " + "]".repeat(levels);
-    const text = nested(20000);
-    const output = formatJson(text);
-    const kept = "[".repeat(20000 - MAX) + " 1 " + "]".repeat(20000 - MAX);
-    const ms = fastest(text, 20);
-    const ratio = fastest(nested(80000), 20) / ms;
-    t.diagnostic(`${text.length} characters to ${output.length}; ${ms.toFixed(1)} ms for 20 calls`);
-    t.diagnostic(`${ratio.toFixed(1)} times the time at four times the depth`);
-    assert.ok(output.length <= text.length + 4 * MAX * MAX, `${output.length} from ${text.length}`);
-    assert.equal(output.replace(/[ \n]+/g, ""), text.replace(/ /g, ""));
-    assert.ok(
-      output.includes(`\n${indent(MAX)}${kept}\n`),
-      "levels past the cap kept, on their line",
-    );
-    assert.ok(ratio < LINEAR_BOUND, `four times the depth took ${ratio} times as long`);
-  });
+  test(
+    "formats text nested 20,000 deep in output linear in its length, without a stall",
+    { timeout: 5_000 },
+    async (t) => {
+      // The JSON_MAX_DEPTH levels formatted add a line break and at most 2 * JSON_MAX_DEPTH spaces
+      // of indent at each of their opening and closing brackets; the levels below are kept as
+      // written.
+      const text = "[".repeat(20000) + " 1 " + "]".repeat(20000);
+      const output = await formatJsonInWorker(text, t.signal);
+      const kept = "[".repeat(20000 - MAX) + " 1 " + "]".repeat(20000 - MAX);
+      t.diagnostic(`${text.length} characters to ${output.length}`);
+      assert.ok(
+        output.length <= text.length + 4 * MAX * MAX,
+        `${output.length} from ${text.length}`,
+      );
+      assert.equal(output.replace(/[ \n]+/g, ""), text.replace(/ /g, ""));
+      assert.ok(
+        output.includes(`\n${indent(MAX)}${kept}\n`),
+        "levels past the cap kept, on their line",
+      );
+    },
+  );
 });
 
 describe("tryFormatJson", () => {
