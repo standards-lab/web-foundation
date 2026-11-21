@@ -110,8 +110,8 @@ why they are built as they are.
 - A package by name draws the layer table and `no-extraneous-dependencies`: the manifest declares
   no dependency, and a devDependency ships nothing.
 - The package's own name resolves to its build, not its `src/`, and the table alone catches it:
-  `no-extraneous-dependencies` (eslint-plugin-import-x 4.18.0) passes a self-import in a package
-  whose manifest has an `exports` field, as Node resolves one.
+  `no-extraneous-dependencies` passes a self-import in a package whose manifest has an `exports`
+  field, as Node resolves one.
 - A value import of a declaration file is caught in each value form, an inline `type` specifier
   among them, since `verbatimModuleSyntax` keeps that import.
 - The allowed imports use names that hold dots, which a rule must tell from `.` and `..` segments.

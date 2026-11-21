@@ -1,11 +1,8 @@
 /* From spike-html-apps-foundation (07ba39a): src/utilities.css. */
+/* From spike-html-packages-foundation (5dd8a58): src/utilities.css. */
 /*
  * The foundation's utilities sheet: scroll, table, list, text, frame, cell, row, quiet type and
  * hidden-label classes. Self-layered and importing nothing, so a shadow root adopts it alone.
- * From spike-html-packages-foundation (5dd8a58): src/utilities.css.
- *
- * The classes after the table's are the patterns web-components' sheets each restated; each names
- * the local copies it is adapted from.
  */
 
 @layer foundation.utilities {

@@ -19,9 +19,7 @@ The architecture pages that apply, in the architecture repository:
   imports nothing above it.
 - `architecture/principles/validation-first.md`: a stored preference, a key binding, and a
   profile name are checked before they are applied.
-- `architecture/principles/comments.md` governs TypeScript, JavaScript, CSS, HTML, shell, tests,
-  fixtures, and every configuration file (TOML, YAML, `.gitignore`, `.prettierignore`), not just
-  exported API.
+- `architecture/principles/comments.md`: the five kinds of comment.
 
 ## Design
 

@@ -1,9 +1,9 @@
 /* From spike-html-apps-foundation (07ba39a): src/page-full.css. */
+/* Adapted from spike-html-design (fe75220): full.css. */
 /*
  * The foundation's full page entry: everything page.css holds and every other built-in unit's
  * sheet, each facet's after its default in its sub-layer, so an attribute on the root selects one
  * by order alone. A plain aggregator, self-contained: a page links it or page.css, never both.
- * Adapted from spike-html-design (fe75220): full.css.
  */
 
 /* The same layers as page.css's, in the same order, the opt-in sheets' among them, which this
