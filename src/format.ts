@@ -1,36 +1,32 @@
-// Adapted from spike-html-apps-foundation (07ba39a): src/format.ts, its header no longer naming
-// the v0.1.0 declaration fixture, which isn't carried.
+// Adapted from spike-html-apps-foundation (07ba39a): src/format.ts, its header trimmed.
+// Adapted from spike-html-packages-foundation (5dd8a58): src/format.d.ts, its declarations given a runtime.
+// Adapted from web-components (a659353): src/json.ts, its MAX_DEPTH renamed JSON_MAX_DEPTH, and artifact-viewer.ts' pretty as tryFormatJson.
 // The foundation's formatters: byte counts, dates, relative times, and durations, on the
 // platform's Intl alone, and JSON text re-indented from its own tokens; no package and no other
 // layer, and none touches the DOM.
-// Adapted from spike-html-packages-foundation (5dd8a58): src/format.d.ts, its declarations given a
-// runtime.
 
 /** Options for formatBytes: Intl.NumberFormat's, less its style and unit, which it sets. */
 export type BytesOptions = Omit<Intl.NumberFormatOptions, "style" | "unit">;
 
-// The byte units Intl.NumberFormat sanctions, smallest first: unit i is 1000 ** i bytes.
 const byteUnits = ["byte", "kilobyte", "megabyte", "gigabyte", "terabyte", "petabyte"];
 
-/** A byte count in SI units, base 1000 (kB, MB, GB, ...), with Intl.NumberFormat's byte units. */
+/**
+ * A byte count in SI units, base 1000 (kB, MB, GB, ...), with Intl.NumberFormat's byte units: the
+ * largest unit that keeps the count's magnitude at 1 or more, bytes under 1 kB or for NaN. Bytes
+ * are long ("1 byte", "13 bytes") and the larger units short ("1.5 kB"), unless `unitDisplay` is
+ * set; at most one fraction digit, unless either fraction-digit bound is set.
+ */
 export function formatBytes(
   bytes: number,
   locale?: Intl.LocalesArgument,
   options?: BytesOptions,
 ): string {
-  // The largest unit that keeps the value at 1 or more, by its magnitude, so a negative count
-  // steps as its positive does; anything under 1 kB, NaN included, stays in bytes.
   let step = 0;
   while (step < byteUnits.length - 1 && Math.abs(bytes) >= 1000 ** (step + 1)) step++;
-  // At most one fraction digit by default, unless the caller sets either bound: a minimum above a
-  // default maximum would throw.
   const fraction =
     options?.minimumFractionDigits === undefined && options?.maximumFractionDigits === undefined
       ? { maximumFractionDigits: 1 }
       : {};
-  // The byte unit long by default, so Intl words and pluralizes it ("1 byte", "13 bytes"): en-US's
-  // short byte is "byte" at every count. The units above it stay short ("1.5 kB"). A caller's own
-  // unitDisplay wins at every unit.
   return new Intl.NumberFormat(locale, {
     unitDisplay: step === 0 ? "long" : "short",
     ...fraction,
@@ -40,8 +36,6 @@ export function formatBytes(
   }).format(bytes / 1000 ** step);
 }
 
-// The options that set a date or time field one by one, which Intl.DateTimeFormat refuses to mix
-// with dateStyle or timeStyle.
 const dateTimeFields = [
   "year",
   "month",
@@ -56,7 +50,6 @@ const dateTimeFields = [
   "timeZoneName",
 ] as const;
 
-/** `options` over `styles`, the styles dropped when `options` sets any field of its own. */
 function withStyles(
   styles: Intl.DateTimeFormatOptions,
   options: Intl.DateTimeFormatOptions = {},
@@ -92,7 +85,6 @@ export interface RelativeOptions extends Intl.RelativeTimeFormatOptions {
 
 const second = 1000;
 const day = 86_400 * second;
-// The relative units, largest first, each a fixed length: a month is 30 days and a year 365.
 const relativeUnits: [Intl.RelativeTimeFormatUnit, number][] = [
   ["year", 365 * day],
   ["month", 30 * day],
@@ -103,7 +95,10 @@ const relativeUnits: [Intl.RelativeTimeFormatUnit, number][] = [
   ["second", second],
 ];
 
-/** A date relative to now in its largest whole unit ("3 days ago", "in 2 hours"). */
+/**
+ * A date relative to now in its largest whole unit ("3 days ago", "in 2 hours"), truncated toward
+ * zero, seconds when it fills no unit; a month is 30 days and a year 365.
+ */
 export function formatRelative(
   date: Date | number,
   locale?: Intl.LocalesArgument,
@@ -111,8 +106,6 @@ export function formatRelative(
 ): string {
   const { now = Date.now(), ...format } = options ?? {};
   const difference = Number(date) - Number(now);
-  // The largest unit the difference fills once, seconds when it fills none; truncated toward zero,
-  // so 59 seconds is 59 seconds and 89 seconds is 1 minute, either way in time.
   const [unit, length] = relativeUnits.find(([, length]) => Math.abs(difference) >= length) ?? [
     "second",
     second,
@@ -125,14 +118,15 @@ export interface DurationOptions {
   style?: "long" | "short" | "narrow" | "digital";
 }
 
-/** A duration given in milliseconds, in days, hours, minutes, and seconds, by Intl.DurationFormat. */
+/**
+ * A duration given in milliseconds, in days, hours, minutes, and whole seconds, by
+ * Intl.DurationFormat; a zero duration shows its seconds.
+ */
 export function formatDuration(
   milliseconds: number,
   locale?: Intl.LocalesArgument,
   options?: DurationOptions,
 ): string {
-  // Whole seconds, the fraction dropped toward zero, split into fields that share its sign, as
-  // Intl.DurationFormat requires; `|| 0` turns a negative zero into zero.
   const total = Math.trunc(milliseconds / second);
   const duration = {
     days: Math.trunc(total / 86_400) || 0,
@@ -140,33 +134,39 @@ export function formatDuration(
     minutes: Math.trunc((total % 3_600) / 60) || 0,
     seconds: total % 60 || 0,
   };
-  // Intl.DurationFormat prints "" when every field is zero, so a zero duration shows its seconds.
   const zero = total === 0 ? { secondsDisplay: "always" as const } : {};
   return new Intl.DurationFormat(locale, { style: "short", ...options, ...zero }).format(duration);
 }
 
-// JSON formatted from its own tokens: the text is walked once, token by token, and each token is
-// emitted exactly as written, with two-space indentation between them. Nothing is parsed into a
-// value and printed again, so the keys keep their order, duplicates included, numbers keep their
-// literals, and strings keep their escapes; only the whitespace between tokens changes. A
-// container deeper than JSON_MAX_DEPTH is kept as written, whole, so no indent grows past
-// JSON_MAX_DEPTH's, and the output's length stays linear in the text's however deep it nests.
-// Adapted from web-components (a659353): src/json.ts, its MAX_DEPTH renamed JSON_MAX_DEPTH, and
-// artifact-viewer.ts' pretty as tryFormatJson.
+const SPACE = 0x20;
+const TAB = 0x09;
+const LINE_FEED = 0x0a;
+const CARRIAGE_RETURN = 0x0d;
+const QUOTE = 0x22;
+const COMMA = 0x2c;
+const COLON = 0x3a;
+const OPEN_BRACKET = 0x5b;
+const BACKSLASH = 0x5c;
+const CLOSE_BRACKET = 0x5d;
+const OPEN_BRACE = 0x7b;
+const CLOSE_BRACE = 0x7d;
 
-// The indent of a depth, two spaces a level.
 function indent(depth: number): string {
   return "  ".repeat(depth);
 }
 
-// JSON's whitespace between tokens: space, tab, line feed, and carriage return.
 function isSpace(code: number): boolean {
-  return code === 0x20 || code === 0x09 || code === 0x0a || code === 0x0d;
+  return code === SPACE || code === TAB || code === LINE_FEED || code === CARRIAGE_RETURN;
 }
 
-// Where a number or a literal ends: whitespace, or the punctuation that may follow a value.
 function endsValue(code: number): boolean {
-  return isSpace(code) || code === 0x2c || code === 0x3a || code === 0x5d || code === 0x7d;
+  return (
+    isSpace(code) ||
+    code === COMMA ||
+    code === COLON ||
+    code === CLOSE_BRACKET ||
+    code === CLOSE_BRACE
+  );
 }
 
 /**
@@ -195,33 +195,28 @@ export function formatJson(text: string): string {
   const length = text.length;
   let depth = 0;
   let at = 0;
-  // Past whitespace from `from`, the index of the next token, or the text's length.
   const skip = (from: number): number => {
     while (from < length && isSpace(text.charCodeAt(from))) from++;
     return from;
   };
-  // From a string's opening quote, the index of its closing one: the first quote no backslash
-  // escapes, or the text's length.
   const stringEnd = (from: number): number => {
     let end = from + 1;
     while (end < length) {
       const inner = text.charCodeAt(end);
-      if (inner === 0x5c) end += 2;
-      else if (inner === 0x22) break;
+      if (inner === BACKSLASH) end += 2;
+      else if (inner === QUOTE) break;
       else end++;
     }
     return end;
   };
-  // From a container's opening bracket, the index past its matching closing one, strings skipped
-  // whole so a bracket inside one never counts.
   const containerEnd = (from: number): number => {
     let open = 0;
     let end = from;
     while (end < length) {
       const inner = text.charCodeAt(end);
-      if (inner === 0x22) end = stringEnd(end);
-      else if (inner === 0x7b || inner === 0x5b) open++;
-      else if ((inner === 0x7d || inner === 0x5d) && --open === 0) return end + 1;
+      if (inner === QUOTE) end = stringEnd(end);
+      else if (inner === OPEN_BRACE || inner === OPEN_BRACKET) open++;
+      else if ((inner === CLOSE_BRACE || inner === CLOSE_BRACKET) && --open === 0) return end + 1;
       end++;
     }
     return length;
@@ -229,20 +224,18 @@ export function formatJson(text: string): string {
   while ((at = skip(at)) < length) {
     const code = text.charCodeAt(at);
     switch (code) {
-      case 0x7b: // {
-      case 0x5b: {
-        // [
+      case OPEN_BRACE:
+      case OPEN_BRACKET: {
         if (depth === JSON_MAX_DEPTH) {
-          // Too deep to indent: the container as written, whole.
           const end = containerEnd(at);
           out.push(text.slice(at, end));
           at = end;
           break;
         }
         const next = skip(at + 1);
-        const close = code === 0x7b ? 0x7d : 0x5d;
+        const close = code === OPEN_BRACE ? CLOSE_BRACE : CLOSE_BRACKET;
         if (text.charCodeAt(next) === close) {
-          out.push(code === 0x7b ? "{}" : "[]");
+          out.push(code === OPEN_BRACE ? "{}" : "[]");
           at = next + 1;
         } else {
           depth++;
@@ -251,29 +244,27 @@ export function formatJson(text: string): string {
         }
         break;
       }
-      case 0x7d: // }
-      case 0x5d: // ]
+      case CLOSE_BRACE:
+      case CLOSE_BRACKET:
         depth--;
         out.push("\n", indent(depth), text[at]);
         at++;
         break;
-      case 0x2c: // ,
+      case COMMA:
         out.push(",\n", indent(depth));
         at++;
         break;
-      case 0x3a: // :
+      case COLON:
         out.push(": ");
         at++;
         break;
-      case 0x22: {
-        // " : a string, as written.
+      case QUOTE: {
         const end = stringEnd(at);
         out.push(text.slice(at, end + 1));
         at = end + 1;
         break;
       }
       default: {
-        // A number, true, false, or null, as written.
         let end = at + 1;
         while (end < length && !endsValue(text.charCodeAt(end))) end++;
         out.push(text.slice(at, end));
@@ -304,7 +295,6 @@ export function tryFormatJson(text: string): FormattedJson {
   try {
     return { ok: true, text: formatJson(text) };
   } catch {
-    // The only throw formatJson has: a RangeError, its output past the longest string.
     return { ok: true, text };
   }
 }

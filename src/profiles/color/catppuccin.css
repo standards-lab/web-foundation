@@ -1,7 +1,5 @@
+/* From catppuccin/palette (v1.8.0, MIT, Catppuccin): palette.json, latte in light and mocha in dark. */
 /*
- * Colors from Catppuccin (MIT, Catppuccin), https://github.com/catppuccin/palette, at v1.8.0: latte
- * in light and mocha in dark, from palette.json.
- *
  * profiles/color/catppuccin.css, the Catppuccin profile of the color facet: one zero-specificity
  * block, applied by data-palette="catppuccin" on any element to its subtree, declaring the sixteen
  * color tokens as light-dark() pairs, latte / mocha. Each value's comment names its upstream

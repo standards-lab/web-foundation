@@ -5,15 +5,13 @@
  * there wherever it is linked from; a component adopts it into its shadow root after the reset and
  * elements sheets (baseline/reset.css and baseline/elements.css), before its own. Self-layered and
  * importing nothing; it reads the baseline's tokens, which a shadow root inherits from the page.
- * Unlike its source, which was unlayered, it sits in its layer, so a page's own later layer wins.
  *
  * The glyph button, a control of its own beside the text button: the class glyph-button on a
  * native <button>, showing a glyph, an svg 1em a side (a block in the reset), and, when the
  * control has one, its key hint, a kbd, in one row centered on the text's line. It keeps the
  * native button the elements layer draws, its border, radius, surface, hover and focus ring, and
- * sets only the row and the padding: --space-3xs block and --space-2xs inline, a quarter and a
- * half of the text button's --space-s, which would spend a glyph's width on padding either side.
- * --space-3xs separates the glyph from its hint.
+ * sets only the row and the padding: --space-3xs block and --space-2xs inline. --space-3xs
+ * separates the glyph from its hint.
  *
  * A 1em glyph and the block padding make the smallest glyph button, the glyph alone in the compact
  * space profile on the narrowest display, 24 CSS px a side with the border: WCAG 2.5.8's target
@@ -26,9 +24,7 @@
  * glyph-hint places the hint below the button, flipped above it where the viewport's foot would
  * cut it, by the implicit anchor its invoker gives it, and draws it as a small label in the page's
  * colors reversed, the text color its fill, so it stands apart from any surface with no border.
- * Under position-area the popover's own inset: 0 and auto margins place it as the source's inset:
- * auto and margin: 0 did, and the area spans the viewport's width, so the name never wraps short
- * of it; the source's three declarations are left out, as dropping each changed nothing.
+ * The hint's name never wraps short of the viewport's width.
  */
 
 @layer foundation.glyph {

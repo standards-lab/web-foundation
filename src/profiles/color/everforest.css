@@ -1,14 +1,10 @@
+/* From sainnhe/everforest (v0.3.0, MIT, sainnhe): autoload/everforest.vim, medium in light and in dark. */
 /*
- * Colors from Everforest (MIT, sainnhe), https://github.com/sainnhe/everforest, at v0.3.0: medium
- * in light and medium in dark, its medium-contrast backgrounds, from the palette in
- * autoload/everforest.vim.
- *
  * profiles/color/everforest.css, the Everforest profile of the color facet: one zero-specificity
  * block, applied by data-palette="everforest" on any element to its subtree, declaring the sixteen
  * color tokens as light-dark() pairs, medium light / medium dark. Each value's comment names its
- * upstream swatch, the one name both schemes share. Everforest has no magenta of its own: its
- * purple is a pink-magenta and fills the terminal's magenta slot, so --purple and --magenta both
- * take it. The tokens' roles and how a profile is selected are the facet's, in
+ * upstream swatch, the one name both schemes share; --purple and --magenta both take Everforest's
+ * purple. The tokens' roles and how a profile is selected are the facet's, in
  * baseline/tokens/color.css.
  *
  * The package exports this file as ./profiles/color/everforest.css, and its registration module as

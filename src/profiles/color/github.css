@@ -1,18 +1,11 @@
+/* From primer/github-vscode-theme (v6.3.5, MIT, GitHub Inc.): Light and Dark Default, with src/colors.js's overrides. */
+/* From primer/primitives (7.10.0, MIT, GitHub Inc.): the values the theme's build resolves. */
 /*
- * Colors from GitHub's VS Code theme (MIT, GitHub Inc.),
- * https://github.com/primer/github-vscode-theme, at v6.3.5: GitHub Light Default in light and
- * GitHub Dark Default in dark, the values its build resolves for them, from @primer/primitives
- * 7.10.0 (MIT) with the theme's own overrides in src/colors.js, which set fg.default and fg.muted
- * in both and accent.fg in dark.
- *
  * profiles/color/github.css, the GitHub profile of the color facet: one zero-specificity block,
  * applied by data-palette="github" on any element to its subtree, declaring the sixteen color
  * tokens as light-dark() pairs, Light Default / Dark Default, and nothing else. The tokens' roles
  * and how a profile is selected are the facet's, in baseline/tokens/color.css. Each value's
- * comment names its upstream swatch, the one name both schemes share. neutral.muted is translucent
- * upstream, rgba(175, 184, 193, 0.2) light and rgba(110, 118, 129, 0.4) dark: --bg-2 is the opaque
- * color each produces over canvas.default, as the surfaces rule reads a surface's luminance. The
- * theme has no functional cyan, so --cyan is its terminal's, ansi.cyan.
+ * comment names its upstream swatch, the one name both schemes share.
  *
  * The package exports this file as ./profiles/color/github.css, and its registration module as
  * ./profiles/color/github.js: together, the GitHub unit. A page that links the lean entry,

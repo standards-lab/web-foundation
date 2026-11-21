@@ -1,14 +1,14 @@
-// Adapted from spike-html-apps-foundation (07ba39a): src/keys.ts, its store, modals, and storage
-// keys renamed web-foundation.keys, web-foundation.keys.modals, and web-foundation.keys.
+// Adapted from spike-html-apps-foundation (07ba39a): src/keys.ts, its global and storage keys renamed web-foundation.keys*.
 // The page's keyboard shortcuts: an element with data-keys is clicked or focused by its keys, and
-// register() binds a handler. One store at a well-known global key is shared by every copy, and
-// the first copy to load installs the one listener, so a key never fires twice.
+// register() binds a handler. One store at the well-known global key
+// Symbol.for("web-foundation.keys") is shared by every copy, and the first copy to load installs
+// the one listener, so a key never fires twice; the modals focus has entered, at
+// Symbol.for("web-foundation.keys.modals"), are shared alike.
 // Adapted from spike-html-packages-foundation (5dd8a58): src/keys.ts.
 
 import { keyshortcuts, matches, normalize, parse, problem, stringify } from "./keys-grammar.ts";
 import type { Binding, KeyLike, Press, Sequence } from "./keys-grammar.ts";
 
-/** A register() binding's handler, given the keys-fire event. */
 type Handler = (event: CustomEvent<FireDetail>) => void;
 
 /** A `register` binding, as the store holds it. */
@@ -25,7 +25,10 @@ export interface Store {
   listening: boolean;
 }
 
-/** The reader's settings in effect. */
+/**
+ * The reader's settings in effect. Turning keys off silences character keys alone, never a
+ * combination with Control, Alt, or Meta (WCAG 2.1.4).
+ */
 export interface Settings {
   enabled: boolean;
   wait: number;
@@ -66,26 +69,19 @@ interface Match {
   sequence: Sequence;
 }
 
-/** The store's well-known global key, shared by every copy of the module. */
 const KEY = Symbol.for("web-foundation.keys");
 const scope = globalThis as typeof globalThis & Record<symbol, Store | Element[] | undefined>;
 scope[KEY] ??= { registered: [], wait: 1500, listening: false };
 const store = scope[KEY] as Store;
 
-/**
- * The well-known global key of the modals focus has entered, oldest first, which every copy
- * shares. The first copy to create the list tracks it.
- */
 const MODALS = Symbol.for("web-foundation.keys.modals");
 const tracking = !scope[MODALS];
 scope[MODALS] ??= [];
 const entered = scope[MODALS] as Element[];
 
-// userAgentData is Chromium's and not yet in TypeScript's DOM types.
 const agent = navigator as Navigator & { userAgentData?: { platform: string } };
 const mac = /mac|iphone|ipad/i.test(agent.userAgentData?.platform ?? navigator.platform);
 
-/** The keys that only modify another, which neither start nor drop a sequence. */
 const MODIFIER_KEYS = new Set(["Shift", "Control", "Alt", "Meta", "AltGraph", "CapsLock", "OS"]);
 
 /** Binds keys to a handler with no element; returns a function that removes this binding. */
@@ -107,22 +103,17 @@ export function register(keys: string, label: string, handler: Handler): () => v
 /** The waits between presses, in ms, a reader can pick. */
 export const WAITS = [1000, 1500, 3000, 5000] as const;
 
-/** The localStorage key of the reader's settings. */
 const STORAGE = "web-foundation.keys";
 
-/** Each setting's check: the values a reader can choose. */
 const VALID: Record<keyof Settings, (value: unknown) => boolean> = {
   enabled: (value) => typeof value === "boolean",
   wait: (value) => WAITS.some((ms) => ms === value),
 };
 
-/** Whether the name is a setting. */
 const isSetting = (name: string): name is keyof Settings => name in VALID;
 
-/** The settings with nothing stored: on, at the store's wait. */
 const defaults = (): Settings => ({ enabled: true, wait: store.wait });
 
-/** The reader's valid stored settings; none when storage is empty, unparseable, or blocked. */
 function stored(): Partial<Settings> {
   let saved: unknown;
   try {
@@ -139,12 +130,25 @@ function stored(): Partial<Settings> {
   );
 }
 
+function persist(next: Record<string, unknown>): boolean {
+  try {
+    if (Object.keys(next).length === 0) localStorage.removeItem(STORAGE);
+    else localStorage.setItem(STORAGE, JSON.stringify(next));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 /** The settings in effect: the reader's where stored and valid, else the defaults. */
 export function settings(): Settings {
   return { ...defaults(), ...stored() };
 }
 
-/** Stores the reader's change, a default or null removing a setting, and returns the settings. */
+/**
+ * Stores the reader's change, a default or null removing a setting, and returns the settings; where
+ * storage is blocked the change is lost.
+ */
 export function changeSettings(change: SettingsChange): Settings {
   const next: Record<string, unknown> = stored();
   const fallback = defaults();
@@ -156,29 +160,20 @@ export function changeSettings(change: SettingsChange): Settings {
     if (value === null || value === fallback[name]) delete next[name];
     else next[name] = value;
   }
-  try {
-    if (Object.keys(next).length === 0) localStorage.removeItem(STORAGE);
-    else localStorage.setItem(STORAGE, JSON.stringify(next));
-  } catch {
-    // Storage is blocked: the change is lost.
-  }
+  persist(next);
   declare();
   return settings();
 }
 
-// The off switch covers character keys alone, never a combination with Control, Alt, or Meta
-// (WCAG 2.1.4).
 const isCharacter = (press: Press): boolean =>
   !press.control && !press.alt && !press.meta && [...press.key].length === 1;
 
-/** The binding's alternatives the settings leave active, or null when it is malformed. */
 function effective(binding: string | null, current: Settings): Binding | null {
   const alternatives = parse(binding, { mac });
   if (!alternatives || current.enabled) return alternatives;
   return alternatives.filter((sequence) => !sequence.every(isCharacter));
 }
 
-/** Writes aria-keyshortcuts on every data-keys element, removing it where nothing is declared. */
 function declare(): void {
   const current = settings();
   for (const el of document.querySelectorAll("[data-keys]")) {
@@ -191,24 +186,14 @@ function declare(): void {
   }
 }
 
-/**
- * The element a key was pressed in. The listener sits on the document, where event.target is
- * retargeted to the outermost shadow host; the composed path's first entry is the field itself,
- * in an open shadow root at any depth.
- */
 const origin = (event: Event): EventTarget => event.composedPath()[0];
 
-/** The focused element, followed down through each open shadow root's own focused element. */
 function focused(): Element | null {
   let el = document.activeElement;
   while (el?.shadowRoot?.activeElement) el = el.shadowRoot.activeElement;
   return el;
 }
 
-/**
- * The node and its ancestors in the flat tree, nearest first: a slotted element's parent is its
- * slot, and a shadow root's is its host.
- */
 function* flat(node: Node | null): Generator<Node> {
   for (let at = node; at;) {
     yield at;
@@ -217,34 +202,20 @@ function* flat(node: Node | null): Generator<Node> {
   }
 }
 
-/** Whether the node is inside the element in the flat tree. */
 const within = (element: Element, node: Node): boolean => flat(node).some((at) => at === element);
 
-/** The innermost open modal the node is inside in the flat tree, or null. */
 const modalOf = (node: Node | null): Element | null =>
   flat(node).find((at): at is Element => at instanceof Element && at.matches(":modal")) ?? null;
 
-/** Moves the modal, if any, to the end of those focus entered, and drops those now closed. */
 function enter(modal: Element | null): void {
   const open = entered.filter((el) => el !== modal && el.matches(":modal"));
   entered.splice(0, entered.length, ...open, ...(modal ? [modal] : []));
 }
 
-/**
- * Records the modal that focus entered. querySelectorAll() searches no shadow root, and nothing
- * lists the top layer, but showModal() moves focus into the dialog, its first focusable element
- * or itself, so focus enters every modal as it opens, at any depth of open shadow roots.
- */
 function onfocusin(event: FocusEvent): void {
   enter(modalOf(origin(event) as Node));
 }
 
-/**
- * The open modals, topmost first: the one focus is in, then those focus entered, newest first,
- * then the document's own. The page outside the topmost modal is inert, so focus is in it, unless
- * its focused element was removed and focus fell to the body; a modal focus entered before keys
- * loaded is recorded here, at the first press.
- */
 function modals(): Element[] {
   enter(modalOf(focused()));
   const recorded = entered.toReversed();
@@ -252,7 +223,6 @@ function modals(): Element[] {
   return [...recorded, ...light];
 }
 
-/** Whether the target is a form field or editable, where a key types. */
 function isField(el: EventTarget | null): boolean {
   return (
     el instanceof HTMLElement &&
@@ -262,7 +232,6 @@ function isField(el: EventTarget | null): boolean {
 
 const warned = new WeakMap<Element, Set<string | null>>();
 
-/** The element's binding, or null after warning once per element and value. */
 function elementBinding(el: HTMLElement, current: Settings): Active | null {
   const keys = el.getAttribute("data-keys");
   const alternatives = effective(keys, current);
@@ -275,15 +244,9 @@ function elementBinding(el: HTMLElement, current: Settings): Active | null {
   return null;
 }
 
-/** Whether the element can act: enabled, not inert, and rendered. */
 const isActiveElement = (el: HTMLElement): boolean =>
   !el.matches(":disabled") && !el.closest("[inert]") && el.checkVisibility();
 
-/**
- * The active bindings, first-wins order: elements in document order, then registered ones. The
- * topmost open modal, in the document or an open shadow root, narrows them to its elements,
- * slotted ones included; `closed` is a dialog treated as closed.
- */
 function active(current: Settings, closed: Element | null = null): Active[] {
   const modal = modals().find((el) => el !== closed);
   const elements = [...document.querySelectorAll<HTMLElement>("[data-keys]")]
@@ -311,7 +274,6 @@ interface Pending {
 
 let pending: Pending | null = null;
 
-// An event's fields are live only while it dispatches, so a pending press keeps a copy.
 const snapshot = ({ key, code, shiftKey, altKey, ctrlKey, metaKey }: KeyboardEvent): KeyLike => ({
   key,
   code,
@@ -321,33 +283,23 @@ const snapshot = ({ key, code, shiftKey, altKey, ctrlKey, metaKey }: KeyboardEve
   metaKey,
 });
 
-/** How long after compositionend, in ms, the next keydown still belongs to the composition. */
 const SETTLE = 100;
 
-/** When the last composition ended, by performance.now(), until a keydown takes it; else null. */
 let ended: number | null = null;
 
-/** Marks a composition's end, for the keydown WebKit sends after it. */
 function oncompositionend(): void {
   ended = performance.now();
 }
 
-/**
- * Whether the press is the composition's own: WebKit sends the Enter or Escape that commits or
- * cancels one after compositionend, with isComposing false. The first keydown takes the mark, so
- * it belongs to the composition only within SETTLE, and Chrome, which sends none, loses nothing.
- */
 function settling(): boolean {
   const at = ended;
   ended = null;
   return at !== null && performance.now() - at < SETTLE;
 }
 
-/** Whether the press is passed over: handled, repeated, or an input method's. */
 const passed = (event: KeyboardEvent): boolean =>
   event.defaultPrevented || event.repeat || event.isComposing;
 
-/** Whether the press is one keys never matches. */
 const silent = (event: KeyboardEvent): boolean =>
   passed(event) ||
   event.key === "Dead" ||
@@ -356,7 +308,6 @@ const silent = (event: KeyboardEvent): boolean =>
   event.getModifierState?.("AltGraph") ||
   isField(origin(event));
 
-/** Blurs the field an Escape was pressed in, outside any modal, and reports whether it did. */
 function release(event: KeyboardEvent): boolean {
   const field = focused();
   if (event.key !== "Escape" || passed(event) || field !== origin(event)) return false;
@@ -365,7 +316,6 @@ function release(event: KeyboardEvent): boolean {
   return true;
 }
 
-/** Dispatches keys-sequence on the document. */
 function announce(
   state: SequenceDetail["state"],
   presses: string[],
@@ -375,7 +325,6 @@ function announce(
   document.dispatchEvent(new CustomEvent("keys-sequence", { detail }));
 }
 
-/** Ends the pending sequence; it ends before the binding acts, so a throw leaves none behind. */
 function end(reason: NonNullable<SequenceDetail["reason"]>): void {
   if (!pending) return;
   clearTimeout(pending.timer);
@@ -384,7 +333,6 @@ function end(reason: NonNullable<SequenceDetail["reason"]>): void {
   announce("end", strings, reason);
 }
 
-/** The binding's keys-fire event, for the presses that fired it. */
 function fireEvent(binding: Active, sequence: Sequence): CustomEvent<FireDetail> {
   const detail: FireDetail = {
     binding: normalize(binding.keys, { mac }),
@@ -394,14 +342,12 @@ function fireEvent(binding: Active, sequence: Sequence): CustomEvent<FireDetail>
   return new CustomEvent("keys-fire", { bubbles: true, cancelable: true, detail });
 }
 
-/** Runs the binding: its handler, else focuses its field or clicks its element. */
 function act(binding: Active, event: CustomEvent<FireDetail>): void {
   if (binding.entry) binding.entry.handler(event);
   else if (isField(binding.el)) binding.el.focus();
   else binding.el.click();
 }
 
-/** Dispatches keys-fire and, unless it is cancelled, acts. */
 function fire({ binding, sequence }: Match): void {
   const event = fireEvent(binding, sequence);
   if ((binding.el ?? document).dispatchEvent(event)) act(binding, event);
@@ -431,7 +377,6 @@ export function bindings(dialog: Element | null): Listed[] {
   return listed;
 }
 
-/** Matches a press, after those pending, and fires, waits for a longer binding, or drops. */
 function onkey(event: KeyboardEvent): void {
   if (settling() || release(event) || silent(event)) return;
   const presses = [...(pending?.presses ?? []), snapshot(event)];
@@ -474,7 +419,6 @@ function onkey(event: KeyboardEvent): void {
   announce(started ? "start" : "continue", strings);
 }
 
-/** Keeps aria-keyshortcuts current as data-keys elements and the stored settings change. */
 function observe(): void {
   declare();
   addEventListener("storage", (event) => {
@@ -504,12 +448,7 @@ function observe(): void {
 if (!store.listening) {
   store.listening = true;
   document.addEventListener("keydown", onkey);
-  // compositionend is composed, so the document sees it from a field in a shadow root; captured,
-  // so a listener that stops it doesn't hide it.
   document.addEventListener("compositionend", oncompositionend, true);
   observe();
 }
-// The copy that created the modal list tracks it, even beside an older copy holding the listener.
-// focusin is composed, so the document sees it from an open shadow root; captured, so a listener
-// that stops it doesn't hide it.
 if (tracking) document.addEventListener("focusin", onfocusin, true);

@@ -48,4 +48,6 @@ comment, so their provenance is here:
 
 ## Why the CSS is built as it is
 
-[docs/css.md](../docs/css.md) gives the reasoning.
+[docs/css.md](../docs/css.md) gives the reasoning; [docs/design-reference.md](../docs/design-reference.md)
+gives the baseline's port of spike-html-design and its rules' reasoning, and
+[docs/modules.md](../docs/modules.md) the modules'.
