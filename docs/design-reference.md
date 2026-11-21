@@ -85,8 +85,10 @@ layout properties it changes to an explicit list.
 - **Disabled fields** sit on `--bg-1` with `--fg-2` text, so a disabled value still reads apart
   from the placeholder's `--fg-3`.
 - **Progress and meter** paint their track on `--bg-2`: chromium's native dark track is its own
-  gray, and its fallback once a page styles the bar is near white. A progress bar drops its
-  native look when its background is set, so its fill is painted too. An indeterminate bar then
+  gray, and its fallback once a page styles the bar is near white. The rules paint through
+  chromium's `::-webkit-progress-bar`, `::-webkit-progress-value`, and `::-webkit-meter-bar`,
+  without `appearance`. A progress bar drops its native look when its background is set, so its
+  fill is painted too. An indeterminate bar then
   has no fill element, so its track paints a segment two fifths wide as a one-color gradient;
   under reduced motion it stands still at the middle, and otherwise it sweeps from -67% to 167%,
   a segment's width outside either edge. A meter keeps chromium's region-colored fill.

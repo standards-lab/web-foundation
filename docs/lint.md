@@ -4,7 +4,7 @@
 `test/unit/layers-tree.ts` writes, so every rule below is tested.
 
 - **The recommended rules, and a reason on every suppression.** ESLint's and typescript-eslint's
-  recommended sets, on every `.js` and `.ts` file. An ESLint directive needs a description
+  recommended sets apply to every `.js` and `.ts` file. An ESLint directive needs a description
   (eslint-comments `require-description`), and a `@ts-expect-error`, `@ts-ignore`, or `@ts-nocheck`
   needs one too (`ban-ts-comment`, `allow-with-description`).
 - **Globals.** Every file sees the browser's globals; the suite and the scripts also see node's,

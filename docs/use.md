@@ -1,4 +1,4 @@
-# Use
+# Using web-foundation
 
 The package is `@standards-lab/web-foundation`. A page links one page entry and imports the
 modules by their `.js` subpaths. The lean entry, `page.css`, carries the default profiles, and

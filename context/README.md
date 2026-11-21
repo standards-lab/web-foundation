@@ -46,8 +46,9 @@ comment, so their provenance is here:
 - **Specimen** (built): [specimen.html](../demo/specimen.html), [backups/](../demo/backups/).
 - **Formatters** (built): [format.ts](../src/format.ts).
 
-## Why the CSS is built as it is
+## Where the design reasoning lives
 
-[docs/css.md](../docs/css.md) gives the reasoning; [docs/design-reference.md](../docs/design-reference.md)
-gives the baseline's port of spike-html-design and its rules' reasoning, and
-[docs/modules.md](../docs/modules.md) the modules'.
+[docs/design-reference.md](../docs/design-reference.md) gives the baseline's port of
+spike-html-design and the reasoning behind its rules, [docs/css.md](../docs/css.md) the reasoning
+behind the other sheets, and [docs/modules.md](../docs/modules.md) the reasoning behind the
+modules.

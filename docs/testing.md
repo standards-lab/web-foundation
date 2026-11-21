@@ -1,8 +1,9 @@
 # Testing
 
-Why the tests measure as they do, where a test's name and its assertions don't say.
-[use.md](use.md) documents what the sheets and modules promise, and [css.md](css.md) and
-[modules.md](modules.md) why they are built as they are; the tests name the behavior each holds to.
+This page explains why the tests measure as they do, where a test's name and assertions don't say.
+[use.md](use.md) documents what the sheets and modules promise;
+[design-reference.md](design-reference.md), [css.md](css.md), and [modules.md](modules.md) explain
+why they are built as they are.
 
 ## The tiers
 
@@ -114,8 +115,8 @@ Why the tests measure as they do, where a test's name and its assertions don't s
 - A value import of a declaration file is caught in each value form, an inline `type` specifier
   among them, since `verbatimModuleSyntax` keeps that import.
 - The allowed imports use names that hold dots, which a rule must tell from `.` and `..` segments.
-- `lint` runs ESLint with `-c` on the repository's config, whose patterns then match from the tree,
-  the working directory, and whose plugins load from the repository's `node_modules`.
+- `lint()` runs ESLint in the tree with `-c` on the repository's config, so the config's patterns
+  match from the tree and its plugins load from the repository's `node_modules`.
 
 ## Formatters
 

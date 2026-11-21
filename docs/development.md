@@ -45,19 +45,19 @@ driver and server also come from, over the capture description in
 profile; `--palette`, `--space`, and `--type` choose a profile, and `--all` captures every color
 and compact and sans. `--output directory --dir <path>` writes the files instead of showing them
 in kitty; `mise run screenshots -- --help` lists the other flags, and web-tooling's README
-documents them. The check never runs either task.
-
-The check lints with ESLint, Prettier, shellcheck, and actionlint, which shellchecks each workflow's
-`run:` blocks with the pinned shellcheck too, and with marathon's lint-context and lint-references,
-from the pinned marathon release; [lint.md](lint.md) gives the ESLint rules, and
-[testing.md](testing.md) why the tests measure as they do. CI runs `mise run install` and the check
-on each pull request to main and each push to it.
+documents them. The check runs neither `demo` nor `screenshots`.
 
 `mise run screenshots` is `raw`: mise pipes a task's output when the task has dependencies, and
 kitty's inline images need the terminal. Its arguments follow the capture description, with or
 without a leading `--`.
 
-## The toolchain
+The check lints with ESLint, Prettier, shellcheck, actionlint, and the pinned marathon release's
+lint-context and lint-references. actionlint also runs the pinned shellcheck on each workflow's
+`run:` blocks. [lint.md](lint.md) gives the ESLint rules, and [testing.md](testing.md) explains why
+the tests measure as they do. CI runs `mise run install` and the check on each pull request to main
+and each push to it.
+
+## How the toolchain is configured
 
 - **No task installs a tool.** `task.run_auto_install` is off, so a missing tool fails its task,
   and the preflight names `mise run install`, the one task that reads the network besides
@@ -70,15 +70,15 @@ without a leading `--`.
   packages. unrs-resolver, under eslint-plugin-import-x and eslint-import-resolver-typescript, has
   a postinstall that fetches its native binding when the optional dependency holding it is
   missing; pnpm installs that dependency, so the script isn't run. `minimumReleaseAge: 0` turns off
-  pnpm's wait of a day before it installs a release: the currency task moves each pin to its
-  latest release, and that release's notes are read before the bump lands, a review that stands
-  in for the age gate; with the wait on, a frozen install of a lockfile that pins a release under a
-  day old fails.
+  pnpm's one-day wait before it installs a release. The currency task moves each pin to its latest
+  release, and that release's notes are read before the bump lands, a review that stands in for
+  the wait. With the wait on, a frozen install of a lockfile that pins a release under a day old
+  fails.
 - **Prettier formats the code, the JSON, and the stylesheets only.** Its default run would also
   rewrite the Markdown, the YAML, and `pnpm-lock.yaml`, so `.prettierignore` ignores every file,
   then lets back every directory and the code, JSON, and CSS files. Prettier also skips what
   `.gitignore` lists.
 - **Currency** runs mise at its error log level, since mise warns on every run that a GitHub
-  release has no assets. It checks the tooling, a `github:` devDependency pinned to its
-  repository's release tag, which the registry doesn't hold, against that repository's latest
-  release, and holds typescript to the newest version typescript-eslint's peer range accepts.
+  release has no assets. It checks a `github:` devDependency, such as web-tooling, which is pinned
+  to a release tag the npm registry doesn't hold, against its repository's latest release. It
+  holds typescript to the newest version typescript-eslint's peer range accepts.

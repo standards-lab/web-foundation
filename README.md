@@ -30,9 +30,10 @@ project itself declares. Each GitHub release also carries the tarball.
 
 ## Use and development
 
-- [Use](https://github.com/standards-lab/web-foundation/blob/main/docs/use.md): the entries, modules, color hooks, tokens, and sheets, and what the
-  foundation stores.
-- [Development](https://github.com/standards-lab/web-foundation/blob/main/docs/development.md): the mise tasks, the demo pages, and the screenshots.
+- [Use](https://github.com/standards-lab/web-foundation/blob/main/docs/use.md): the entries,
+  modules, color hooks, tokens, and sheets, and what the foundation stores.
+- [Development](https://github.com/standards-lab/web-foundation/blob/main/docs/development.md):
+  the mise tasks, the demo pages, the screenshots, and how the toolchain is configured.
 
 ## Release
 
