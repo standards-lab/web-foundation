@@ -4,11 +4,11 @@ Tasks run through [mise](https://mise.jdx.dev):
 
 ```
 mise run install      # the pinned tools and node_modules; reads the network
-mise run check        # lint, types, build, and the unit and browser tiers; reads no network
+mise run check        # lint (lint-context and lint-references too), types, build, and the unit and browser tiers; reads no network
 mise run build        # src/ into dist/
 mise run demo         # serve the demo pages on dist/
 mise run screenshots  # capture the demo pages light and dark, shown inline in kitty
-mise run currency     # report every tool, package, action pin, and tooling tag behind its latest
+mise run currency     # report every tool, package, action pin, and tooling tag behind its latest; reads the network
 ```
 
 The demo pages, in `demo/`:
@@ -48,7 +48,8 @@ in kitty; `mise run screenshots -- --help` lists the other flags, and web-toolin
 documents them. The check never runs either task.
 
 The check lints with ESLint, Prettier, shellcheck, and actionlint, which shellchecks each workflow's
-`run:` blocks with the pinned shellcheck too; [lint.md](lint.md) gives the ESLint rules, and
+`run:` blocks with the pinned shellcheck too, and with marathon's lint-context and lint-references,
+from the pinned marathon release; [lint.md](lint.md) gives the ESLint rules, and
 [testing.md](testing.md) why the tests measure as they do. CI runs `mise run install` and the check
 on each pull request to main and each push to it.
 
