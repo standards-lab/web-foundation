@@ -1,17 +1,11 @@
+/* From zenbones-theme/zenbones.nvim (v4.12.0): colors/zenwritten.vim; MIT, Michael Chris Lopez. */
 /*
- * Colors from Zenwritten, of zenbones (MIT, Michael Chris Lopez),
- * https://github.com/zenbones-theme/zenbones.nvim, at v4.12.0: its light and dark backgrounds, the
- * values its generated colors/zenwritten.vim bakes for them.
- *
  * profiles/color/zen.css, the Zen profile of the color facet, the default: one zero-specificity
  * block, applied by data-palette="zen" on any element to its subtree and on the root with no
  * attribute anywhere, declaring the sixteen color tokens as light-dark() pairs, light / dark. Each
  * value's comment names its upstream source, the one name both schemes share: a highlight group's
- * color, or a palette swatch as the file's terminal colors bake it. --fg-2 is fg1, the palette's
- * step from fg toward the background, baked as the bright-white terminal color. The upstream has
- * six hues of its own, not eight: wood fills both --orange and --yellow, and blossom both --purple
- * and --magenta. The tokens' roles and how a profile is selected are the facet's, in
- * baseline/tokens/color.css.
+ * color, or a palette swatch as the file's terminal colors bake it. The tokens' roles and how a
+ * profile is selected are the facet's, in baseline/tokens/color.css.
  *
  * The package exports this file as ./profiles/color/zen.css, and its registration module as
  * ./profiles/color/zen.js: together, the Zen unit. Both entries, page.css through baseline.css and

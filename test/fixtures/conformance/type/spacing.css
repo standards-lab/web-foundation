@@ -1,5 +1,4 @@
 /* From spike-html-apps-foundation (07ba39a): test/fixtures/conformance/type/spacing.css. */
-/* A type profile that also sets a color token and a space token. It fails type-only alone. */
 
 @layer foundation.tokens.type {
   :where([data-type="spacing"]) {

@@ -4,10 +4,9 @@
  * Adapted from spike-html-packages-foundation (5dd8a58): src/page.css.
  */
 
-/* Comes first to fix the order. meta precedes structure and utilities so a .button that is also
-   .scroll-y or .field computes as in v0.7.0; a page's own later layer wins over the foundation.
-   The opt-in sheets, which this entry doesn't import, are named last, so a page that links one
-   after it gets the layer in its place: glyph-button.css's foundation.glyph, dialog.css's
+/* The foundation's layers, in order; a page's own later layer wins over all of them. The opt-in
+   sheets' layers, which this entry doesn't import, are named last, so a page that links one after
+   it gets the layer in its place: glyph-button.css's foundation.glyph, dialog.css's
    foundation.dialog, layout.css's foundation.layout, and motion.css's foundation.motion. */
 
 @layer foundation.tokens.color, foundation.tokens.space, foundation.tokens.type, foundation.reset, foundation.elements, foundation.meta, foundation.structure, foundation.utilities, foundation.glyph, foundation.dialog, foundation.layout, foundation.motion;

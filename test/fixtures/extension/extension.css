@@ -1,11 +1,4 @@
 /* From spike-html-apps-foundation (07ba39a): test/fixtures/extension/extension.css. */
-/*
- * The extension fixture's sheet: a color profile from outside the package, written as a built-in
- * unit's sheet is, one zero-specificity block applied by data-palette="extension", self-layered in
- * foundation.tokens.color so a page links it after the entry and it follows the default there.
- * Its sixteen tokens are each a light-dark() pair no built-in profile uses, so the browser tier
- * tells it apart from all of them.
- */
 
 @layer foundation.tokens.color {
   :where([data-palette="extension"]) {

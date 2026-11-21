@@ -1,11 +1,4 @@
-// Adapted from spike-html-apps-foundation (07ba39a): test/browser/preferences.test.ts, importing
-// the tooling as @standards-lab/web-tooling, with the storage key renamed
-// web-foundation.preferences, and without the theme menu.
-// The preferences module from the package's dist/, as a consumer loads it: the stored choice
-// applied before first paint, kept in storage, and followed across tabs, on
-// test/fixtures/preferences*.html and test/fixtures/flash-*.html; demo/theme.html's and
-// demo/unit.html's own controls; and a unit, built-in or from outside the package, joining a lean
-// page.
+// Adapted from spike-html-apps-foundation (07ba39a): test/browser/preferences.test.ts, importing the tooling by name, its key renamed web-foundation.preferences, without the theme menu.
 // Adapted from spike-html-design (fe75220): test/preferences.test.js, in TypeScript.
 
 import assert from "node:assert/strict";
@@ -17,12 +10,10 @@ import { serve } from "@standards-lab/web-tooling/server.js";
 import type { Browser, Page } from "@standards-lab/web-tooling/browser.js";
 import type { Server } from "@standards-lab/web-tooling/server.js";
 
-/** The repository root, which the server serves. */
 const root = join(import.meta.dirname, "../..");
 
 const KEY = "web-foundation.preferences";
 const PREFERENCES = "/dist/preferences.js";
-/** A profile other than the default in every facet, and the dark scheme. */
 const CHOICE = { color: "github", space: "compact", type: "sans", scheme: "dark" };
 const APPLIED = {
   "data-palette": "github",
@@ -41,7 +32,6 @@ before(async () => {
   server = await serve({ root });
   browser = await launch();
 });
-// Every page shares one origin, and so the one stored choice.
 afterEach(async () => {
   for (const page of pages.splice(0)) {
     await page.evaluate("localStorage.clear()").catch(() => {});
@@ -53,17 +43,12 @@ after(async () => {
   await server?.stop();
 });
 
-/** Opens the URL, closing it after the test. */
 async function open(url: string): Promise<Page> {
   const page = await browser.open(url);
   pages.push(page);
   return page;
 }
 
-/**
- * Stores the value under KEY, as JSON unless it is a string, or clears it when null, from a page
- * of the origin, which it returns: a fixture loaded next finds the value in storage.
- */
 async function seed(value: unknown): Promise<Page> {
   const page = await open(fixture("preferences.html"));
   await page.evaluate(
@@ -76,31 +61,25 @@ async function seed(value: unknown): Promise<Page> {
   return page;
 }
 
-/** The page's stored choice, parsed. */
 const stored = (page: Page) =>
   page.evaluate(`JSON.parse(localStorage.getItem(${JSON.stringify(KEY)}))`);
 
-/** The root's four preference attributes, null where one is absent. */
 const rooted = (page: Page) =>
   page.evaluate(`Object.fromEntries(["data-palette", "data-space", "data-type", "data-scheme"]
     .map((name) => [name, document.documentElement.getAttribute(name)]))`);
 
-/** Evaluates the body with the page's preferences module, the one it loaded, bound. */
 const call = (page: Page, body: string) =>
   page.evaluate(`import(${JSON.stringify(PREFERENCES)}).then((preferences) => ${body})`);
 
-/** Evaluates the body with the page's registry module, the one it loaded, bound. */
 const registry = (page: Page, body: string) =>
   page.evaluate(`import("/dist/registry.js").then((registry) => ${body})`);
 
-/** The names the page registered, per facet. */
 const registered = (page: Page) =>
   registry(
     page,
     `Object.fromEntries(registry.FACETS.map((facet) => [facet, registry.profiles(facet)]))`,
   );
 
-/** Chooses the value in the page's demo control for the key, as the reader would. */
 const choose = (page: Page, key: string, value: string) =>
   page.evaluate(`(() => {
     const select = document.querySelector("form[data-choice] select[name=${key}]");
@@ -108,7 +87,6 @@ const choose = (page: Page, key: string, value: string) =>
     select.dispatchEvent(new Event("change", { bubbles: true }));
   })()`);
 
-/** The computed value of the property on the first element the selector matches. */
 const style = (page: Page, selector: string, property: string) =>
   page.evaluate(
     `getComputedStyle(document.querySelector(${JSON.stringify(selector)})).getPropertyValue(${JSON.stringify(property)})`,
@@ -156,12 +134,9 @@ describe("preferences: apply and storage", () => {
     const page = await open(fixture("preferences-lean.html"));
     assert.deepEqual(await rooted(page), { ...NONE, "data-scheme": "dark" });
     assert.deepEqual(await stored(page), CHOICE);
-    // The default's tokens apply: mono's heading font, not sans's.
     assert.match(await style(page, "h1", "font-family"), /^ui-monospace/);
   });
 
-  // A palette the package no longer ships, or no longer ships by that name (zenwritten, renamed
-  // zen in 0.3.0, has no alias), as a choice saved before it went, or any unknown name.
   for (const color of ["zenwritten", "flexoki", "primer", "kanagawa", "tokyo-night", "unknown"]) {
     test(`a stored ${color} palette applies zen and stays in storage`, async () => {
       const choice = { ...CHOICE, color };
@@ -169,7 +144,6 @@ describe("preferences: apply and storage", () => {
       const page = await open(fixture("preferences.html"));
       assert.deepEqual(await rooted(page), { ...APPLIED, "data-palette": null });
       assert.deepEqual(await stored(page), choice);
-      // zen's dark --bg, Normal's background, on the dark scheme the choice applies.
       assert.equal(await style(page, "body", "background-color"), "rgb(25, 25, 25)");
     });
   }
@@ -178,7 +152,6 @@ describe("preferences: apply and storage", () => {
     await seed(null);
     const page = await open(fixture("preferences.html"));
     assert.equal(await call(page, `preferences.save(${JSON.stringify(CHOICE)})`), true);
-    // save writes storage only; the page applies a choice itself.
     assert.deepEqual(await rooted(page), NONE);
     const lean = await open(fixture("preferences-lean.html"));
     assert.deepEqual(await rooted(lean), { ...NONE, "data-scheme": "dark" });
@@ -222,7 +195,6 @@ describe("preferences: apply and storage", () => {
   test("blocked storage reads as nothing stored and saves nothing, without throwing", async () => {
     await seed(CHOICE);
     const page = await open(fixture("preferences.html"));
-    // Storage that throws on get and on set from before the modules run, as a sandboxed frame's.
     await page.cdp("Page.addScriptToEvaluateOnNewDocument", {
       source: `window.errors = [];
         addEventListener("error", (event) => window.errors.push(String(event.message)));
@@ -238,13 +210,9 @@ describe("preferences: apply and storage", () => {
   });
 });
 
-// The flash: the stored choice reaching the root against first paint, with each module's fetch
-// held. The recorder takes first-paint from a PerformanceObserver and the moment data-palette
-// lands from a MutationObserver.
 describe("preferences: the flash", () => {
   const DELAY = 200;
 
-  /** Loads the flash fixture with CHOICE stored and every dist/ module's fetch held DELAY ms. */
   async function flash(name: string) {
     const page = await seed(CHOICE);
     page.on("Fetch.requestPaused", ({ requestId }: { requestId: string }) => {
@@ -262,7 +230,6 @@ describe("preferences: the flash", () => {
     assert.ok(blocking.applied <= blocking.paint, `applied ${blocking.applied}, ${blocking.paint}`);
     assert.ok(blocking.paint >= DELAY, `first paint ${blocking.paint} didn't wait on the fetch`);
     assert.deepEqual(await rooted(blocking.page), APPLIED);
-    // Not blocking, the defaults paint first and the choice lands after the held fetch.
     const deferred = await flash("flash-deferred.html");
     assert.ok(deferred.applied > deferred.paint, `applied ${deferred.applied}, ${deferred.paint}`);
   });
@@ -274,13 +241,11 @@ describe("preferences: the storage event", () => {
     const saver = await open(fixture("preferences.html"));
     const page = await open(fixture("preferences.html"));
     for (const color of ["github", "catppuccin", "everforest"]) {
-      // This tab's own apply, which a save from the other tab then replaces.
       await call(page, `preferences.apply({ color: "zen" })`);
       await call(saver, `preferences.save(${JSON.stringify({ ...CHOICE, color })})`);
       await until(page, `document.documentElement.getAttribute("data-palette") === "${color}"`);
       assert.deepEqual(await rooted(page), { ...APPLIED, "data-palette": color });
     }
-    // A cleared key restores the defaults.
     await saver.evaluate("localStorage.clear()");
     await until(page, `!document.documentElement.hasAttribute("data-palette")`);
     assert.deepEqual(await rooted(page), NONE);
@@ -303,11 +268,7 @@ describe("preferences: the module", () => {
   });
 });
 
-// A unit joins a lean page by its sheet linked after the entry and its module imported, a built-in
-// unit from dist/profiles/ or a profile from outside the package, test/fixtures/extension/, alike:
-// the registry lists it, and the attribute and a stored choice apply it.
 describe("preferences: units and extensions", () => {
-  /** The root's --bg, its whitespace collapsed. */
   const background = (page: Page) =>
     page.evaluate(`getComputedStyle(document.documentElement).getPropertyValue("--bg")
       .trim().replace(/\\s+/g, " ")`);
@@ -349,7 +310,6 @@ describe("preferences: units and extensions", () => {
   }
 });
 
-// The demo pages' own controls, demo/choice.js, in place of a menu: a select per key of a choice.
 describe("preferences: demo/theme.html", () => {
   const demo = () => `${server.origin}/demo/theme.html`;
 
@@ -372,7 +332,6 @@ describe("preferences: demo/theme.html", () => {
       type: "mono",
     });
     await until(other, `document.documentElement.getAttribute("data-palette") === "github"`);
-    // The second tab's controls show the choice too.
     assert.equal(
       await other.evaluate(`document.querySelector("select[name=color]").value`),
       "github",
@@ -397,7 +356,6 @@ describe("preferences: demo/unit.html", () => {
     });
     await choose(page, "color", "github");
     assert.equal((await rooted(page))["data-palette"], "github");
-    // GitHub's light --bg, canvas.default, on the system scheme the page follows.
     assert.equal(await style(page, "body", "background-color"), "rgb(255, 255, 255)");
   });
 });

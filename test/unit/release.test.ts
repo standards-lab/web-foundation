@@ -1,7 +1,4 @@
 // From spike-html-apps-foundation (07ba39a): test/unit/release.test.ts.
-// The release's integrity: a pnpm pack of the build, extracted, against package.json's files and
-// exports and against its license, by release.ts's releaseProblems, as it stands and in scratch
-// copies with one fault each. It packs the dist/ that mise run build writes.
 // Adapted from spike-html-packages-foundation (5dd8a58): test/unit/release.test.js, in TypeScript.
 
 import assert from "node:assert/strict";
@@ -17,14 +14,12 @@ const root = join(import.meta.dirname, "../..");
 const src = join(root, "src");
 const scratches: string[] = [];
 
-/** A new temporary directory, removed after the run. */
 function scratchDir() {
   const scratch = mkdtempSync(join(tmpdir(), "release-"));
   scratches.push(scratch);
   return scratch;
 }
 
-// The pack under test: pnpm pack's tarball, extracted, its package/ directory.
 let pack: string;
 before(() => {
   const scratch = scratchDir();
@@ -37,11 +32,8 @@ after(() => {
   for (const scratch of scratches) rmSync(scratch, { recursive: true, force: true });
 });
 
-/** A fault: a change to a pack's copy, given its directory and its manifest, every field of which
- * the pack declares. */
 type Change = (dir: string, manifest: Required<Manifest>) => void;
 
-/** A scratch copy of the pack, `change` applied to it and its manifest, and its problems. */
 function faulted(change: Change) {
   const copy = join(scratchDir(), "package");
   cpSync(pack, copy, { recursive: true });

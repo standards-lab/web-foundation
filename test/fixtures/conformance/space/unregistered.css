@@ -1,5 +1,4 @@
 /* From spike-html-apps-foundation (07ba39a): test/fixtures/conformance/space/unregistered.css. */
-/* A conforming space profile the fixture page never registers. It fails registered alone. */
 
 @layer foundation.tokens.space {
   :where([data-space="unregistered"]) {

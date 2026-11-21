@@ -1,9 +1,8 @@
-# Adapted from web-tooling (1ff49e4): .github/workflows/ci.yml, its comment for this package's pins.
-# mise run install installs every pin mise.toml names, the chrome-headless-shell the browser tier
-# runs in included.
-# Adapted from spike-html-apps-tooling (d77877b): .github/workflows/ci.yml, its pins at their
-# latest.
+# Adapted from web-tooling (1ff49e4): .github/workflows/ci.yml, for this package's pins.
+# Adapted from spike-html-apps-tooling (d77877b): .github/workflows/ci.yml, its pins at their latest.
 # From spike-html-apps-foundation (9c15b8d): .github/workflows/ci.yml.
+# The check on each pull request to main and each push to it.
+# See docs/development.md
 
 name: CI
 

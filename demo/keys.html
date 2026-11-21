@@ -1,22 +1,17 @@
 <!doctype html>
-<!-- Adapted from spike-html-apps-foundation (07ba39a): demo/keys.html, its help dialog a plain
-     list the page fills from bindings(). -->
+<!-- Adapted from spike-html-apps-foundation (07ba39a): demo/keys.html, its help dialog a plain list the page fills from bindings(). -->
+<!-- From spike-html-packages-foundation (5dd8a58): demo/keys.html. -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>foundation keys</title>
-    <!-- The keys family from dist/: bindings by data-keys and register(), and a help dialog this
-         page fills from bindings() as it opens, a demo and not a foundation feature. Its modules
-         run served only: mise run demo.
-         From spike-html-packages-foundation (5dd8a58): demo/keys.html. -->
     <link rel="stylesheet" href="../dist/page.css" />
     <link rel="stylesheet" href="demo.css" />
     <script type="module" src="../dist/keys.js"></script>
     <script type="module">
       import { bindings, register } from "../dist/keys.js";
 
-      // say writes what a binding did into the log, newest first.
       const say = (text) => {
         const item = document.createElement("li");
         item.textContent = text;
@@ -26,14 +21,11 @@
         const name = event.target.closest?.("[data-say]")?.dataset.say;
         if (name) say(name);
       });
-      // The pending presses of a sequence, from keys-sequence alone.
       document.addEventListener("keys-sequence", ({ detail }) => {
         document.getElementById("pending").textContent =
           detail.state === "end" ? "" : detail.presses.join(" then ");
       });
       register("j", "Say j, a register() binding", () => say("j, from register()"));
-      // The help dialog lists, as it opens, each binding the page would have with it closed: its
-      // keys as written, and its label, else the text of its element or the element's <label>.
       const help = document.getElementById("help");
       help.addEventListener("beforetoggle", (event) => {
         if (event.newState !== "open") return;

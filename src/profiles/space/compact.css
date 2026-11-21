@@ -1,20 +1,12 @@
 /* From spike-html-apps-foundation (07ba39a): src/profiles/space/compact.css. */
-/* Adapted from spike-html-design (fe75220): layers/tokens/space/compact.css */
+/* Adapted from spike-html-design (fe75220): profiles/space/compact.css. */
 
 /*
- * The content is upstream's but for the block that wraps it in the foundation.tokens.space layer,
- * the layer names its comments give, spike-html-design.* upstream and foundation.* here, and the
- * paragraph on how a page takes the unit, written for this package. The port is this repository's
- * own code: Prettier formats it, and the browser tier holds what it computes, not its text, to
- * upstream's.
- */
-
-/*
- * layers/tokens/space/compact.css, the compact profile of the space facet: one zero-specificity
+ * profiles/space/compact.css, the compact profile of the space facet: one zero-specificity
  * block, applied by data-space="compact" on any element to its subtree, declaring the four values
  * the space tokens derive from. It is denser than regular: a smaller base and tighter radii, with
  * the same line widths. The tokens' roles, what derives from these values, and how a profile is
- * selected are the facet's, in layers/tokens/space.css.
+ * selected are the facet's, in baseline/tokens/space.css.
  *
  * The package exports this file as ./profiles/space/compact.css, and its registration module as
  * ./profiles/space/compact.js: together, the compact unit. A page that links the lean entry,

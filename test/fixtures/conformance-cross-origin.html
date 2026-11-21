@@ -5,10 +5,6 @@
   <head>
     <meta charset="utf-8" />
     <title>conformance cross-origin fixture</title>
-    <!-- The full entry from the origin the sheets parameter names, as a page links it from a CDN:
-         a cross-origin sheet served without CORS, so chromium hides its rules, and only computed
-         values can be read. Written in by the parser, so it blocks rendering and the load event as
-         a link in the markup does. -->
     <script>
       const sheets = new URLSearchParams(location.search).get("sheets");
       document.write(`<link rel="stylesheet" href="${sheets}/dist/page-full.css" />`);

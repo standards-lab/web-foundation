@@ -1,6 +1,4 @@
 /* From spike-html-apps-foundation (07ba39a): test/fixtures/conformance/color/unpainted.css. */
-/* A color profile whose block also paints its scope's background from --red, beating the facet's
-   own paint rule, earlier in foundation.tokens.color, by order. It fails paints alone. */
 
 @layer foundation.tokens.color {
   :where([data-palette="unpainted"]) {

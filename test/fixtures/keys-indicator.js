@@ -1,6 +1,4 @@
 // From spike-html-apps-foundation (07ba39a): test/fixtures/keys-indicator.js.
-// A pending-sequence indicator built outside keys from its keys-sequence events alone: the presses
-// so far in #indicator, cleared when the sequence ends. It proves the extension point.
 // From spike-html-packages-foundation (5dd8a58): test/fixtures/keys-indicator.js.
 
 document.addEventListener("keys-sequence", ({ detail }) => {

@@ -39,7 +39,6 @@
       <button type="button" data-keys="Escape" commandfor="modal" command="close">Close</button>
     </dialog>
     <script type="module">
-      // log records each action a binding runs, in order, for the tests and the reader.
       window.log = [];
       document.addEventListener("click", (event) => {
         const name = event.target.closest?.("[data-log]")?.dataset.log;

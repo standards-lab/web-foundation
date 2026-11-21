@@ -1,10 +1,8 @@
-// Adapted from spike-html-apps-foundation (07ba39a): src/conformance.ts, its registry key renamed
-// web-foundation.registry.
-// The conformance check: whether a profile an extension adds keeps its facet's contract, in a live
-// page. It imports nothing at runtime and reads computed values only, never a sheet's rules, which
-// chromium hides from a file:// page and across origins, so it runs alike from file://, a CDN, a
-// local server, and node_modules.
+// Adapted from spike-html-apps-foundation (07ba39a): src/conformance.ts, its registry key renamed web-foundation.registry.
 // Adapted from spike-html-design (fe75220): modules/conformance.js.
+// The conformance check: whether a profile an extension adds keeps its facet's contract, in a live
+// page. It imports nothing at runtime and reads computed values only, never a sheet's rules, so it
+// runs alike from file://, a CDN, a local server, and node_modules.
 
 import type { Facet } from "./registry.ts";
 
@@ -14,40 +12,39 @@ export interface Failure {
   message: string;
 }
 
-/** The registry's facets, a copy, since this module imports nothing at runtime. */
 const FACETS: readonly Facet[] = ["color", "space", "type"];
 
-/** Each facet's rule names, in the order check() reports them. */
+/**
+ * Each facet's rule names, in the order check() reports them:
+ *
+ * - tokens: color's sixteen tokens are each a color, in light and in dark; space's --space-base,
+ *   --line-s, --line-m, and --radius-base are lengths; type's four role fonts and four role
+ *   leadings are set.
+ * - color-only, space-only, type-only: no other facet's token is set.
+ * - layer: the block is in the facet's sub-layer, such as foundation.tokens.color.
+ * - specificity: the selector is :where([data-palette="<name>"]), or the facet's attribute.
+ * - paints (color): a scope paints its background from its --bg and its text from its --fg.
+ * - surfaces (color): --bg, --bg-1, and --bg-2 each step closer to --fg's luminance.
+ * - contrast (color): --fg on --bg reaches 4.5:1, WCAG's AA for body text, in light and in dark.
+ * - scale (space): the nine steps derived from --space-base ascend strictly.
+ * - scale (type): the text steps ascend strictly, and each role font resolves to a family.
+ * - registered: the registry lists the name under the facet.
+ */
 export const RULES: Readonly<Record<Facet, readonly string[]>> = Object.freeze({
   color: Object.freeze([
-    "tokens", // each of the sixteen tokens is a color, in light and in dark
-    "color-only", // no space or type token is set
-    "layer", // the block is in foundation.tokens.color
-    "specificity", // the selector is :where([data-palette="<name>"])
-    "paints", // a scope paints its background from its --bg and its text from its --fg
-    "surfaces", // --bg, --bg-1, and --bg-2 each step closer to --fg's luminance
-    "contrast", // --fg on --bg reaches 4.5:1, WCAG's AA for body text, in light and in dark
-    "registered", // the registry lists the name under color
-  ]),
-  space: Object.freeze([
-    "tokens", // --space-base, --line-s, --line-m, and --radius-base are lengths
-    "space-only",
+    "tokens",
+    "color-only",
     "layer",
     "specificity",
-    "scale", // the nine steps derived from --space-base ascend strictly
+    "paints",
+    "surfaces",
+    "contrast",
     "registered",
   ]),
-  type: Object.freeze([
-    "tokens", // the four role fonts and four role leadings are set
-    "type-only",
-    "layer",
-    "specificity",
-    "scale", // the text steps ascend strictly, and each role font resolves to a family
-    "registered",
-  ]),
+  space: Object.freeze(["tokens", "space-only", "layer", "specificity", "scale", "registered"]),
+  type: Object.freeze(["tokens", "type-only", "layer", "specificity", "scale", "registered"]),
 });
 
-/** The sixteen color tokens, in the facet's order. */
 const COLOR = [
   "--bg",
   "--bg-1",
@@ -67,7 +64,6 @@ const COLOR = [
   "--magenta",
 ];
 
-/** The space facet's nine spacing steps, smallest first. */
 const STEPS = [
   "--space-3xs",
   "--space-2xs",
@@ -80,10 +76,8 @@ const STEPS = [
   "--space-3xl",
 ];
 
-/** The four values a space profile sets, which the rest derive from. */
 const SPACE_VALUES = ["--space-base", "--line-s", "--line-m", "--radius-base"];
 
-/** The space facet's tokens: the values its profiles set and every token derived from them. */
 const SPACE = [
   "--space-fluid",
   ...SPACE_VALUES,
@@ -94,7 +88,6 @@ const SPACE = [
   "--radius-full",
 ];
 
-/** The type facet's eight text steps, smallest first. */
 const TEXT = [
   "--text-xs",
   "--text-s",
@@ -106,9 +99,7 @@ const TEXT = [
   "--text-4xl",
 ];
 
-/** The four role fonts. */
 const FONTS = ["--font-body", "--font-heading", "--font-ui", "--font-code"];
-/** The eight values a type profile sets. */
 const TYPE_VALUES = [
   ...FONTS,
   "--leading-body",
@@ -117,25 +108,14 @@ const TYPE_VALUES = [
   "--leading-code",
 ];
 
-/** The type facet's tokens: the values its profiles set and the text scale. */
 const TYPE = ["--type-fluid", ...TEXT, ...TYPE_VALUES];
 
-/** What check() needs to know of a facet. */
 interface Spec {
-  /** The attribute that names a profile of the facet. */
   attribute: string;
-  /** The values a profile sets. */
   values: readonly string[];
-  /** The other facets' tokens, which a profile never sets. */
   others: readonly string[];
-  /**
-   * The facet's tokens declared on the root alone, which the check's host leaves to inherit from
-   * it, as a scope under the profile reads them: the fluid expansions, and the text scale.
-   */
   rooted: readonly string[];
-  /** The layer after the facet's sub-layer, in the package's order. */
   next: string;
-  /** The schemes a scope is read in, or null for one scope that sets none. */
   schemes: readonly (string | null)[];
 }
 
@@ -166,23 +146,13 @@ const SPECS: Readonly<Record<Facet, Spec>> = {
   },
 };
 
-/** The attribute that marks the check's own scopes. */
 const PROBE = "data-conformance-probe";
-/** The value the check's own rules set every value token of the facet to, on its scopes. */
 const SENTINEL = "conformance-probe";
 
-/** The color a probe reads when a token is unset or no color: no palette holds one 0.4% opaque. */
 const MISSING = "rgba(1, 2, 3, 0.004)";
 
-/** The family a font probe inherits when a token is unset or no family: no profile's. */
 const FAMILY = `"${SENTINEL}"`;
 
-/**
- * The check's own stylesheet for the facet: every value token set to SENTINEL at zero specificity
- * on a scope marked same, later in the facet's layer than any profile, and on one marked later, in
- * the layer after it. The layer statement names both layers in the package's order and creates
- * neither when the page's entry already has.
- */
 function style(facet: Facet): string {
   const { values, next } = SPECS[facet];
   const sentinels = values.map((token) => `${token}: ${SENTINEL};`).join(" ");
@@ -202,35 +172,28 @@ export async function check(facet: Facet, name: string): Promise<Failure[]> {
   if (typeof name !== "string" || name === "") {
     throw new TypeError(`conformance: a ${facet} profile's name must be a non-empty string`);
   }
-  // Every stylesheet has applied once the page has loaded.
   if (document.readyState !== "complete") {
     await new Promise((resolve) => addEventListener("load", resolve, { once: true }));
   }
   return probe(facet, name);
 }
 
-/** One scope of the profile, in a scheme or none, with a probe element two levels inside it. */
 interface Scope {
   scheme: string | null;
   scope: HTMLElement;
   probe: HTMLElement;
 }
 
-/** The probes check() reads: a scope per scheme, and the two the layer rules read. */
 interface Probes {
   scopes: Scope[];
   same: HTMLElement;
   later: HTMLElement;
 }
 
-/** Builds the probes for facet's profile name, reads them, and removes them. */
 function probe(facet: Facet, name: string): Failure[] {
   const spec = SPECS[facet];
   const sheet = document.createElement("style");
   sheet.textContent = style(facet);
-  // The host resets every token but the facet's rooted ones, so a scope inside it holds only what
-  // the profile, or the check's own rules, set there. It renders nothing: getComputedStyle still
-  // computes a subtree that is not displayed.
   const host = document.createElement("div");
   host.style.display = "none";
   for (const token of [...spec.values, ...spec.others]) {
@@ -245,9 +208,6 @@ function probe(facet: Facet, name: string): Failure[] {
   };
   const scopes = spec.schemes.map((scheme) => {
     const el = scope(scheme);
-    // A color token that is unset falls back to MISSING, and one that is set but no color is
-    // invalid at computed-value time, so the probe inherits MISSING from its parent; a font token
-    // likewise inherits FAMILY.
     const parent = el.appendChild(document.createElement("div"));
     parent.style.color = MISSING;
     parent.style.fontFamily = FAMILY;
@@ -265,7 +225,6 @@ function probe(facet: Facet, name: string): Failure[] {
   }
 }
 
-/** The rules facet's profile name breaks, read from the probes, in RULES's order. */
 function failures(facet: Facet, name: string, probes: Probes): Failure[] {
   const spec = SPECS[facet];
   const failed: Failure[] = [];
@@ -274,7 +233,6 @@ function failures(facet: Facet, name: string, probes: Probes): Failure[] {
   const own = getComputedStyle(probes.scopes[0].scope);
   const layer = `foundation.tokens.${facet}`;
 
-  // tokens, and what the derived rules read of the tokens that pass it.
   const derive = TOKENS[facet](probes, fail);
 
   const others = spec.others.filter((token) => own.getPropertyValue(token).trim() !== "");
@@ -283,7 +241,6 @@ function failures(facet: Facet, name: string, probes: Probes): Failure[] {
     fail(`${facet}-only`, `sets ${kinds[facet]} tokens: ${others.join(", ")}`);
   }
 
-  // The values the profile sets on its scope, as the layer and specificity rules read them.
   const set = spec.values.filter((token) => own.getPropertyValue(token).trim() !== "");
   const beaten = (el: HTMLElement) => {
     const computed = getComputedStyle(el);
@@ -314,29 +271,17 @@ function failures(facet: Facet, name: string, probes: Probes): Failure[] {
   return failed;
 }
 
-/** A rule's failure, reported under the profile's name. */
 type Fail = (rule: string, message: string) => void;
 
-/**
- * Each facet's tokens rule, run on the probes: it reports what fails, and returns the facet's
- * derived rules, bound to what they read of the tokens that passed, to run after specificity. A
- * derived rule skips a token that failed tokens, so a missing token fails tokens alone.
- */
 const TOKENS: Readonly<Record<Facet, (probes: Probes, fail: Fail) => () => void>> = {
   color: colorTokens,
   space: spaceTokens,
   type: typeTokens,
 };
 
-/** The contrast ratio --fg on --bg must reach in each scheme: WCAG's AA for body text. */
 const CONTRAST = 4.5;
 
-/**
- * The color tokens rule, reading each token in each scheme; returns paints, surfaces, and
- * contrast.
- */
 function colorTokens({ scopes }: Probes, fail: Fail): () => void {
-  // Each scheme's computed color per token, or null when the token is unset or no color there.
   const colors = scopes.map(({ scheme, probe }) => {
     const resolved: Record<string, string | null> = {};
     for (const token of COLOR) {
@@ -386,7 +331,6 @@ function colorTokens({ scopes }: Probes, fail: Fail): () => void {
       );
     }
 
-    // Compared unrounded, so 4.49:1 fails; shown truncated, so a failing ratio never reads 4.50:1.
     const low = [];
     for (const { scheme, resolved } of colors) {
       if (!resolved["--fg"] || !resolved["--bg"]) continue;
@@ -399,7 +343,6 @@ function colorTokens({ scopes }: Probes, fail: Fail): () => void {
   };
 }
 
-/** The space tokens rule, reading each of the four values as a length; returns scale. */
 function spaceTokens({ scopes: [{ probe }] }: Probes, fail: Fail): () => void {
   const broken = SPACE_VALUES.filter((token) => length(probe, token) === null);
   if (broken.length) fail("tokens", `sets no length for ${broken.join(", ")}`);
@@ -416,7 +359,6 @@ function spaceTokens({ scopes: [{ probe }] }: Probes, fail: Fail): () => void {
   };
 }
 
-/** The type tokens rule, reading each of the eight values as set; returns scale. */
 function typeTokens({ scopes: [{ scope, probe }] }: Probes, fail: Fail): () => void {
   const own = getComputedStyle(scope);
   const broken = TYPE_VALUES.filter((token) => own.getPropertyValue(token).trim() === "");
@@ -443,11 +385,6 @@ function typeTokens({ scopes: [{ scope, probe }] }: Probes, fail: Fail): () => v
   };
 }
 
-/**
- * The length, in px, that token computes to on the probe, or null when it is unset or no length
- * there. A margin that reads an invalid token computes to 0 whatever is added to it,
- * while a length's two sums differ by the 1px between them.
- */
 function length(probe: HTMLElement, token: string): number | null {
   const sum = (px: number) => {
     probe.style.marginLeft = `calc(var(${token}) + ${px}px)`;
@@ -458,25 +395,18 @@ function length(probe: HTMLElement, token: string): number | null {
   return Math.abs(two - one - 1) < 0.01 ? one - 1 : null;
 }
 
-/** Whether every value is a length, each strictly greater than the one before. */
 function ascending(values: (number | null)[]): boolean {
   return values.every((value, i) => value !== null && (i === 0 || value > values[i - 1]!));
 }
 
-/** Lengths written for a message, in px, unresolved ones as such. */
 function shown(values: (number | null)[]): string {
   return values
     .map((value) => (value === null ? "no length" : `${+value.toFixed(3)}px`))
     .join(", ");
 }
 
-/** The one-pixel canvas luminance() draws on, made at its first call. */
 let context: CanvasRenderingContext2D | null = null;
 
-/**
- * A computed color's WCAG relative luminance, 0 to 1. The color is drawn into a one-pixel canvas
- * and read back as sRGB, so any notation a computed value takes reads alike.
- */
 function luminance(color: string): number {
   context ??= document.createElement("canvas").getContext("2d", { willReadFrequently: true })!;
   context.clearRect(0, 0, 1, 1);
@@ -489,7 +419,6 @@ function luminance(color: string): number {
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 }
 
-/** Two computed colors' WCAG contrast ratio, 1 to 21: the lighter's luminance over the darker's. */
 function contrast(one: string, two: string): number {
   const [lighter, darker] = [luminance(one), luminance(two)].sort((a, b) => b - a);
   return (lighter + 0.05) / (darker + 0.05);

@@ -1,8 +1,4 @@
-// Adapted from spike-html-apps-foundation (07ba39a): test/browser/keys.test.ts, importing the
-// tooling and the package as @standards-lab/web-tooling and @standards-lab/web-foundation, and with
-// the store and settings keys renamed web-foundation.keys.
-// The keys runtime from the package's dist/, pressed with real keys through the DevTools Protocol
-// on test/fixtures/keys*.html.
+// Adapted from spike-html-apps-foundation (07ba39a): test/browser/keys.test.ts, importing the tooling and the package by name, its keys renamed web-foundation.keys.
 // Adapted from spike-html-packages-foundation (5dd8a58): test/browser/keys.test.js, in TypeScript.
 
 import assert from "node:assert/strict";
@@ -15,12 +11,10 @@ import type { Browser, Page } from "@standards-lab/web-tooling/browser.js";
 import type { Server } from "@standards-lab/web-tooling/server.js";
 import type { FireDetail } from "@standards-lab/web-foundation/keys.js";
 
-/** The repository root, which the server serves. */
 const root = join(import.meta.dirname, "../..");
 
 const KEYS = "/dist/keys.js";
 const STORE = 'globalThis[Symbol.for("web-foundation.keys")]';
-// The sequence wait the tests set, short so a test waits it out quickly.
 const WAIT = 150;
 
 let server: Server;
@@ -32,7 +26,6 @@ before(async () => {
   server = await serve({ root });
   browser = await launch();
 });
-// Every fixture shares one origin, and so the reader's stored settings.
 afterEach(async () => {
   for (const page of pages.splice(0)) {
     await page.evaluate("localStorage.clear()");
@@ -44,7 +37,6 @@ after(async () => {
   await server?.stop();
 });
 
-/** Opens a fixture with the wait set to WAIT, recording keys-fire and keys-sequence details. */
 async function open(name = "keys.html"): Promise<Page> {
   const page = await browser.open(fixture(name));
   pages.push(page);
@@ -61,8 +53,6 @@ async function open(name = "keys.html"): Promise<Page> {
 
 const MODIFIERS: Record<string, number> = { alt: 1, ctrl: 2, meta: 4, shift: 8 };
 
-/** A press's code and keyCode where its key's default isn't the one, whether it repeats, and the
- * modifiers held. */
 interface PressInit {
   code?: string;
   repeat?: boolean;
@@ -73,10 +63,6 @@ interface PressInit {
   shift?: boolean;
 }
 
-/**
- * Sends a real key press: keyDown then keyUp, with a US layout's code for a letter or digit
- * unless given, and the text a character types when no Control or Meta is held.
- */
 async function press(
   page: Page,
   key: string,
@@ -99,26 +85,17 @@ async function press(
   await page.cdp("Input.dispatchKeyEvent", { type: "keyUp", ...event });
 }
 
-/** Presses Escape as a keyboard sends it. */
 const pressEscape = (page: Page, init?: PressInit) =>
   press(page, "Escape", { code: "Escape", keyCode: 27, ...init });
 
-/** Presses ?, Shift and the slash key. */
 const pressHelp = (page: Page) => press(page, "?", { code: "Slash", shift: true });
 
-/** The actions the fixture's bindings ran, in order. */
 const log = (page: Page) => page.evaluate("window.log");
 
-/** The keys-fire details, in order. */
 const fired = (page: Page): Promise<FireDetail[]> => page.evaluate("window.fired");
 
-/** How long after compositionend keys takes a keydown as the composition's, in ms. */
 const SETTLE = 100;
 
-/**
- * Dispatches, in one task, a composition on the element with the id, or the body, then a keydown
- * of each key there as WebKit sends the key that ends one: after compositionend, not composing.
- */
 const composeThen = (page: Page, id: string | null, keys: string[]) =>
   page.evaluate(`(() => {
     const el = ${id ? `document.getElementById(${JSON.stringify(id)})` : "document.body"};
@@ -132,40 +109,32 @@ const composeThen = (page: Page, id: string | null, keys: string[]) =>
     }
   })()`);
 
-/** Resolves after ms, as measured in the page. */
 const sleep = (page: Page, ms: number) =>
   page.evaluate(`new Promise((resolve) => setTimeout(resolve, ${ms}))`);
 
-/** Evaluates the expression with the page's keys module bound as `keys`. */
 const call = (page: Page, body: string) =>
   page.evaluate(`import(${JSON.stringify(KEYS)}).then((keys) => ${body})`);
 
-/** Registers a binding, labelled by its keys, whose handler logs its keys. */
 const registerLogged = (page: Page, binding: string) => {
   const keys = JSON.stringify(binding);
   return call(page, `keys.register(${keys}, ${keys}, () => window.log.push(${keys}))`);
 };
 
-/** The [name, message] of the error the keys call throws, or null. */
 const thrown = (page: Page, body: string) =>
   call(
     page,
     `{ try { ${body}; return null; } catch (e) { return [e.constructor.name, e.message]; } }`,
   );
 
-/** Focuses the element with the id. */
 const focus = (page: Page, id: string) =>
   page.evaluate(`document.getElementById(${JSON.stringify(id)}).focus()`);
 
-/** The focused element's id, or its tag when it has none. */
 const active = (page: Page) =>
   page.evaluate("document.activeElement.id || document.activeElement.localName");
 
-/** Whether the dialog with the id is open. */
 const isOpen = (page: Page, id = "help") =>
   page.evaluate(`document.getElementById(${JSON.stringify(id)}).open`);
 
-/** Whether the dialog with the id is modal. */
 const isModal = (page: Page, id = "help") =>
   page.evaluate(`document.getElementById(${JSON.stringify(id)}).matches(":modal")`);
 
@@ -179,13 +148,13 @@ describe("keys: element bindings", () => {
     assert.deepEqual(await log(page), ["command --theme"]);
     assert.equal(await page.evaluate("window.handled"), true);
     assert.deepEqual(await fired(page), [{ binding: "t", keys: ["t"] }]);
-    // A single press that fires at once is no sequence.
     assert.deepEqual(await page.evaluate("window.sequences"), []);
   });
 
   test("on a layout such as Russian, the key on T's code runs the T binding", async () => {
     const page = await open();
-    await press(page, "е", { code: "KeyT" }); // Cyrillic е, not Latin e.
+    const cyrillicE = "\u0435";
+    await press(page, cyrillicE, { code: "KeyT" });
     assert.deepEqual(await log(page), ["command --theme"]);
     assert.deepEqual(await fired(page), [{ binding: "t", keys: ["t"] }]);
   });
@@ -282,7 +251,7 @@ describe("keys: sequences", () => {
   test("a press that doesn't continue the sequence ends it and is dropped, not retried", async () => {
     const page = await open();
     await press(page, "g");
-    await press(page, "t"); // Bound, but as a new start, not as g's next press.
+    await press(page, "t");
     await sleep(page, WAIT + 100);
     assert.deepEqual(await log(page), []);
     assert.deepEqual(await page.evaluate("window.sequences"), [
@@ -349,7 +318,6 @@ describe("keys: silence", () => {
     const page = await open();
     await press(page, "t", { repeat: true });
     await press(page, "Dead");
-    // Chrome and Firefox name a press an input method takes, before isComposing is set, Process.
     await press(page, "Process", { keyCode: 229 });
     await page.evaluate(`for (const init of [{ isComposing: true }, { modifierAltGraph: true }]) {
       document.dispatchEvent(new KeyboardEvent("keydown",
@@ -456,7 +424,6 @@ describe("keys: Escape releases a field", () => {
     }
     const each = FIELDS.map(() => "j");
     assert.deepEqual(await log(page), each);
-    // Escape is no binding: only the j presses fired keys-fire.
     assert.deepEqual(
       (await fired(page)).map(({ binding }) => binding),
       each,
@@ -520,7 +487,6 @@ describe("keys: Escape releases a field", () => {
       modal.append(Object.assign(document.createElement("input"), { id: "inside" }));
       modal.showModal();
       document.getElementById("inside").focus();
-      // Added after keys's listener, it sees where focus is once keys has run.
       document.addEventListener("keydown", () => (window.after = document.activeElement.id));
     })()`);
     await pressEscape(page);
@@ -529,25 +495,20 @@ describe("keys: Escape releases a field", () => {
   });
 });
 
-// Each field of keys-shadow.html, as the path through open shadow roots to it: one root deep in
-// x-fields, and two in x-panel's own x-fields.
 const SHADOW_FIELDS = ["input", "textarea", "editable"].flatMap((id) => [
   ["fields", id],
   ["panel", "inner", id],
 ]);
 
-/** The expression for the element at the path: a document id, then an id in each shadow root. */
 const deep = ([host, ...rest]: string[]) =>
   rest.reduce(
     (expression, id) => `${expression}.shadowRoot.getElementById(${JSON.stringify(id)})`,
     `document.getElementById(${JSON.stringify(host)})`,
   );
 
-/** The text the field at the path holds: its value, or a contenteditable's text. */
 const typed = (page: Page, path: string[]) =>
   page.evaluate(`(() => { const el = ${deep(path)}; return el.value ?? el.textContent; })()`);
 
-/** Whether the field at the path is focused, as the page follows focus through shadow roots. */
 const isFocused = (page: Page, path: string[]) =>
   page.evaluate(`(() => {
     let el = document.activeElement;
@@ -596,18 +557,12 @@ describe("keys: fields in open shadow roots", () => {
   });
 });
 
-// Each modal of keys-modal.html, as the paths to its dialog and to its field: in the document,
-// one shadow root deep in x-modal, and two in x-nest's own x-modal.
 const MODALS = [
   { name: "light", dialog: ["light"], field: ["field"] },
   { name: "one", dialog: ["one", "dialog"], field: ["one", "field"] },
   { name: "two", dialog: ["two", "inner", "dialog"], field: ["two", "inner", "field"] },
 ];
 
-/**
- * Records, as window.after, where focus is once keys has run on each keydown: added after keys's
- * listener, it runs after it.
- */
 const followFocus = (page: Page) =>
   page.evaluate(`document.addEventListener("keydown", () => {
     let el = document.activeElement;
@@ -622,13 +577,11 @@ describe("keys: modals in open shadow roots", () => {
     const expected: string[] = [];
     for (const { name, dialog } of MODALS) {
       await page.evaluate(`${deep(dialog)}.showModal()`);
-      // Out of the field showModal() focused, onto the slotted button.
       await page.evaluate(`document.querySelector('[data-log="m ${name}"]').focus()`);
       await press(page, "t");
       await press(page, "/");
       await pressHelp(page);
       assert.equal(await isOpen(page, "help"), false, name);
-      // Its slotted button binds.
       await press(page, "m");
       await page.evaluate(`${deep(dialog)}.close()`);
       await press(page, "t");
@@ -670,7 +623,6 @@ describe("keys: modals in open shadow roots", () => {
   test("with a modal open over another, only the topmost one's bindings fire", async () => {
     const page = await open("keys-modal.html");
     await page.evaluate(`document.getElementById("host").showModal()`);
-    // The host's own x-modal, then the document's light dialog, each opened over the host.
     for (const { name, dialog } of [
       { name: "over", dialog: ["over", "dialog"] },
       { name: "light", dialog: ["light"] },
@@ -747,7 +699,6 @@ describe("keys: extension and the store", () => {
       "wait",
       "listening",
     ]);
-    // The modals list sits beside the store, at its own well-known key.
     assert.equal(
       await page.evaluate(`Array.isArray(globalThis[Symbol.for("web-foundation.keys.modals")])`),
       true,
@@ -762,10 +713,8 @@ describe("keys: extension and the store", () => {
   });
 });
 
-// The settings fixture's bindings: a key, a symbol, a chord, two combinations, and a named key.
 const SETTINGS = "keys-settings.html";
 const ALL = ["t", "?", "g c", "Alt+t", "Control+k", "Escape"];
-// Each binding's aria-keyshortcuts with the off switch on, and with it off.
 const DECLARED = {
   t: "T",
   "?": "Shift+/",
@@ -776,12 +725,10 @@ const DECLARED = {
 };
 const OFF = { ...DECLARED, t: null, "?": null };
 
-/** Each bound button's aria-keyshortcuts, by its data-log. */
 const declared = (page: Page) =>
   page.evaluate(`Object.fromEntries([...document.querySelectorAll("[data-log]")]
     .map((el) => [el.dataset.log, el.getAttribute("aria-keyshortcuts")]))`);
 
-/** Writes the reader's settings as another tab would, and sends the storage event it sends. */
 const store = (page: Page, value: unknown) => {
   const json = JSON.stringify(typeof value === "string" ? value : JSON.stringify(value));
   return page.evaluate(`(() => {
@@ -792,17 +739,14 @@ const store = (page: Page, value: unknown) => {
   })()`);
 };
 
-/** The reader's stored settings, or null. */
 const saved = (page: Page) =>
   page.evaluate(`JSON.parse(localStorage.getItem("web-foundation.keys"))`);
 
-/** Presses each of the settings fixture's bindings as written. */
 async function pressAll(page: Page) {
   await press(page, "t");
   await pressHelp(page);
   await press(page, "g");
   await press(page, "c");
-  // Option changes the character on macOS, so Alt matches a letter by its code.
   await press(page, "†", { code: "KeyT", alt: true });
   await press(page, "k", { ctrl: true });
   await press(page, "Escape", { code: "Escape" });
@@ -818,7 +762,6 @@ describe("keys: bindings as written", () => {
       (await fired(page)).map(({ keys }) => keys),
       [["t"], ["?"], ["g", "c"], ["Alt+t"], ["Control+k"], ["Escape"]],
     );
-    // Modifiers are exact: k without Control, and Alt+Shift+T, fire nothing.
     await page.evaluate("window.log = []");
     await press(page, "k");
     await press(page, "†", { code: "KeyT", alt: true, shift: true });
@@ -878,7 +821,6 @@ describe("keys: the reader's settings", () => {
     assert.deepEqual(await saved(page), { wait: 3000, enabled: false });
     await call(page, `keys.changeSettings({ wait: null, enabled: true })`);
     assert.equal(await saved(page), null);
-    // Invalid values and unknown names already stored are dropped on the next change.
     await store(page, { enabled: 1, foo: 1 });
     await call(page, `keys.changeSettings({ wait: 5000 })`);
     assert.deepEqual(await saved(page), { wait: 5000 });
@@ -917,7 +859,6 @@ describe("keys: aria-keyshortcuts", () => {
     assert.deepEqual(await declared(page), OFF);
     await pressAll(page);
     assert.deepEqual(await log(page), ["Alt+t", "Control+k", "Escape"]);
-    // Storage cleared in another tab sends a null key.
     await page.evaluate(`(localStorage.clear(),
       dispatchEvent(new StorageEvent("storage", { key: null, storageArea: localStorage })))`);
     assert.deepEqual(await declared(page), DECLARED);
@@ -927,7 +868,7 @@ describe("keys: aria-keyshortcuts", () => {
     const one = await open(SETTINGS);
     const two = await open(SETTINGS);
     await call(one, `keys.changeSettings({ enabled: false })`);
-    await sleep(two, 50); // The other tab's storage event arrives as a task.
+    await sleep(two, 50);
     assert.deepEqual(await declared(two), OFF);
     await press(two, "t");
     await press(two, "k", { ctrl: true });
@@ -956,13 +897,10 @@ describe("keys: aria-keyshortcuts", () => {
     );
     assert.equal(await shortcut("n"), "N");
     assert.equal(await shortcut("Alt+n, ?"), "Alt+N Shift+/");
-    // A sequence declares nothing; nor does a malformed binding.
     assert.equal(await shortcut("n m"), null);
     assert.equal(await shortcut("Control+"), null);
-    // data-keys removed: the attribute keys wrote goes with it.
     assert.equal(await shortcut("n"), "N");
     assert.equal(await shortcut(null), null);
-    // An element that never carried data-keys keeps its own.
     await call(page, `keys.changeSettings({ enabled: false })`);
     assert.equal(
       await page.evaluate(`document.getElementById("unbound").getAttribute("aria-keyshortcuts")`),
@@ -971,15 +909,9 @@ describe("keys: aria-keyshortcuts", () => {
   });
 });
 
-// bindings(): the list a page's own help shows. keys writes nothing into any dialog: a dialog
-// holding [data-keys-list], which 0.3.0 filled with its help, opens as the page wrote it.
 describe("keys: bindings() and the help dialog", () => {
   const BINDINGS = "keys-bindings.html";
 
-  /**
-   * bindings(), passed the help dialog or null, as [keys, label, element, sequences, off]: the
-   * element by its data-log, else its tag, and each sequence's presses as stringify writes them.
-   */
   const listed = (page: Page, dialog = true) =>
     call(
       page,
@@ -992,7 +924,6 @@ describe("keys: bindings() and the help dialog", () => {
       ])`,
     );
 
-  /** Registers j, and a second f the first element's f shadows. */
   const registerJ = (page: Page) =>
     call(
       page,
@@ -1000,7 +931,6 @@ describe("keys: bindings() and the help dialog", () => {
       keys.register("f", "Shadowed f", () => window.log.push("f registered")))`,
     );
 
-  // The fixture's bindings, with j registered after the elements.
   const LISTED = [
     ["?", null, "button", 1, false],
     ["t", null, "t", 1, false],
@@ -1018,7 +948,6 @@ describe("keys: bindings() and the help dialog", () => {
     const written = await page.evaluate(list);
     const loaded = `performance.getEntriesByType("resource").map(({ name }) => name)`;
     const before = await page.evaluate(loaded);
-    // By its show-modal button, by showModal() from script, and by the ? key.
     const opens = [
       `document.querySelector("button[command=show-modal]").click()`,
       `document.getElementById("help").showModal()`,
@@ -1040,14 +969,11 @@ describe("keys: bindings() and the help dialog", () => {
   test("lists each active binding once, as the one that fires, with no run", async () => {
     const page = await open(BINDINGS);
     await registerJ(page);
-    // Second F and the registered f lose to First; Disabled, Inert, and Hidden are left out, and
-    // so is the closed dialog's own Close.
     assert.deepEqual(await listed(page), LISTED);
     assert.equal(
       await call(page, `keys.bindings(null).some((binding) => "run" in binding)`),
       false,
     );
-    // Each call lists the page as it is then.
     await page.evaluate(`(document.querySelector("[data-keys=d]").disabled = false,
       document.querySelector("[data-log='f first']").remove())`);
     const now = await listed(page);
@@ -1060,7 +986,6 @@ describe("keys: bindings() and the help dialog", () => {
     await registerJ(page);
     await page.evaluate(`document.getElementById("help").showModal()`);
     assert.deepEqual(await listed(page), LISTED);
-    // Without the dialog, the open modal scopes the list to its own Close.
     assert.deepEqual(await listed(page, false), [["?", null, "button", 1, false]]);
   });
 

@@ -1,5 +1,4 @@
-/* Adapted from spike-html-hosting-sdk (f49087e): src/site.css's .dialog-header and its shortcut
-   dialogs' widths, as classes. */
+/* Adapted from spike-html-hosting-sdk (f49087e): src/site.css's .dialog-header and dialog widths. */
 /*
  * The foundation's dialog sheet, opt-in: neither page entry imports it. A page links it after its
  * entry, whose layer statement names foundation.dialog after foundation.glyph, so the sheet orders
@@ -8,17 +7,16 @@
  * its padding, border and surface; this sheet adds its header row and two widths. A dialog's Close
  * is a glyph button, from glyph-button.css, which a page links beside this one.
  *
- * As spike-html-go-wasm (f026de3) index.html arranges it: a dialog opened by an invoker,
- * commandfor naming it and command="show-modal", holds a header row, <header class=
- * "dialog-header">, its heading, then a Close glyph button, commandfor naming the dialog and
- * command="close". Close and Escape close the dialog by the platform alone; no script runs.
+ * A dialog opened by an invoker, commandfor naming it and command="show-modal", holds a header row,
+ * <header class="dialog-header">, its heading, then a Close glyph button, commandfor naming the
+ * dialog and command="close". Close and Escape close the dialog by the platform alone; no script
+ * runs. A heading with tabindex="-1", which the dialog focuses as it opens, draws no focus outline.
  */
 
 @layer foundation.dialog {
   /* A dialog's header row: its heading at the inline start and its Close at the inline end, aligned
-     on their centers, with --space-m under it, more than the --space-s between the content's own
-     blocks, so the first block stands apart from the heading. The heading takes none of its own
-     margins in the row. */
+     on their centers, with --space-m under it. A heading too long for the row wraps; Close keeps
+     its width. */
   .dialog-header {
     display: flex;
     align-items: center;
@@ -31,25 +29,17 @@
     margin-block: 0;
   }
 
-  /* A heading too long for the row wraps; Close, and anything else in the row, keeps its width. */
   .dialog-header > :not(h1, h2, h3, h4, h5, h6) {
     flex-shrink: 0;
   }
 
-  /* A heading that script focuses, by its tabindex="-1", as a dialog's heading takes focus as it
-     opens, by its autofocus, so that Close's hint doesn't show: the heading isn't a control, and
-     Tab never reaches it, so it draws none of the focus outline the elements layer's
-     :focus-visible rule gives it as its dialog opens from a key. */
   .dialog-header > :is(h1, h2, h3, h4, h5, h6)[tabindex="-1"]:focus {
     outline: none;
   }
 
-  /* Two widths, each capped at the viewport less --space-s each side, and at 56rem: a modal
-     dialog's containing block is the viewport, so 100% is its width. .dialog-wide takes the whole
-     cap, as a settings dialog laid out in rows does; .dialog-fit is as wide as its content, as a
-     list of shortcuts is, up to the same cap: a dialog's own width, fit-content, which the class
-     leaves as it is. The cap replaces chromium's own, the viewport less about 1em each side,
-     which would hold a wide dialog narrower than its gutters on a phone. */
+  /* Two widths, each capped at the viewport less --space-s each side, and at 56rem. .dialog-wide
+     takes the whole cap, as a settings dialog laid out in rows does; .dialog-fit is as wide as its
+     content, as a list of shortcuts is, up to the same cap. */
   .dialog-wide,
   .dialog-fit {
     max-inline-size: min(100% - 2 * var(--space-s), 56rem);

@@ -1,17 +1,11 @@
 <!doctype html>
 <!-- From spike-html-apps-foundation (07ba39a): demo/tools.html. -->
+<!-- From spike-html-packages-foundation (5dd8a58): demo/tools.html. -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>foundation tools</title>
-    <!-- Every tool class of the foundation's three lateral-concern sheets, from dist/. The browser
-         tier (test/browser/tools.test.ts) compares each element's computed style here against
-         spike-html-design v0.7.0's sheets, so every tool class sits on at least one element.
-         The #elements section shows the elements rules the foundation departs from v0.7.0 on,
-         which the comparison leaves out and test/browser/controls.test.ts holds.
-         demo.css lays out the column and the sections alike under either set of sheets.
-         From spike-html-packages-foundation (5dd8a58): demo/tools.html. -->
     <link rel="stylesheet" href="../dist/page.css" />
     <link rel="stylesheet" href="demo.css" />
   </head>
@@ -70,8 +64,6 @@
 
       <section id="utilities">
         <h2>Utilities: scroll and tables</h2>
-        <!-- One paragraph of whole lines, in a frame four lines high inside its border, so it
-             clips between lines and reads as a scroller where the scrollbar is hidden. -->
         <div
           class="scroll-y"
           style="

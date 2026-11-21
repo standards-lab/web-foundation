@@ -1,6 +1,4 @@
-// Adapted from spike-html-apps-foundation (07ba39a): test/unit/declarations.test.ts, without the
-// comparison of the built format.d.ts with v0.1.0's handwritten one.
-// tsc, under tsconfig.json, refusing runtime code in a declaration file, run against scratch trees.
+// Adapted from spike-html-apps-foundation (07ba39a): test/unit/declarations.test.ts, without the format.d.ts comparison.
 // Adapted from spike-html-packages-foundation (5dd8a58): test/unit/declarations.test.js, in TypeScript.
 
 import assert from "node:assert/strict";
@@ -11,10 +9,8 @@ import { join } from "node:path";
 import { describe, test } from "node:test";
 
 const root = join(import.meta.dirname, "../..");
-// The check's own tsc, mise.toml's TypeScript-Go pin, not the typescript package in node_modules.
 const tsc = "tsc";
 
-/** Each "path code" tsc reports, sorted, for `files` (paths under layers/ to sources) in scratch. */
 function check(files: Record<string, string>): string[] {
   const scratch = mkdtempSync(join(tmpdir(), "declarations-"));
   try {
@@ -29,9 +25,11 @@ function check(files: Record<string, string>): string[] {
     const run = spawnSync(tsc, ["--noEmit", "-p", "."], { cwd: scratch, encoding: "utf8" });
     assert.equal(run.error, undefined, `tsc didn't run: ${run.error}`);
     const errors = [...run.stdout.matchAll(/^layers\/(\S+)\(\d+,\d+\): error (TS\d+)/gm)];
-    // An error outside the scratch layers/ (a config tsc can't read, say) would leave the list
-    // empty and pass the cases that expect none, so every error tsc reports must be one of these.
-    assert.equal(run.stdout.match(/error TS\d+/g)?.length ?? 0, errors.length, run.stdout);
+    assert.equal(
+      run.stdout.match(/error TS\d+/g)?.length ?? 0,
+      errors.length,
+      `every error tsc reports is in the scratch layers/:\n${run.stdout}`,
+    );
     return errors.map(([, path, code]) => `${path} ${code}`).sort();
   } finally {
     rmSync(scratch, { recursive: true, force: true });
@@ -46,7 +44,6 @@ const runtime = {
   "format.d.ts": `export declare function formatBytes(bytes: number): string;\nformatBytes(1);`,
 };
 
-// skipLibCheck off is the guard: with it on, tsc skips every .d.ts, and these errors with them.
 describe("declaration files", () => {
   test("tsc, under tsconfig.json, refuses runtime code in a declaration file", () => {
     assert.deepEqual(check(runtime), [

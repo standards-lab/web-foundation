@@ -1,10 +1,8 @@
-// The page layout cases' in-page half: imported into test/fixtures/layout.html, it fills the body
-// with the case, a header of the page's name and four glyph buttons over a main of a heading, a
-// lede, two sections and a block on the full lines, and measures the page's geometry under each
-// page type, the body's class switched. Each export returns plain JSON for evaluate(); the
-// constants are also read on node. The glyphs are inline svgs, 1em a side, as the icons layer
-// draws them.
 // From spike-html-hosting-icons (8b8d955): dist/octicon/x-16.js; Octicons, primer/octicons, MIT.
+// The page layout cases' in-page half, imported into test/fixtures/layout.html: it fills the body
+// with a header and main and measures the page's geometry under each page type, as plain JSON for
+// evaluate(); the constants are also read on node.
+// See docs/testing.md
 
 import { declarations } from "./computed-styles.js";
 
@@ -21,15 +19,12 @@ const X =
   `.749 0 0 1-.326 1.275a.75.75 0 0 1-.734-.215L8 9.06l-3.22 3.22a.75.75 0 0 1-1.042-.018a.75.75 ` +
   `0 0 1-.018-1.042L6.94 8L3.72 4.78a.75.75 0 0 1 0-1.06"/></svg>`;
 
-/** A glyph button named `name`, with a key hint given one. */
 const glyphButton = (name, key) =>
   `<button type="button" class="glyph-button" aria-label="${name}" data-part="button">${X}` +
   (key ? `<span aria-hidden="true"><kbd>${key}</kbd></span>` : "") +
   `</button>`;
 
-/** The case: the body's header and main, and a probe that reads the tokens, the reading width,
- * 80ch border to border, and the dynamic viewport's height, 100dvh; fixed, so it takes no grid
- * track and no part of the page's scroll size. */
+/** The case: the body's header and main, and a fixed probe that reads the tokens, 80ch, and 100dvh. */
 export const MARKUP = `
   <header data-part="header">
     <strong data-part="title">Layout</strong>
@@ -54,7 +49,6 @@ export function fill() {
 
 const round = (n) => Math.round(n * 64) / 64;
 
-/** An element's box in the viewport, in px rounded to 1/64. */
 const box = (element) => {
   const r = element.getBoundingClientRect();
   return { left: round(r.left), top: round(r.top), right: round(r.right), bottom: round(r.bottom) };
@@ -63,8 +57,6 @@ const box = (element) => {
 const part = (name) => document.querySelector(`[data-part="${name}"]`);
 const parts = (name) => [...document.querySelectorAll(`[data-part="${name}"]`)];
 
-/** The page laid out as the type, the body's class: the viewport, the document's scroll size, and
- * each part's box. The body keeps any other class it had. */
 function page(type) {
   const { classList } = document.body;
   const before = TYPES.filter((t) => classList.contains(t));
@@ -108,7 +100,6 @@ export function measure() {
   };
 }
 
-/** Every rule of the list, depth first, into grouping rules. */
 function* rules(list) {
   for (const rule of list) {
     yield rule;
@@ -116,10 +107,7 @@ function* rules(list) {
   }
 }
 
-/**
- * Drops each declaration of the sheet under test, in turn, and reports whether measure() then
- * differs from the reference.
- */
+/** Drops each declaration of the sheet under test in turn, reporting whether measure() differs. */
 export function drops(reference) {
   const tried = [];
   const sheet = [...document.styleSheets].find((s) => s.href?.endsWith(`/${SHEET}`));

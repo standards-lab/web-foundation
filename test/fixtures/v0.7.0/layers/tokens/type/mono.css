@@ -1,16 +1,6 @@
 /* From spike-html-apps-foundation (07ba39a): test/fixtures/v0.7.0/layers/tokens/type/mono.css. */
-/* From spike-html-packages-foundation (5dd8a58): test/fixtures/v0.7.0/layers/tokens/type/mono.css */
-/*
- * layers/tokens/type/mono.css, the mono profile of the type facet, the default and the interface
- * voice: one zero-specificity block, applied by data-type="mono" on any element to its subtree
- * and on the root with no attribute anywhere, declaring the four role fonts and the four role
- * leadings. The fonts are system stacks: sans for the body, mono for the rest. The tokens' roles
- * and how a profile is selected are the facet's, in layers/tokens/type.css.
- *
- * Both entries, baseline.css and full.css, import it into spike-html-design.tokens.type after the
- * facet's own file. Pages link an entry, never this file: linked on its own, its rules would be
- * unlayered.
- */
+/* From spike-html-packages-foundation (5dd8a58): test/fixtures/v0.7.0/layers/tokens/type/mono.css. */
+/* layers/tokens/type/mono.css: the mono type profile, the default. */
 
 :where(:root, [data-type="mono"]) {
   --font-body:

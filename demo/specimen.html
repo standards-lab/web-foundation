@@ -4,16 +4,6 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>foundation specimen</title>
-    <!-- The color specimen: every color profile register-full.js registers, read from the registry,
-         in light and dark, each beside its backup, the palette that stands in should the profile
-         be dropped. A sheet shows the sixteen tokens as labelled swatches, each text token and hue
-         as text on the three surfaces, and the two borders as borders, all read from the tokens
-         its own data-palette and data-scheme resolve. The backups' sheets live beside this page,
-         in demo/backups/: they are not profiles, so the package neither ships nor registers them,
-         and this page names them in BACKUPS. The Theme and Scheme switches narrow the page to one
-         pair or one scheme; mise run screenshots sets them from the root's data-palette and
-         data-scheme, one capture per pair per scheme. Its module runs served only: mise run
-         demo. -->
     <link rel="stylesheet" href="../dist/page-full.css" />
     <link rel="stylesheet" href="demo.css" />
     <link rel="stylesheet" href="backups/tomorrow.css" />
@@ -22,9 +12,6 @@
     <link rel="stylesheet" href="backups/nightfox.css" />
     <style>
       @layer demo {
-        /* A pair's two sheets side by side, and its two schemes one under the other; one column
-           when the pair can't fit. A hidden row stays hidden: the grid would otherwise override
-           the hidden attribute's display. */
         .pair-scheme:not([hidden]) {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(min(100%, 30rem), 1fr));
@@ -32,7 +19,6 @@
           margin-block-start: var(--space-m);
         }
 
-        /* A sheet is a scope: its data-palette and data-scheme paint it from its own tokens. */
         .sheet {
           padding: var(--space-m);
           border: var(--line-s) solid var(--border-2);
@@ -48,12 +34,10 @@
           font-weight: normal;
         }
 
-        /* The backup's sheet is told apart by a dashed edge as well as its heading. */
         .sheet[data-role="backup"] {
           border-style: dashed;
         }
 
-        /* The swatches: four to a row, each a chip over its token's name and value. */
         .swatches {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
@@ -82,7 +66,6 @@
           color: var(--fg-2);
         }
 
-        /* The text samples: a row per text token or hue, a column per surface. */
         .samples {
           inline-size: 100%;
           margin-block: var(--space-s) 0;
@@ -100,7 +83,6 @@
           font-weight: normal;
         }
 
-        /* The borders, drawn as borders on the base. */
         .borders {
           display: grid;
           grid-template-columns: 1fr 1fr;
@@ -121,10 +103,6 @@
       import "../dist/register-full.js";
       import { profiles } from "../dist/registry.js";
 
-      /**
-       * Each built-in color profile's backup: the data-palette its sheet in backups/ answers to,
-       * and its upstream's name.
-       */
       const BACKUPS = {
         zen: { palette: "seoulbones", title: "Seoulbones" },
         github: { palette: "tomorrow", title: "Tomorrow" },
@@ -132,7 +110,6 @@
         everforest: { palette: "nightfox", title: "Nightfox" },
       };
 
-      /** The sixteen tokens, in the facet's order. */
       const SURFACES = ["--bg", "--bg-1", "--bg-2"];
       const BORDERS = ["--border", "--border-2"];
       const TEXT = ["--fg", "--fg-2", "--fg-3"];
@@ -140,7 +117,6 @@
       const TOKENS = [...SURFACES, ...BORDERS, ...TEXT, ...HUES];
       const SCHEMES = ["light", "dark"];
 
-      /** An element of the tag, its attributes and children given. */
       function h(tag, attributes = {}, ...children) {
         const el = document.createElement(tag);
         for (const [name, value] of Object.entries(attributes)) el.setAttribute(name, value);
@@ -148,7 +124,6 @@
         return el;
       }
 
-      /** A sheet of the palette in the scheme: its heading, swatches, text samples, and borders. */
       function sheet(palette, scheme, role, heading, note) {
         const swatches = h(
           "ul",
@@ -215,7 +190,6 @@
         );
       }
 
-      /** Labels each swatch with its computed value as hex, as its sheet's scheme resolves it. */
       function label() {
         for (const swatch of document.querySelectorAll(".swatch")) {
           const channels = getComputedStyle(swatch).backgroundColor.match(/\d+(\.\d+)?/g).slice(0, 3);
@@ -251,7 +225,6 @@
       theme.append(new Option("all", ""), ...names.map((name) => new Option(name, name)));
       schemeSelect.append(new Option("both", ""), ...SCHEMES.map((scheme) => new Option(scheme, scheme)));
 
-      // Narrows the page to the chosen theme's pair and the chosen scheme; empty shows them all.
       function narrow() {
         for (const section of main.querySelectorAll("section[data-theme]")) {
           section.hidden = theme.value !== "" && section.dataset.theme !== theme.value;

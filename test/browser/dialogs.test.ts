@@ -1,16 +1,3 @@
-// The glyph-button and dialog sheets the foundation adds, from the package's dist/, on
-// test/fixtures/dialogs.html: the full page entry, glyph-button.css and dialog.css linked after it,
-// and no script. Each case, from support/dialogs.js, lays out as the sheets promise, and lays out
-// the same in a shadow root that adopts the reset, elements, glyph-button and dialog sheets alone;
-// dropping any one declaration of the two sheets changes a case. The glyph button is a centered
-// row of its glyph and key hint on the native button's surface, at least 24 CSS px a side in every
-// space and type profile on the narrowest display; its hint shows below it on hover and on
-// keyboard focus, above it at the viewport's foot, reversed in every palette and scheme, and
-// Escape dismisses it. A dialog's header row holds its heading at the start and Close at the end;
-// a heading focused as its dialog opens from a key draws no outline; .dialog-wide and .dialog-fit
-// are capped at 390px and 1280px; and Close and Escape close a dialog with no listener anywhere,
-// the platform's invoker commands alone. A page's own later layer wins over both sheets.
-
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -23,15 +10,11 @@ import type { Server } from "@standards-lab/web-tooling/server.js";
 
 import { SHEETS } from "./support/dialogs.js";
 
-/** The repository root, which the server serves. */
 const root = join(import.meta.dirname, "../..");
 const fixture = "/test/fixtures/dialogs.html";
 
-/** The smallest target WCAG 2.5.8 allows, in CSS px a side. */
 const TARGET = 24;
-/** The dialogs' cap, 56rem, in CSS px at the reader's default 16px. */
 const CAP = 56 * 16;
-/** A width under the space scale's narrowest display, 22.5rem, where its steps are smallest. */
 const NARROWEST = 320;
 
 const PALETTES = ["zen", "github", "catppuccin", "everforest"];
@@ -45,7 +28,6 @@ interface Box {
   width: number;
   height: number;
 }
-/** support/dialogs.js's row(). */
 interface Row {
   display: string;
   align: string;
@@ -58,7 +40,6 @@ interface Row {
   centers: number;
   surface: string;
 }
-/** support/dialogs.js's hint(). */
 interface Hint {
   box: Box;
   below: boolean;
@@ -73,7 +54,6 @@ interface Hint {
   font: string[];
   lines: number;
 }
-/** support/dialogs.js's dialog(). */
 interface Dialog {
   width: number;
   content: number;
@@ -88,7 +68,6 @@ interface Dialog {
   outline: [boolean, string];
   display: string;
 }
-/** support/dialogs.js's measure(). */
 interface Measured {
   tokens: {
     "3xs": string;
@@ -108,7 +87,6 @@ interface Measured {
   endHint: Hint & { viewport: number };
   dialogs: Record<"help" | "settings" | "long", Dialog>;
 }
-/** One declaration support/dialogs.js's drops() dropped. */
 interface Drop {
   sheet: string;
   selector: string;
@@ -116,14 +94,11 @@ interface Drop {
   differs: boolean;
 }
 
-/** The in-page module, imported as m. */
 const WITH_MODULE = (body: string) =>
   `import("/test/browser/support/dialogs.js").then(async (m) => ${body})`;
 
-/** Fills the page's #light with the cases. */
 const FILL = WITH_MODULE(`{ document.querySelector("#light").innerHTML = m.MARKUP; }`);
 
-/** Sets the page's width, its height the tooling's 720. */
 const width = (page: Page, inline: number) =>
   page.cdp("Emulation.setDeviceMetricsOverride", {
     width: inline,
@@ -132,22 +107,18 @@ const width = (page: Page, inline: number) =>
     mobile: false,
   });
 
-/** The center of the element the page expression names, in the viewport. */
 const center = (page: Page, element: string): Promise<{ x: number; y: number }> =>
   page.evaluate(`(() => {
     const { left, top, width, height } = (${element}).getBoundingClientRect();
     return { x: left + width / 2, y: top + height / 2 };
   })()`);
 
-/** Moves the mouse onto the element's center, as a user points at it. */
 const hover = async (page: Page, element: string) =>
   page.cdp("Input.dispatchMouseEvent", { type: "mouseMoved", ...(await center(page, element)) });
 
-/** Moves the mouse to the viewport's top-left corner, off every button. */
 const pointAway = (page: Page) =>
   page.cdp("Input.dispatchMouseEvent", { type: "mouseMoved", x: 0, y: 0 });
 
-/** Clicks the element's center with the mouse's main button. */
 async function click(page: Page, element: string) {
   const at = await center(page, element);
   await page.cdp("Input.dispatchMouseEvent", { type: "mouseMoved", ...at });
@@ -156,7 +127,6 @@ async function click(page: Page, element: string) {
   }
 }
 
-/** Presses a named key, as a keyboard sends it. */
 async function press(page: Page, key: "Tab" | "Enter" | "Escape") {
   const keyCode = { Tab: 9, Enter: 13, Escape: 27 }[key];
   const event = { key, code: key, windowsVirtualKeyCode: keyCode };
@@ -165,30 +135,23 @@ async function press(page: Page, key: "Tab" | "Enter" | "Escape") {
   await page.cdp("Input.dispatchKeyEvent", { type: "keyUp", ...event });
 }
 
-/** The light DOM's button of the part. */
 const button = (part: string) => `document.querySelector('#light [data-part="${part}"]')`;
-/** Whether the button's hint is open. */
 const hintOpen = (part: string) => `${button(part)}.interestForElement.matches(":popover-open")`;
-/** The hint's box against its button's. */
 const hintPlace = (part: string) => `(() => {
   const b = ${button(part)}.getBoundingClientRect();
   const h = ${button(part)}.interestForElement.getBoundingClientRect();
   return { below: h.top >= b.bottom, above: h.bottom <= b.top, overlaps: h.left < b.right && h.right > b.left };
 })()`;
-/** Whether the light DOM's dialog of the id is open. */
 const dialogOpen = (id: string) => `document.querySelector("#light #${id}").open`;
 
 describe("foundation glyph button and dialogs", () => {
   let server: Server;
   let browser: Browser;
-  /** The cases in the page and in the shadow root, measured. */
   let page: Page;
-  /** The cases in the page alone, driven by the mouse and keyboard. */
   let live: Page;
   let light: Measured;
   let shadow: Measured;
 
-  /** The page's cases, and the shadow root's, measured at the page's current width. */
   const measureBoth = (): Promise<{ light: Measured; shadow: Measured }> =>
     page.evaluate(
       WITH_MODULE(`({
@@ -208,7 +171,6 @@ describe("foundation glyph button and dialogs", () => {
     await live.evaluate(FILL);
   });
 
-  /** Loads the live page afresh, so the next Tab reaches its first button. */
   const fresh = async () => {
     await live.goto(`${server.origin}${fixture}`);
     await live.evaluate(FILL);
@@ -422,7 +384,6 @@ describe("foundation glyph button and dialogs", () => {
         assert.equal(d.viewport, inline);
         assert.ok(d.width <= inline, `${name}: ${d.width}px is wider than the viewport`);
       }
-      // Layout lengths land on 1/64 px.
       const near = (a: number, b: number) => Math.abs(a - b) < 1 / 64;
       assert.ok(
         near(dialogs.settings.width, cap),

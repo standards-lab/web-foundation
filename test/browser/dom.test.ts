@@ -1,8 +1,3 @@
-// The DOM helpers from the package's dist/, as a page imports them, on test/fixtures/dom.html:
-// define registers a custom element and leaves a second definition of its name a no-op, emit
-// dispatches a bubbling, composed CustomEvent with its detail, and required returns the first
-// match under its root or throws naming the selector.
-
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { after, afterEach, before, describe, test } from "node:test";
@@ -12,7 +7,6 @@ import { serve } from "@standards-lab/web-tooling/server.js";
 import type { Browser, Page } from "@standards-lab/web-tooling/browser.js";
 import type { Server } from "@standards-lab/web-tooling/server.js";
 
-/** The repository root, which the server serves. */
 const root = join(import.meta.dirname, "../..");
 
 const DOM = "/dist/dom.js";
@@ -35,14 +29,12 @@ after(async () => {
   await server?.stop();
 });
 
-/** Opens a fresh test/fixtures/dom.html, so no test sees another's definitions. */
 async function open(): Promise<Page> {
   const page = await browser.open(`${server.origin}/test/fixtures/dom.html`);
   pages.push(page);
   return page;
 }
 
-/** Evaluates the async body with the page's dom module bound as `dom`. */
 const call = (page: Page, body: string) =>
   page.evaluate(`import(${JSON.stringify(DOM)}).then(async (dom) => { ${body} })`);
 
@@ -100,7 +92,6 @@ describe("define", () => {
     assert.deepEqual(result, { thrown: null, registered: true, version: "first" });
   });
 
-  // The platform's own second definition throws, so the test above tells define from it.
   test("the platform's customElements.define throws on the same second definition", async () => {
     const page = await open();
     const thrown = await call(
