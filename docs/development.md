@@ -44,7 +44,8 @@ driver and server also come from, over the capture description in
 `scripts/screenshots.config.ts`, and passes its arguments on. With none it captures the default
 profile; `--palette`, `--space`, and `--type` choose a profile, and `--all` captures every color
 and compact and sans. `--output directory --dir <path>` writes the files instead of showing them
-in kitty; `mise run screenshots -- --help` lists the other flags, and web-tooling's README
+in kitty; `mise run screenshots -- --help` lists the other flags, and web-tooling's
+[docs/screenshots.md](https://github.com/standards-lab/web-tooling/blob/main/docs/screenshots.md)
 documents them. The check runs neither `demo` nor `screenshots`.
 
 `mise run screenshots` is `raw`: mise pipes a task's output when the task has dependencies, and
@@ -74,6 +75,14 @@ and each push to it.
   release, and that release's notes are read before the bump lands, a review that stands in for
   the wait. With the wait on, a frozen install of a lockfile that pins a release under a day old
   fails.
+- **`tsconfig.json` is the build**, src/ into dist/: tsc emits each module's `.js` and `.d.ts`,
+  and `mise run types` checks the same sources with `--noEmit`. `lib` is es2025 for
+  `Intl.DurationFormat`'s types, which `src/format.ts` uses.
+- **`tsconfig.test.json` is the suite's type check**, `mise run types:test`: the tests and their
+  helpers, which node runs under its type stripping, and `scripts/screenshots.config.ts`, which the
+  tooling's bin runs the same way, checked against `dist/` as a consumer's code is and never
+  emitted. `allowJs` reads the browser tier's in-page `support/` module, which stays `.js` because
+  the server sends it as written.
 - **Prettier formats the code, the JSON, and the stylesheets only.** Its default run would also
   rewrite the Markdown, the YAML, and `pnpm-lock.yaml`, so `.prettierignore` ignores every file,
   then lets back every directory and the code, JSON, and CSS files. Prettier also skips what

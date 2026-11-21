@@ -1,8 +1,8 @@
 // Adapted from spike-html-apps-foundation (07ba39a): src/registry.ts, its store's key renamed web-foundation.registry.
+// Adapted from spike-html-packages-foundation (5dd8a58): src/registry.ts.
 // The page's registry of the profiles it can apply, per facet, in one store at the well-known
 // global key Symbol.for("web-foundation.registry"), so every copy of this module, from any URL or
 // tag, registers into the same lists.
-// Adapted from spike-html-packages-foundation (5dd8a58): src/registry.ts.
 
 /** A facet a profile belongs to. */
 export type Facet = "color" | "space" | "type";

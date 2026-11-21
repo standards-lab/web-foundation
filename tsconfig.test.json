@@ -1,8 +1,6 @@
 // From spike-html-apps-foundation (07ba39a): tsconfig.test.json.
-// The type check of the suite, mise run types:test: the tests and their helpers, which node runs
-// under its type stripping, and scripts/screenshots.config.ts, which the tooling's bin runs the
-// same way, checked against dist/ as a consumer's code is and never emitted. allowJs reads the
-// browser tier's in-page support/ module, which stays .js because the server sends it as written.
+// The type check of the suite, mise run types:test.
+// See docs/development.md
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {

@@ -8,8 +8,9 @@ reset, and elements), the five color role hooks, the profiles for color, space, 
 sheets (meta, structure, and utilities), the opt-in sheets for glyph buttons, dialogs, page layout,
 and motion, the DOM helpers, the registry and keys family, the theme preferences, the conformance
 check for profiles, and the formatters, Intl's and JSON's. It is plain CSS and ES modules with
-their type declarations, with no runtime dependency, and is released by git tag. Its theme
-settings and keyboard help are web-components' `sl-settings` and `sl-shortcuts`, built on it.
+their type declarations, with no runtime dependency, and is released by git tag. A theme settings
+UI and keyboard help are planned as web-components' `sl-settings` and `sl-shortcuts`; the
+foundation ships `preferences.js` and `bindings()` for them.
 
 ## Install
 
@@ -73,9 +74,8 @@ tarball attached.
 The package is seeded by copy from spike-html-apps-foundation at 07ba39a, its v0.3.1, itself
 copied from spike-html-packages-foundation at 5dd8a58 with profiles, registration modules, the
 preferences module, the theme menu, the conformance check, and the full entry ported from
-spike-html-design at fe75220, its v0.7.0. v0.4.0 removed the theme menu and the keys help, which
-web-components' `sl-settings` and `sl-shortcuts` replace. Each copied file that takes comments
-names each of its sources in a provenance line.
+spike-html-design at fe75220, its v0.7.0. Each copied file that takes comments names each of its
+sources in a provenance line.
 
 ## License
 

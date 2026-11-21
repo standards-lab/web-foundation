@@ -8,7 +8,7 @@ sixteen color tokens as `light-dark()` pairs. Each section below gives a backup'
 it maps onto the tokens; its table names each token's upstream swatch by the one name both variants
 share.
 
-## ayu
+## ayu, catppuccin's backup
 
 Colors from ayu (MIT, Konstantin Pschera), https://github.com/ayu-theme/ayu-colors, at v6.0.0: Light
 in light and Mirage in dark. The palette's src/light.ts and src/mirage.ts derive many swatches from
@@ -39,7 +39,7 @@ gray, and the comment. Fills: ayu has no magenta, so constant, its purple, fills
 | `--purple` | syntax.constant |
 | `--magenta` | syntax.constant |
 
-## nightfox
+## nightfox, everforest's backup
 
 Colors from Nightfox (MIT, James Simpson), https://github.com/EdenEast/nightfox.nvim, at v3.10.0:
 Dayfox in light and Nightfox in dark, from lua/nightfox/palette/dayfox.lua and nightfox.lua, through
@@ -69,7 +69,7 @@ filled.
 | `--purple` | magenta |
 | `--magenta` | pink |
 
-## seoulbones
+## seoulbones, zen's backup
 
 Colors from Seoulbones, of zenbones (MIT, Michael Chris Lopez),
 https://github.com/zenbones-theme/zenbones.nvim, at v4.12.0: its light and dark backgrounds, the
@@ -100,7 +100,7 @@ blossom both `--purple` and `--magenta`.
 | `--purple` | blossom |
 | `--magenta` | blossom |
 
-## tomorrow
+## tomorrow, github's backup
 
 Colors from Tomorrow (MIT, Chris Kempson), https://github.com/chriskempson/tomorrow-theme, at commit
 ccf6666: Tomorrow in light and Tomorrow Night in dark, from the palettes its vim/colors/Tomorrow.vim
