@@ -1,13 +1,11 @@
-// The utilities cases' in-page half: imported into test/fixtures/utilities.html, it lays out one
-// case per utility class, in the light DOM or in a shadow root that adopts the foundation's sheets,
-// and measures each case's geometry. Each export returns plain JSON for evaluate(); the constants
-// are also read on node. Every length a case sets is a style attribute, so the markup lays out the
-// same on either side of a shadow boundary.
+// The utilities cases' in-page half, imported into test/fixtures/utilities.html: it lays out one
+// case per utility class, in the light DOM or a shadow root, and measures each case's geometry, as
+// plain JSON for evaluate(); the constants are also read on node.
+// See docs/testing.md.
 
 import { declarations } from "./computed-styles.js";
 
-/** The utility classes the foundation adds to v0.7.0's tools, which no comparison with v0.7.0
- * reads; test/browser/utilities.test.ts holds each. */
+/** The utility classes the foundation adds to v0.7.0's tools. */
 export const ADDED_UTILITIES = [
   "list-bare",
   "text-nowrap",
@@ -25,8 +23,7 @@ export const ADDED_UTILITIES = [
   "visually-hidden",
 ];
 
-/** The sheets a shadow root adopts, in order: the baseline's reset and elements layers, whose
- * selectors stop at a shadow boundary, and the two sheets under test. The tokens it inherits. */
+/** The sheets a shadow root adopts, in order. */
 export const ADOPTED = [
   "baseline/reset.css",
   "baseline/elements.css",
@@ -34,23 +31,20 @@ export const ADOPTED = [
   "motion.css",
 ];
 
-/** A flex column host around a scrolling frame, its style attribute given, around four lines. */
 const frame = (style) =>
   `<div style="display: flex; flex-direction: column; ${style}">` +
   `<div class="scroll-frame"><div>1<br />2<br />3<br />4</div></div></div>`;
 
-/** A shrink-to-fit parent 20ch wide at most, holding a frame around one unbreakable line. */
 const fitted = (text) =>
   `<div style="inline-size: 20ch"><div style="inline-size: fit-content">` +
   `<div style="display: flex; flex-direction: column"><div class="scroll-frame">` +
   `<div style="white-space: nowrap">${text}</div></div></div></div></div>`;
 
-/** A head row in a box of the width, its name and its end label in the quiet type. */
 const head = (width, name, label) =>
   `<div style="inline-size: ${width}"><div class="head-row"><span class="head-name">${name}</span>` +
   `<span class="head-end text-quiet-xs">${label}</span></div></div>`;
 
-/** Every case, each a [data-case] element, its parts named by [data-part]. */
+/** Every case, each a [data-case] element, its parts [data-part]. */
 export const MARKUP = `
   <div data-case="list">
     <p data-part="before">Before</p>
@@ -107,13 +101,11 @@ export const MARKUP = `
   </div>
 `;
 
-/** The case's element, or a part of it, under the root. */
 const find = (root, name, part) => {
   const box = root.querySelector(`[data-case="${name}"]`);
   return part ? box.querySelector(`[data-part="${part}"]`) : box;
 };
 
-/** An element's box, relative to the case's box, in px rounded to 1/64. */
 const box = (element, origin) => {
   const r = element.getBoundingClientRect();
   const o = origin.getBoundingClientRect();
@@ -126,8 +118,6 @@ const box = (element, origin) => {
   };
 };
 
-/** The element a point at the given offset from the element's top left hits, as its data-part, or
- * its tag when it has none. */
 const hit = (root, element, dx, dy) => {
   element.scrollIntoView({ block: "center" });
   const r = element.getBoundingClientRect();
@@ -135,7 +125,6 @@ const hit = (root, element, dx, dy) => {
   return found?.dataset.part ?? found?.localName ?? null;
 };
 
-/** The width of the element's text laid out on one line, in px rounded to 1/64. */
 const textWidth = (element) => {
   const range = document.createRange();
   range.selectNodeContents(element);
@@ -187,7 +176,6 @@ export function measure(root) {
     out.truncate = {
       lines: Math.round(r.height / line(element)),
       overflows: element.scrollWidth > element.clientWidth,
-      // A point past the box's end, on its line: a clipped overflow paints there no text to hit.
       past: root.elementFromPoint(r.right + 8, r.top + r.height / 2) === element,
       ending: getComputedStyle(element).textOverflow,
     };
@@ -202,7 +190,6 @@ export function measure(root) {
       content: box(content, find(root, name)),
       scrollsDown: frameElement.scrollHeight > frameElement.clientHeight,
       scrollsAcross: frameElement.scrollWidth > frameElement.clientWidth,
-      // The case's first box: the host, or the 20ch box around a shrink-to-fit parent.
       limit: box(find(root, name).firstElementChild, find(root, name)).width,
       line: line(frameElement),
     };
@@ -217,7 +204,6 @@ export function measure(root) {
       hidden: box(hidden, cell),
       shownText: textWidth(shown),
       hiddenText: textWidth(hidden),
-      // Inside the hidden alternative's box, past the shown one's text: what is painted there.
       hit: hit(root, hidden, textWidth(hidden) - 2, 2),
     };
   }
@@ -299,7 +285,6 @@ export function light() {
   return document;
 }
 
-/** Every rule of the list, depth first, into grouping rules. */
 function* rules(list) {
   for (const rule of list) {
     yield rule;
@@ -307,10 +292,7 @@ function* rules(list) {
   }
 }
 
-/**
- * Drops each declaration of the linked utilities sheet's rules that name an added class, in turn,
- * and reports whether the light DOM's measure() then differs from the reference.
- */
+/** Drops each declaration naming an added class in turn, reporting whether measure() differs. */
 export function drops(reference) {
   const sheet = [...document.styleSheets]
     .flatMap((s) => [...rules(s.cssRules)])

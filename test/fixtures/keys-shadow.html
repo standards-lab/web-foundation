@@ -14,7 +14,6 @@
     <x-fields id="fields"></x-fields>
     <x-panel id="panel"></x-panel>
     <script type="module">
-      // x-fields: the three kinds of field, in an open shadow root.
       customElements.define(
         "x-fields",
         class extends HTMLElement {
@@ -27,7 +26,6 @@
           }
         },
       );
-      // x-panel: a component inside a component, its fields two shadow roots deep.
       customElements.define(
         "x-panel",
         class extends HTMLElement {
@@ -37,7 +35,6 @@
           }
         },
       );
-      // log records each action a binding runs, in order, for the tests and the reader.
       window.log = [];
       document.addEventListener("click", (event) => {
         const name = event.target.closest?.("[data-log]")?.dataset.log;

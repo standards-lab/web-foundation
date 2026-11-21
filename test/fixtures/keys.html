@@ -1,6 +1,5 @@
 <!doctype html>
 <!-- From spike-html-apps-foundation (07ba39a): test/fixtures/keys.html. -->
-<!-- From spike-html-packages-foundation (5dd8a58): test/fixtures/keys.html. -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -39,7 +38,6 @@
       <button type="button" data-keys="Escape" commandfor="modal" command="close">Close</button>
     </dialog>
     <script type="module">
-      // log records each action a binding runs, in order, for the tests and the reader.
       window.log = [];
       document.addEventListener("click", (event) => {
         const name = event.target.closest?.("[data-log]")?.dataset.log;

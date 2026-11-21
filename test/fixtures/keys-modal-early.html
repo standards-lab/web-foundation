@@ -1,15 +1,11 @@
 <!doctype html>
-<!-- Adapted from spike-html-apps-foundation (07ba39a): test/fixtures/keys-modal-early.html,
-     its help dialog without [data-keys-list]. -->
+<!-- Adapted from spike-html-apps-foundation (07ba39a): test/fixtures/keys-modal-early.html, its help dialog without [data-keys-list]. -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <title>keys early modal fixture</title>
     <link rel="stylesheet" href="../../dist/page.css" />
     <script>
-      // x-modal: a dialog in an open shadow root, its button slotted, that opens itself as it
-      // connects, as a component open in markup does. Defined by a classic script, it opens while
-      // the page parses, before keys loads; with ?field its dialog holds a field, which takes focus.
       const field = new URLSearchParams(location.search).has("field");
       customElements.define(
         "x-modal",
@@ -45,7 +41,6 @@
       <button type="button" commandfor="help" command="close" data-keys="?">Close <kbd>?</kbd></button>
     </dialog>
     <script type="module">
-      // log records each action a binding runs, in order, for the tests and the reader.
       window.log = [];
       document.addEventListener("click", (event) => {
         const name = event.target.closest?.("[data-log]")?.dataset.log;

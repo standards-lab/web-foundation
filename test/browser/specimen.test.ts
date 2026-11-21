@@ -1,11 +1,3 @@
-// The color specimen, demo/specimen.html, served, as mise run demo serves it: every color profile
-// the registry lists has its sheet and its backup's, in light and in dark, and each sheet shows
-// the values its own stylesheet declares, read from the page's computed colors against the hex
-// pairs in src/profiles/color/ and demo/backups/: every swatch, every text sample's text and
-// surface, and both borders. The backups stay demo sheets: the registry never lists them and the
-// build never carries them. Each backup's conformance, by the package's check(), is pinned as it
-// stands: a backup that breaks a rule is a fact the specimen reports, not one to fix.
-
 import assert from "node:assert/strict";
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
@@ -17,10 +9,8 @@ import type { Browser, Page } from "@standards-lab/web-tooling/browser.js";
 import type { Server } from "@standards-lab/web-tooling/server.js";
 import type { Failure } from "@standards-lab/web-foundation/conformance.js";
 
-/** The repository root, which the server serves. */
 const root = join(import.meta.dirname, "../..");
 
-/** Each built-in color profile's backup, by its data-palette, as the specimen pairs them. */
 const BACKUPS: Record<string, string> = {
   zen: "seoulbones",
   github: "tomorrow",
@@ -28,10 +18,6 @@ const BACKUPS: Record<string, string> = {
   everforest: "nightfox",
 };
 
-/**
- * The rules each backup breaks, as check() reports them. None is registered, by design; ayu's light
- * raised surfaces are lighter than its base, as upstream draws them.
- */
 const BACKUP_RULES: Record<string, string[]> = {
   tomorrow: ["registered"],
   seoulbones: ["registered"],
@@ -42,10 +28,8 @@ const BACKUP_RULES: Record<string, string[]> = {
 const SCHEMES = ["light", "dark"] as const;
 type Scheme = (typeof SCHEMES)[number];
 
-/** A sheet's tokens in one scheme, token to lowercase #rrggbb. */
 type Tokens = Record<string, string>;
 
-/** The light and dark values a palette's stylesheet declares, from its light-dark() pairs. */
 function declared(path: string): Record<Scheme, Tokens> {
   const values: Record<Scheme, Tokens> = { light: {}, dark: {} };
   const css = readFileSync(join(root, path), "utf8");
@@ -59,7 +43,6 @@ function declared(path: string): Record<Scheme, Tokens> {
   return values;
 }
 
-/** What the page shows of one sheet: its swatches, text samples, and borders, as hex. */
 interface Shown {
   palette: string;
   scheme: string;
@@ -70,7 +53,6 @@ interface Shown {
   borders: Tokens;
 }
 
-/** Reads every sheet on the page, each color as its computed value in #rrggbb. */
 const READ = `(() => {
   const hex = (color) =>
     "#" + color.match(/\\d+(\\.\\d+)?/g).slice(0, 3).map((c) => Number(c).toString(16).padStart(2, "0")).join("");

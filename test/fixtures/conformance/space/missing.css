@@ -1,5 +1,4 @@
 /* From spike-html-apps-foundation (07ba39a): test/fixtures/conformance/space/missing.css. */
-/* A space profile that sets three of the four values: no --radius-base. It fails tokens alone. */
 
 @layer foundation.tokens.space {
   :where([data-space="missing"]) {

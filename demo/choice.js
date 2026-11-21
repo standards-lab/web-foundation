@@ -1,7 +1,5 @@
-// The theme and unit demo pages' controls, a demo and not a foundation feature: each select of
-// the page's form[data-choice], named for a key of a choice, lists the names this page registered
-// (the schemes for scheme), shows the stored choice, and applies and saves a change through
-// preferences.js. Another tab's save, which preferences.js applies, shows here too.
+// The theme and unit demo pages' controls: each select of form[data-choice] lists the names the
+// page registered, shows the stored choice, and applies and saves a change through preferences.js.
 
 import { apply, read, save, SCHEMES } from "../dist/preferences.js";
 import { DEFAULTS, profiles } from "../dist/registry.js";
@@ -14,7 +12,6 @@ for (const select of selects) {
   select.replaceChildren(...names.map((name) => new Option(name)));
 }
 
-/** Selects the stored choice, a name this page didn't register showing its default. */
 function show() {
   const choice = read() ?? {};
   for (const select of selects) {

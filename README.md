@@ -64,7 +64,8 @@ push's workflows from the tagged tree, and the pack commit's tree holds only the
 workflow runs from main's copy. It checks that the tag's commit has one parent, a merge commit on
 main, whose `package.json` version the tag names; runs the check on that parent; packs it and holds
 the tag's tree to the pack, file for file; and creates the GitHub release from the version's
-`CHANGELOG.md` section, with the tarball attached.
+`CHANGELOG.md` section, on the tag its `ref` names rather than the dispatching ref, with the
+tarball attached.
 
 ## Provenance
 

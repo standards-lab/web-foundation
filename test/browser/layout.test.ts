@@ -1,18 +1,3 @@
-// The page-layout sheet the foundation adds, from the package's dist/, on
-// test/fixtures/layout.html: the full page entry, glyph-button.css and layout.css linked after it,
-// and the case from support/layout.js, measured under each page type at 1280px and at 390px with
-// the reader's text at 200%. The application page fills the dynamic viewport exactly, the header
-// over main, main taking the rest, a gutter of --page-gutter at the inline sides and the block
-// end; main's children sit on its content lines, at most 80ch and centered, and a child the page
-// places on full spans main between the gutters. The reading page is an 80ch column centered in
-// the gutters, its sections --space-xl apart and --space-2xl below it. In both the header's
-// actions sit at its inline end, and at 390px and 200% text they wrap rather than scroll the page
-// sideways. Where a phone's bars make the small viewport shorter, through the protocol, the
-// application page is the dynamic viewport tall. The geometry holds in every space and type
-// profile; dropping any one declaration of the sheet changes it in one of the three states; a
-// page's own later layer wins. The sheet lays out
-// the body, so no shadow root adopts it.
-
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -23,25 +8,20 @@ import { serve } from "@standards-lab/web-tooling/server.js";
 import type { Browser, Page } from "@standards-lab/web-tooling/browser.js";
 import type { Server } from "@standards-lab/web-tooling/server.js";
 
-/** The repository root, which the server serves. */
 const root = join(import.meta.dirname, "../..");
 const fixture = "/test/fixtures/layout.html";
 
-/** The browser's default text sizes, the standard and the monospace, in px; doubled, a reader's
- * 200% text. */
 const TEXT = { standard: 16, fixed: 13 };
 
 const SPACES = ["regular", "compact"];
 const TYPES = ["mono", "sans"];
 
-/** A box in the viewport, in px. */
 interface Box {
   left: number;
   top: number;
   right: number;
   bottom: number;
 }
-/** support/layout.js's page(): one page type's geometry. */
 interface Laid {
   viewport: { width: number; height: number };
   scroll: { width: number; height: number };
@@ -56,7 +36,6 @@ interface Laid {
   sections: Box[];
   full: Box;
 }
-/** support/layout.js's measure(). */
 interface Measured {
   tokens: {
     m: number;
@@ -70,19 +49,15 @@ interface Measured {
   "page-app": Laid;
   "page-prose": Laid;
 }
-/** One declaration support/layout.js's drops() dropped. */
 interface Drop {
   selector: string;
   declaration: string;
   differs: boolean;
 }
 
-/** The in-page module, imported as m. */
 const WITH_MODULE = (body: string) =>
   `import("/test/browser/support/layout.js").then(async (m) => ${body})`;
 
-/** Lays the page out at the width, its height the tooling's 720, with the reader's text at the
- * scale of the browser's default sizes. */
 async function view(page: Page, width: number, scale: number) {
   await page.cdp("Emulation.setDeviceMetricsOverride", {
     width,
@@ -95,25 +70,19 @@ async function view(page: Page, width: number, scale: number) {
   });
 }
 const wide = (page: Page) => view(page, 1280, 1);
-/** How much shorter the small viewport is than the large one, as a phone's retracting bars make
- * it, set through the protocol; 0, the desktop's, by default. */
 const bars = (page: Page, difference: number) =>
   page.cdp("Emulation.setSmallViewportHeightDifferenceOverride", { difference });
-/** The difference the bars case sets, in px. */
 const BARS = 100;
 const narrow = (page: Page) => view(page, 390, 2);
 
 const center = (box: Box) => (box.top + box.bottom) / 2;
 
-/** Asserts the box spans exactly main's content lines: as wide as main up to 80ch, centered. */
 function onContent(laid: Laid, box: Box, ch80: number, name: string) {
   const width = Math.min(ch80, laid.main.right - laid.main.left);
   assert.equal(box.right - box.left, width, `${name} isn't the content's width`);
   assert.equal(box.left - laid.main.left, laid.main.right - box.right, `${name} isn't centered`);
 }
 
-/** Asserts the header's row: the name at the inline start and the actions at the end, in the
- * gutters, every line of buttons ending at the actions' end, none past it. */
 function headerRow(laid: Laid, gutter: number) {
   const end = laid.viewport.width - gutter;
   assert.deepEqual([laid.header.left, laid.header.right], [gutter, end], "the header's gutters");
@@ -132,10 +101,8 @@ describe("foundation page layout", () => {
   let server: Server;
   let browser: Browser;
   let page: Page;
-  /** The case at 1280px, and at 390px with 200% text. */
   let atWide: Measured;
   let atNarrow: Measured;
-  /** The case at 1280px, its small viewport BARS shorter than its dynamic one. */
   let atBars: Measured;
 
   const measure = (): Promise<Measured> => page.evaluate(WITH_MODULE(`m.measure()`));

@@ -1,10 +1,4 @@
-// Adapted from spike-html-apps-foundation (07ba39a): test/browser/backdrop.test.ts, importing the
-// tooling as @standards-lab/web-tooling.
-// The baseline's ::backdrop veil from the package's dist/, on test/fixtures/backdrop.html under the
-// full page entry, in each built-in palette and scheme: a modal dialog's backdrop computes to the
-// veil, the page's --bg at 80%, a popover's, hint, auto, or manual, on the page or inside the open
-// dialog, stays transparent, so a hint shown on hover veils nothing, and a fullscreen element's
-// stays chromium's black.
+// Adapted from spike-html-apps-foundation (07ba39a): test/browser/backdrop.test.ts, importing the tooling as @standards-lab/web-tooling.
 
 import assert from "node:assert/strict";
 import { join } from "node:path";
@@ -15,17 +9,13 @@ import { serve } from "@standards-lab/web-tooling/server.js";
 import type { Browser, Page } from "@standards-lab/web-tooling/browser.js";
 import type { Server } from "@standards-lab/web-tooling/server.js";
 
-/** The repository root, which the server serves. */
 const root = join(import.meta.dirname, "../..");
 
 const PALETTES = ["zen", "github", "catppuccin", "everforest"];
 const SCHEMES = ["light", "dark"];
-/** A transparent background, as getComputedStyle gives it. */
 const TRANSPARENT = "rgba(0, 0, 0, 0)";
-/** Chromium's own background for a fullscreen element's ::backdrop. */
 const BLACK = "rgb(0, 0, 0)";
 
-/** Each top-layer element's ::backdrop background color, the veil the probe computes, and --bg. */
 interface Backdrops {
   bg: string;
   veil: string;
@@ -38,9 +28,6 @@ interface Backdrops {
   fullscreen: string;
 }
 
-/** The fixture's reading in one palette and scheme: each popover shown alone, then the modal
- * dialog, then the hint inside it over it, then the fullscreen element, each read while it is in
- * the top layer. Fullscreen asks for a user gesture, which the evaluation carries. */
 const READ = (palette: string, scheme: string) => `(async () => {
   const root = document.documentElement;
   root.setAttribute("data-palette", ${JSON.stringify(palette)});
@@ -96,7 +83,6 @@ describe("foundation backdrop", () => {
     await server?.stop();
   });
 
-  /** Each palette and scheme's --bg and veil, so the readings are seen to differ by profile. */
   const readings: { bg: string; veil: string }[] = [];
 
   for (const palette of PALETTES) {
@@ -111,8 +97,11 @@ describe("foundation backdrop", () => {
         assert.equal(exceptionDetails, undefined, exceptionDetails?.exception?.description);
         const read: Backdrops = result.value;
         readings.push({ bg: read.bg, veil: read.veil });
-        // The veil is a color, so a backdrop left transparent can't pass for it.
-        assert.notEqual(read.veil, TRANSPARENT);
+        assert.notEqual(
+          read.veil,
+          TRANSPARENT,
+          "the veil is a color, so a transparent backdrop can't pass for it",
+        );
         assert.deepEqual(read, {
           bg: read.bg,
           veil: read.veil,
@@ -128,8 +117,6 @@ describe("foundation backdrop", () => {
     }
   }
 
-  // The veils differ as the computed --bg values do, so a reading that never left one profile
-  // would show here; two palettes that share a --bg share its veil.
   test("each palette and scheme's --bg computes a veil of its own", () => {
     const count = (values: string[]) => new Set(values).size;
     const backgrounds = count(readings.map(({ bg }) => bg));

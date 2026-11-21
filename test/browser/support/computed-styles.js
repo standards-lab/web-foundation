@@ -1,13 +1,12 @@
+// The tools cases' in-page half, imported into demo/tools.html: readings of every element's computed
+// style, as plain JSON for evaluate(); differences() also runs on node.
 // From spike-html-apps-foundation (07ba39a): test/browser/support/computed-styles.js.
-// The tools cases' in-page half: imported into demo/tools.html, it reads every element's computed
-// style. Each export returns plain JSON for evaluate(); differences() also runs on node. :hover is
-// forced from outside, through the DevTools Protocol, so a reading takes the page as it is.
 // Adapted from spike-html-packages-foundation (5dd8a58): test/browser/support/computed-styles.js.
+// See docs/testing.md.
 
 /** The three lateral-concern sheets, by file name. */
 export const concerns = ["meta", "structure", "utilities"];
 
-/** Every rule in the list, depth first, into imported sheets and grouping rules. */
 function* rules(list) {
   for (const rule of list) {
     yield rule;
@@ -19,10 +18,8 @@ function* rules(list) {
   }
 }
 
-/** Every rule of every sheet the document has. */
 const allRules = () => [...document.styleSheets].flatMap((sheet) => [...rules(sheet.cssRules)]);
 
-/** Each facet's profile attribute. */
 const attributes = { color: "data-palette", space: "data-space", type: "data-type" };
 
 /** The profiles the page's sheets define, per facet, by the names their selectors match, in order. */
@@ -41,10 +38,7 @@ export function defined() {
   return out;
 }
 
-/**
- * Points the page's stylesheet link at the URL, resolving once it and its imports have loaded,
- * and returns every select to its own block size (see ADDED_TOKENS).
- */
+/** Points the page's stylesheet link at the URL, resolving once it and its imports have loaded. */
 export async function useSheets(href) {
   const link = document.querySelector('link[rel="stylesheet"]');
   const loaded = new Promise((resolve, reject) => {
@@ -60,13 +54,7 @@ export async function useSheets(href) {
   document.adoptedStyleSheets = [...document.adoptedStyleSheets, own];
 }
 
-/**
- * Names a profile and a scheme on the page. The scheme's data-scheme goes on the root. The
- * profile's attribute goes on the root, or, given `sentinels`, on the body, with every token named
- * there set on the root to a value no profile holds, by an unlayered adopted sheet that beats every
- * layer: the body then shows each token its profile declares itself, and none it inherits from the
- * default's block.
- */
+/** Names a profile and a scheme on the page, the profile on the body under `sentinels` tokens. */
 export function scope({ attribute, name, scheme, sentinels }) {
   const root = document.documentElement;
   if (scheme) root.setAttribute("data-scheme", scheme);
@@ -81,25 +69,13 @@ export function scope({ attribute, name, scheme, sentinels }) {
   document.body.setAttribute(attribute, name);
 }
 
-/**
- * Sets the declarations on the root by an unlayered adopted sheet, which beats every layer: two
- * pages pinned alike read the same values for those tokens whatever profiles their sheets hold.
- */
+/** Sets the declarations on the root by an unlayered adopted sheet, which beats every layer. */
 export function pin(declarations) {
   const sheet = new CSSStyleSheet();
   sheet.replaceSync(`:root { ${declarations} }`);
   document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
 }
 
-/**
- * What the foundation adds to v0.7.0, which no comparison with v0.7.0 reads, so each reads only
- * what the two share; test/browser/controls.test.ts holds each. The reading leaves out the five
- * tokens the space facet adds, and the elements of demo/tools.html's #elements section, which
- * shows the elements rules the foundation departs on. A one-line select's block size, which the
- * elements layer sets to the control block size, also moves the lines and blocks around it, the
- * tools page's .button select's among them: useSheets() returns every select to its own, by an
- * unlayered adopted sheet that beats every layer, on both sides of a comparison alike.
- */
 const ADDED_TOKENS = [
   "--control-edge",
   "--control-block-size",
@@ -110,10 +86,9 @@ const ADDED_TOKENS = [
 const DEPARTED_ELEMENTS = "#elements *";
 const SELECT_OWN_SIZE = "select { block-size: auto; }";
 
-/**
- * Every element's computed properties, each element named by its position, tag, and classes, but
- * for what the foundation adds to v0.7.0.
- */
+const collapsedWhitespace = (value) => value.trim().replace(/\s+/g, " ");
+
+/** Every element's computed properties, by position, tag, and classes, but what v0.7.0 lacks. */
 export function reading() {
   const out = {};
   for (const [i, element] of [...document.querySelectorAll("*")].entries()) {
@@ -124,8 +99,7 @@ export function reading() {
     for (const property of style) {
       if (ADDED_TOKENS.includes(property)) continue;
       const value = style.getPropertyValue(property);
-      // A custom property keeps its source's whitespace, which is formatting, not style.
-      values[property] = property.startsWith("--") ? value.trim().replace(/\s+/g, " ") : value;
+      values[property] = property.startsWith("--") ? collapsedWhitespace(value) : value;
     }
     out[name] = values;
   }
@@ -164,11 +138,7 @@ export function declarations(cssText) {
   return out;
 }
 
-/**
- * Drops each declaration of the imported sheets whose URLs end in one of the suffixes, the
- * lateral-concern sheets by default, in turn, and counts how many differences from the reference
- * reading its absence makes.
- */
+/** Drops each declaration of the suffixes' sheets in turn, counting the differences it makes. */
 export function drops(reference, suffixes = concerns.map((concern) => `/${concern}.css`)) {
   const tried = [];
   const sheets = allRules()
@@ -194,17 +164,13 @@ export function drops(reference, suffixes = concerns.map((concern) => `/${concer
   return tried;
 }
 
-/** One sample element per sheet, and the two properties read from it. */
 const samples = {
   meta: ['<span class="button">a</span>', "display", "padding-left"],
   structure: ['<div class="field">a</div>', "display", "row-gap"],
   utilities: ['<div class="scroll-y">a</div>', "overflow-y", "padding-right"],
 };
 
-/**
- * Adopts each lateral-concern sheet alone into a shadow root, and reports how many imports its
- * source holds, its top-level rules, and its sample's two properties.
- */
+/** Adopts each lateral-concern sheet alone into a shadow root, reporting its rules and a sample. */
 export async function adopt(base) {
   const out = {};
   for (const concern of concerns) {

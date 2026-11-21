@@ -1,6 +1,3 @@
-/* A color profile whose dark --fg is its --fg-3, too faint on its --bg: about 3.75:1, under
-   4.5:1. Its light scheme passes. It fails contrast alone, in dark alone. */
-
 @layer foundation.tokens.color {
   :where([data-palette="contrast"]) {
     --bg: light-dark(#fffcf0, #100f0f);

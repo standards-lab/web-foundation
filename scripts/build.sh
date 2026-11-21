@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# From spike-html-apps-foundation (07ba39a): scripts/build.sh.
 # The build: src/ into a fresh dist/. tsc emits each module's .js and .d.ts, and the .css and the
 # handwritten .d.ts are copied beside them as written.
+# From spike-html-apps-foundation (07ba39a): scripts/build.sh.
 # From spike-html-packages-foundation (5dd8a58): scripts/build.sh.
 set -euo pipefail
 cd "$(dirname "$0")/.."

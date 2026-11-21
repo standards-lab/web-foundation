@@ -16,7 +16,8 @@ The demo pages, in `demo/`:
 - `tools.html`: every tool class, and the elements rules the foundation adds to v0.7.0: disabled
   fields, progress and meter.
 - `profiles.html`: the tools page switched through every profile.
-- `specimen.html`: each color profile light and dark, beside its backup from `demo/backups/`.
+- `specimen.html`: each color profile light and dark, beside its backup from `demo/backups/`
+  ([backups.md](backups.md)).
 - `theme.html`: the stored choice on `page-full.css`, switched by the demo's own selects.
 - `unit.html`: `page.css` with the GitHub unit.
 - `keys.html`: bindings, and a help dialog the page fills from `bindings()`.
@@ -46,5 +47,37 @@ and compact and sans. `--output directory --dir <path>` writes the files instead
 in kitty; `mise run screenshots -- --help` lists the other flags, and web-tooling's README
 documents them. The check never runs either task.
 
-The check lints with ESLint, Prettier, shellcheck, and actionlint. CI runs `mise run install` and
-the check on each pull request to main and each push to it.
+The check lints with ESLint, Prettier, shellcheck, and actionlint, which shellchecks each workflow's
+`run:` blocks with the pinned shellcheck too; [lint.md](lint.md) gives the ESLint rules, and
+[testing.md](testing.md) why the tests measure as they do. CI runs `mise run install` and the check
+on each pull request to main and each push to it.
+
+`mise run screenshots` is `raw`: mise pipes a task's output when the task has dependencies, and
+kitty's inline images need the terminal. Its arguments follow the capture description, with or
+without a leading `--`.
+
+## The toolchain
+
+- **No task installs a tool.** `task.run_auto_install` is off, so a missing tool fails its task,
+  and the preflight names `mise run install`, the one task that reads the network besides
+  `currency`.
+- **chrome-headless-shell has no published checksum.** Chrome for Testing publishes none, so each
+  bump takes the sha256 and size from the download by hand. mise caches downloads by checksum: a
+  version bumped without its own sha256 installs the old build, and the preflight fails naming the
+  pin.
+- **pnpm's settings** are in `pnpm-workspace.yaml`; the repository is one package, so it lists no
+  packages. unrs-resolver, under eslint-plugin-import-x and eslint-import-resolver-typescript, has
+  a postinstall that fetches its native binding when the optional dependency holding it is
+  missing; pnpm installs that dependency, so the script isn't run. `minimumReleaseAge: 0` turns off
+  pnpm's wait of a day before it installs a release: the currency task moves each pin to its
+  latest release, and that release's notes are read before the bump lands, a review that stands
+  in for the age gate; with the wait on, a frozen install of a lockfile that pins a release under a
+  day old fails.
+- **Prettier formats the code, the JSON, and the stylesheets only.** Its default run would also
+  rewrite the Markdown, the YAML, and `pnpm-lock.yaml`, so `.prettierignore` ignores every file,
+  then lets back every directory and the code, JSON, and CSS files. Prettier also skips what
+  `.gitignore` lists.
+- **Currency** runs mise at its error log level, since mise warns on every run that a GitHub
+  release has no assets. It checks the tooling, a `github:` devDependency pinned to its
+  repository's release tag, which the registry doesn't hold, against that repository's latest
+  release, and holds typescript to the newest version typescript-eslint's peer range accepts.

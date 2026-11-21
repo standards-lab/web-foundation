@@ -5,12 +5,6 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>foundation profiles</title>
-    <!-- The tools page, demo/tools.html, on the full page entry, switched through every profile by
-         attribute: data-palette, data-space, data-type, and data-scheme on its root. The tools page
-         itself stays as the browser tier compares it, on page.css with no attribute: this page
-         loads it in a frame, points the frame's link at page-full.css, and sets the attributes
-         there. The switches list the profiles register-full.js registers. Its module runs served
-         only: mise run demo. -->
     <link rel="stylesheet" href="../dist/page-full.css" />
     <link rel="stylesheet" href="demo.css" />
     <script type="module">
@@ -18,8 +12,6 @@
       import { DEFAULTS, profiles } from "../dist/registry.js";
 
       const frame = document.querySelector("iframe");
-      // Each switch, by the attribute it sets: a facet's registered profiles, or the schemes,
-      // where the empty value removes the attribute and the page follows the system.
       const switches = {
         "data-palette": profiles("color"),
         "data-space": profiles("space"),
@@ -34,7 +26,6 @@
         select.addEventListener("change", apply);
       }
 
-      // Sets every switch's attribute on the frame's root, the default profile's too.
       function apply() {
         const root = frame.contentDocument.documentElement;
         for (const attribute of Object.keys(switches)) {
@@ -44,8 +35,6 @@
         }
       }
 
-      // The tools page links page.css, which ships the defaults only: its link moves to the full
-      // entry, and the attributes are set once that entry has loaded.
       function load() {
         const link = frame.contentDocument.querySelector('link[rel="stylesheet"]');
         link.addEventListener("load", apply, { once: true });

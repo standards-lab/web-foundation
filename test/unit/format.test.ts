@@ -1,18 +1,5 @@
-// Adapted from spike-html-apps-foundation (07ba39a): test/unit/format.test.ts, importing the
-// package as @standards-lab/web-foundation.
-// The formatters as a consumer imports them: the package's ./format.js export, which resolves to
-// the dist/ mise run build wrote. Every case pins its locale, en-US, and a date's time zone, UTC.
-// Adapted from web-components (a659353): test/browser/json.test.ts, its cases run in node rather
-// than a page: keys in their order, integer-like keys and duplicates included;
-// number literals and strings with their escapes as written; minified and oddly spaced text
-// re-indented; empty, nested, scalar, and array documents; whitespace between tokens the only
-// difference from the text; a document of about 1 MB formatted without a stall; and containers
-// past JSON_MAX_DEPTH kept as written, so 20,000 levels format in output linear in the text.
-// Its absolute bounds on the time taken are a per-test timeout here instead, and no timing is
-// compared: a linear formatter takes milliseconds over either text, a quadratic one minutes over
-// the 1 MB one, so the timeout fails a stall, rather than hanging the job, on a runner of any speed.
-// Those two tests format in a worker: node:test times out only a test's promise, so a stall in
-// the test's own thread would run to its end and pass.
+// Adapted from spike-html-apps-foundation (07ba39a): test/unit/format.test.ts, importing the package as @standards-lab/web-foundation.
+// Adapted from web-components (a659353): test/browser/json.test.ts, its cases run in node, its time bounds a per-test timeout.
 
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
@@ -43,8 +30,7 @@ describe("formatBytes", () => {
     assert.equal(formatBytes(1e9, LOCALE), "1 GB");
     assert.equal(formatBytes(1e12, LOCALE), "1 TB");
     assert.equal(formatBytes(1e15, LOCALE), "1 PB");
-    // Past a petabyte it stays in petabytes.
-    assert.equal(formatBytes(2e18, LOCALE), "2,000 PB");
+    assert.equal(formatBytes(2e18, LOCALE), "2,000 PB", "past a petabyte it stays in petabytes");
   });
 
   test("steps a negative count by its magnitude", () => {
@@ -56,16 +42,21 @@ describe("formatBytes", () => {
     assert.equal(formatBytes(1, LOCALE), "1 byte");
     assert.equal(formatBytes(13, LOCALE), "13 bytes");
     assert.equal(formatBytes(999, LOCALE), "999 bytes");
-    // The units above it stay short.
-    assert.equal(formatBytes(1000, LOCALE), "1 kB");
+    assert.equal(formatBytes(1000, LOCALE), "1 kB", "the units above it stay short");
   });
 
   test("leaves the byte unit's plural and its word to the locale", () => {
-    // French's short byte unit is "o", whatever the count; its long one pluralizes. French sets
-    // the byte unit off by a no-break space and the short ones by a narrow no-break space.
-    assert.equal(formatBytes(1, "fr"), "1\u00a0octet");
-    assert.equal(formatBytes(13, "fr"), "13\u00a0octets");
-    assert.equal(formatBytes(1500, "fr"), "1,5\u202fko");
+    assert.equal(
+      formatBytes(1, "fr"),
+      "1\u00a0octet",
+      "the long byte unit, after a no-break space",
+    );
+    assert.equal(formatBytes(13, "fr"), "13\u00a0octets", "the long byte unit pluralized");
+    assert.equal(
+      formatBytes(1500, "fr"),
+      "1,5\u202fko",
+      "a short unit, after a narrow no-break space",
+    );
   });
 
   test("keeps a caller's unitDisplay for the byte unit too", () => {
@@ -73,10 +64,7 @@ describe("formatBytes", () => {
     assert.equal(formatBytes(13, LOCALE, { unitDisplay: "narrow" }), "13B");
   });
 
-  // An independent byte formatter, stepping by log10 to at most gigabytes at one fraction digit,
-  // the byte unit long and the others short, for the counts it handles: none past a gigabyte's
-  // unit, none negative.
-  const entryUnits = ["byte", "kilobyte", "megabyte", "gigabyte"].map(
+  const independentUnits = ["byte", "kilobyte", "megabyte", "gigabyte"].map(
     (unit) =>
       new Intl.NumberFormat(LOCALE, {
         style: "unit",
@@ -85,15 +73,18 @@ describe("formatBytes", () => {
         maximumFractionDigits: 1,
       }),
   );
-  const entrySize = (bytes: number) => {
-    const step = Math.min(Math.floor(Math.log10(Math.max(bytes, 1)) / 3), entryUnits.length - 1);
-    return entryUnits[step].format(bytes / 1000 ** step);
+  const independentSize = (bytes: number) => {
+    const step = Math.min(
+      Math.floor(Math.log10(Math.max(bytes, 1)) / 3),
+      independentUnits.length - 1,
+    );
+    return independentUnits[step].format(bytes / 1000 ** step);
   };
 
   test("its defaults print what an independent one-fraction-digit formatter prints", () => {
     const counts = [0, 1, 999, 1000, 1049, 1050, 12_345, 999_949, 999_950, 1e6, 123_456_789, 4.2e9];
     for (const bytes of counts)
-      assert.equal(formatBytes(bytes, LOCALE), entrySize(bytes), String(bytes));
+      assert.equal(formatBytes(bytes, LOCALE), independentSize(bytes), String(bytes));
   });
 
   test("passes the caller's other NumberFormat options through", () => {
@@ -103,13 +94,11 @@ describe("formatBytes", () => {
   });
 
   test("keeps its own style and unit over a caller's", () => {
-    // BytesOptions omits both, so it's a caller holding a whole NumberFormatOptions that passes them.
-    const theirs: Intl.NumberFormatOptions = { style: "percent", unit: "meter" };
-    assert.equal(formatBytes(1500, LOCALE, theirs), "1.5 kB");
+    const wholeNumberFormatOptions: Intl.NumberFormatOptions = { style: "percent", unit: "meter" };
+    assert.equal(formatBytes(1500, LOCALE, wholeNumberFormatOptions), "1.5 kB");
   });
 });
 
-// 2026-03-04 05:06:07 UTC.
 const moment = Date.UTC(2026, 2, 4, 5, 6, 7);
 
 describe("formatDate and formatDateTime", () => {
@@ -153,7 +142,6 @@ const SECOND = 1000;
 const DAY = 86_400 * SECOND;
 
 describe("formatRelative", () => {
-  /** `offset` milliseconds from a fixed now, formatted relative to it. */
   const relative = (offset: number, options: RelativeOptions = {}) =>
     formatRelative(moment + offset, LOCALE, { now: moment, ...options });
 
@@ -226,20 +214,13 @@ describe("formatDuration", () => {
   });
 });
 
-/** The text with the whitespace between its tokens removed, its strings' whitespace kept. */
 const tokensOf = (text: string): string =>
   text.replace(/("(?:[^"\\]|\\.)*")|[ \t\n\r]+/g, (_, string?: string) => string ?? "");
 
-/** The deepest level formatJson indents. */
 const MAX = JSON_MAX_DEPTH;
 
-/** Two spaces a level, as formatJson indents. */
 const indent = (depth: number): string => "  ".repeat(depth);
 
-/**
- * formatJson's output for the text, from a worker that the test's signal terminates, so the
- * test's timeout fails a stall instead of waiting it out.
- */
 const formatJsonInWorker = (text: string, signal: AbortSignal): Promise<string> =>
   new Promise((resolve, reject) => {
     const source = `
@@ -317,9 +298,7 @@ describe("formatJson", () => {
     assert.ok(!/[ \t\r]\n|\n\n/.test(output), "no trailing space and no blank line");
   });
 
-  // A quadratic formatter takes more than five minutes over this text.
   test("formats about 1 MB of JSON without a stall", { timeout: 10_000 }, async (t) => {
-    // 6,000 records of nested objects, arrays, strings with escapes, and numbers, minified.
     const record = (i: number) => ({
       id: `run-${i}`,
       "10": i,
@@ -350,9 +329,6 @@ describe("formatJson", () => {
   });
 
   test("keeps a container that would open past JSON_MAX_DEPTH as written, on its line", () => {
-    // Arrays to one level short of the cap, an object at the cap, and in it an array past it,
-    // spaced oddly, a string with brackets in it, and a member after it, where the formatting
-    // resumes.
     const inner = '[ 1 ,{"b" : "] }"} ,\t[ ] ]';
     const text = "[".repeat(MAX - 1) + `{"a":${inner} , "c":3}` + "]".repeat(MAX - 1);
     const opening = Array.from({ length: MAX - 1 }, (_, depth) => `${indent(depth)}[`);
@@ -365,10 +341,6 @@ describe("formatJson", () => {
   });
 
   test("keeps a container past JSON_MAX_DEPTH whole when its strings hold quotes and brackets", () => {
-    // Past the cap, an object whose key holds an opening brace, an escaped quote before closing
-    // brackets, and an escaped backslash before a string's real end; then, back at the cap, a
-    // string holding the brackets that would close it. A count fooled by any of them ends the kept
-    // container early or late, and the text after it shows indented differently or not at all.
     const kept = String.raw`{"{k\"": [ "\"]}", "\\", {"[" :"}]"} ] }`;
     const after = String.raw`"]]}\"["`;
     const text = "[".repeat(MAX) + `${kept},${after}` + "]".repeat(MAX);
@@ -384,16 +356,13 @@ describe("formatJson", () => {
     "formats text nested 20,000 deep in output linear in its length, without a stall",
     { timeout: 5_000 },
     async (t) => {
-      // The JSON_MAX_DEPTH levels formatted add a line break and at most 2 * JSON_MAX_DEPTH spaces
-      // of indent at each of their opening and closing brackets; the levels below are kept as
-      // written.
       const text = "[".repeat(20000) + " 1 " + "]".repeat(20000);
       const output = await formatJsonInWorker(text, t.signal);
       const kept = "[".repeat(20000 - MAX) + " 1 " + "]".repeat(20000 - MAX);
       t.diagnostic(`${text.length} characters to ${output.length}`);
       assert.ok(
         output.length <= text.length + 4 * MAX * MAX,
-        `${output.length} from ${text.length}`,
+        `${output.length} from ${text.length}: past the formatted levels' breaks and indents`,
       );
       assert.equal(output.replace(/[ \n]+/g, ""), text.replace(/ /g, ""));
       assert.ok(
@@ -430,12 +399,9 @@ describe("tryFormatJson", () => {
   });
 
   test("gives the text unchanged when its formatting would pass the longest string", () => {
-    // Ones in an array at JSON_MAX_DEPTH, about 8 MB: each element formats to a comma, a line
-    // break and 2 * JSON_MAX_DEPTH spaces of indent, past V8's longest string, 2 ** 29 - 24
-    // characters, so formatJson throws a RangeError.
     const ones = Math.ceil(2 ** 29 / (2 * MAX + 3));
     const text = "[".repeat(MAX) + "1,".repeat(ones) + "1" + "]".repeat(MAX);
-    assert.throws(() => formatJson(text), RangeError);
+    assert.throws(() => formatJson(text), RangeError, "its formatting passes V8's longest string");
     assert.deepEqual(tryFormatJson(text), { ok: true, text });
   });
 });

@@ -1,5 +1,4 @@
 // From spike-html-apps-foundation (07ba39a): test/unit/keys-grammar.test.ts.
-// The keys family's binding grammar, on src/keys-grammar.ts as node runs it.
 // Adapted from spike-html-packages-foundation (5dd8a58): test/unit/keys-grammar.test.js, in TypeScript.
 
 import assert from "node:assert/strict";
@@ -15,7 +14,6 @@ import {
 } from "../../src/keys-grammar.ts";
 import type { Binding, KeyLike, ParseOptions, Press } from "../../src/keys-grammar.ts";
 
-// press builds a parsed press: key, then the modifiers it holds.
 const press = (key: string, held: Partial<Press> = {}): Press => ({
   key,
   control: false,
@@ -25,8 +23,6 @@ const press = (key: string, held: Partial<Press> = {}): Press => ({
   ...held,
 });
 
-// event builds a keydown-like object, a US layout's code for an ASCII letter or digit unless
-// given, and no modifier unless given.
 function event(key: string, held: Partial<KeyLike> = {}): KeyLike {
   const code = /^[a-z]$/i.test(key)
     ? `Key${key.toUpperCase()}`
@@ -36,14 +32,12 @@ function event(key: string, held: Partial<KeyLike> = {}): KeyLike {
   return { key, code, shiftKey: false, altKey: false, ctrlKey: false, metaKey: false, ...held };
 }
 
-// valid parses a binding the case writes well formed, throwing, so failing the case, if it isn't.
 function valid(binding: string, options?: ParseOptions): Binding {
   const parsed = parse(binding, options);
   if (parsed === null) throw new Error(`${binding} doesn't parse`);
   return parsed;
 }
 
-// pressed reports whether the first press of binding's first alternative matches e.
 const pressed = (binding: string, e: KeyLike, options?: ParseOptions) =>
   matches(valid(binding, options)[0][0], e);
 
@@ -172,8 +166,7 @@ describe("keys grammar: matches", () => {
     assert.equal(pressed("Mod+k", event("k", { metaKey: true })), false);
   });
 
-  test("with Alt held, letters and digits match by event.code", () => {
-    // macOS Option+t types †, and Option+1 types ¡.
+  test("with Alt held, letters and digits match by event.code, as macOS Option+t types †", () => {
     assert.equal(pressed("Alt+t", event("†", { code: "KeyT", altKey: true })), true);
     assert.equal(pressed("Alt+t", event("t", { code: "KeyY", altKey: true })), false);
     assert.equal(pressed("Alt+1", event("¡", { code: "Digit1", altKey: true })), true);
@@ -200,8 +193,7 @@ describe("keys grammar: matches", () => {
 });
 
 describe("keys grammar: formatting", () => {
-  // The demo: "g t", "Alt+T", and "?" in every form.
-  const FORMATS = {
+  const DEMO_BINDINGS = {
     "g t": {
       normal: "g t",
       labels: [[["G"], ["T"]]],
@@ -218,7 +210,7 @@ describe("keys grammar: formatting", () => {
       keyshortcuts: "Shift+/",
     },
   };
-  for (const [binding, expected] of Object.entries(FORMATS)) {
+  for (const [binding, expected] of Object.entries(DEMO_BINDINGS)) {
     test(`formats ${binding} every way`, () => {
       const parsed = valid(binding);
       assert.equal(stringify(parsed), expected.normal);
@@ -244,10 +236,8 @@ describe("keys grammar: formatting", () => {
   });
 
   test("a symbol is declared by its US physical key with Shift", () => {
-    // A sample across the Shift row, not the whole table: restating every entry would restate
-    // US_SHIFTED itself. Plus is the named key, and the quote and backslash need escaping.
-    const SHIFTED = { "?": "/", "!": "1", Plus: "=", '"': "'", "|": "\\", "~": "`" };
-    for (const [symbol, key] of Object.entries(SHIFTED)) {
+    const SHIFT_ROW_SAMPLE = { "?": "/", "!": "1", Plus: "=", '"': "'", "|": "\\", "~": "`" };
+    for (const [symbol, key] of Object.entries(SHIFT_ROW_SAMPLE)) {
       assert.deepEqual([symbol, keyshortcuts(valid(symbol))], [symbol, `Shift+${key}`]);
     }
     assert.equal(keyshortcuts(valid("Alt+?")), "Alt+Shift+/");

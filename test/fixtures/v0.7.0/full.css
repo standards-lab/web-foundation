@@ -1,22 +1,5 @@
 /* From spike-html-apps-foundation (07ba39a): test/fixtures/v0.7.0/full.css. */
-/* From spike-html-design (fe75220): full.css */
-/*
- * full.css: the package's full entry, every profile of every facet in one link.
- *
- * The lean entry, baseline.css, holds the foundation and each facet's default profile: Flexoki,
- * regular, and mono. This entry holds everything the lean entry holds plus every other profile:
- * Primer, Catppuccin, and Everforest for color, compact for space, and sans for type. A page
- * links this entry to select any profile with data-palette, data-space, or data-type, or the
- * lean entry to fetch less.
- *
- * It is self-contained, not an add-on to the lean entry: it declares the same package layer
- * statement and imports every file the lean entry imports, in the same order, each directly into
- * its layer, one hop deep. Each facet's profiles follow its default in its sub-layer, so an
- * attribute on the root overrides the default's block of equal, zero specificity by order alone.
- * A page links one entry, never both. Like the lean entry, it has no build: the URLs are relative, so a
- * pinned jsDelivr tag serves every file from the same tag, and it works from file:// and under a
- * Pages subpath alike.
- */
+/* full.css: the package's full entry, every profile of every facet in one link. */
 
 @layer spike-html-design.tokens.color,
   spike-html-design.tokens.space,

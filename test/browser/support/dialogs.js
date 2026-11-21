@@ -1,16 +1,13 @@
-// The glyph button and dialog cases' in-page half: imported into test/fixtures/dialogs.html, it lays
-// out the cases, a header of glyph buttons with their hints and three dialogs with header rows, in
-// the light DOM or in a shadow root that adopts the foundation's sheets, and measures each case's
-// geometry and colors. Each export returns plain JSON for evaluate(); the constants are also read
-// on node. Every length a case sets is a style attribute, so the markup lays out the same on either
-// side of a shadow boundary. The glyphs are inline svgs, 1em a side, as the icons layer draws them.
-// From spike-html-hosting-icons (8b8d955): dist/octicon/question-16.js and x-16.js;
-// Octicons, primer/octicons, MIT.
+// The glyph button and dialog cases' in-page half, imported into test/fixtures/dialogs.html: it lays
+// out glyph buttons with their hints and three dialogs, in the light DOM or a shadow root, and
+// measures each case's geometry and colors, as plain JSON for evaluate(); the constants are also
+// read on node.
+// From spike-html-hosting-icons (8b8d955): dist/octicon/question-16.js and x-16.js; Octicons, primer/octicons, MIT.
+// See docs/testing.md.
 
 import { declarations } from "./computed-styles.js";
 
-/** The sheets a shadow root adopts, in order: the baseline's reset and elements layers, whose
- * selectors stop at a shadow boundary, and the two sheets under test. The tokens it inherits. */
+/** The sheets a shadow root adopts, in order. */
 export const ADOPTED = [
   "baseline/reset.css",
   "baseline/elements.css",
@@ -21,7 +18,6 @@ export const ADOPTED = [
 /** The sheets under test, whose every declaration drops() drops in turn. */
 export const SHEETS = ["glyph-button.css", "dialog.css"];
 
-/** An Octicon's svg, as the icons layer writes it, around its path data. */
 const svg = (d) =>
   `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 16 16" ` +
   `aria-hidden="true" focusable="false"><path fill="currentColor" d="${d}"/></svg>`;
@@ -33,23 +29,19 @@ const X = svg(
   "M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.749.749 0 0 1 1.275.326a.75.75 0 0 1-.215.734L9.06 8l3.22 3.22a.749.749 0 0 1-.326 1.275a.75.75 0 0 1-.734-.215L8 9.06l-3.22 3.22a.75.75 0 0 1-1.042-.018a.75.75 0 0 1-.018-1.042L6.94 8L3.72 4.78a.75.75 0 0 1 0-1.06",
 );
 
-/** A glyph button and its hint: the button named `name` by its aria-label and the hint, holding
- * the glyph and, given one, a key hint; `attributes` are its own, an invoker's command. */
 const glyphButton = (id, name, glyph, key, attributes = "") =>
   `<button type="button" class="glyph-button" aria-label="${name}" interestfor="${id}-hint" ` +
   `aria-description="" data-part="${id}" ${attributes}>${glyph}` +
   (key ? `<span aria-hidden="true"><kbd>${key}</kbd></span>` : "") +
   `</button><div id="${id}-hint" class="glyph-hint" popover="hint" aria-hidden="true">${name}</div>`;
 
-/** A dialog's header row, its heading's attributes given, and its Close glyph button. */
 const header = (dialog, title, attributes = "") =>
   `<header class="dialog-header" data-part="header"><h2 id="${dialog}-title" ${attributes} ` +
   `data-part="heading">${title}</h2>` +
   glyphButton(`${dialog}-close`, "Close", X, "Esc", `commandfor="${dialog}" command="close"`) +
   `</header>`;
 
-/** Every case: the header's glyph buttons, a glyph alone beside a plain button, one at the
- * viewport's foot, and the three dialogs, each a [data-case] element, its parts [data-part]. */
+/** Every case, each a [data-case] element, its parts [data-part]. */
 export const MARKUP = `
   <div data-case="actions">
     ${glyphButton("help", "Help", QUESTION, "?", 'commandfor="help" command="show-modal"')}
@@ -80,7 +72,6 @@ export const MARKUP = `
   </dialog>
 `;
 
-/** The case's element, or a part of it, under the root. */
 const find = (root, name, part) => {
   const element = root.querySelector(`[data-case="${name}"]`);
   return part ? element.querySelector(`[data-part="${part}"]`) : element;
@@ -88,7 +79,6 @@ const find = (root, name, part) => {
 
 const round = (n) => Math.round(n * 64) / 64;
 
-/** An element's box, relative to the origin's, in px rounded to 1/64. */
 const box = (element, origin) => {
   const r = element.getBoundingClientRect();
   const o = origin.getBoundingClientRect();
@@ -100,13 +90,11 @@ const box = (element, origin) => {
   };
 };
 
-/** The vertical center of an element's box, in px rounded to 1/64. */
 const middle = (element) => {
   const r = element.getBoundingClientRect();
   return round(r.top + r.height / 2);
 };
 
-/** An element's border, radius, surface and text color, as one string. */
 const surface = (element) => {
   const s = getComputedStyle(element);
   return [
@@ -119,7 +107,6 @@ const surface = (element) => {
   ].join(" ");
 };
 
-/** A glyph button's row: its layout, its glyph's and key hint's boxes, and its surface. */
 const row = (button) => {
   const style = getComputedStyle(button);
   const glyph = button.querySelector("svg");
@@ -146,8 +133,6 @@ const row = (button) => {
   };
 };
 
-/** The button's hint, shown with the button as its source, as an interest shows it: its box
- * against the button's, its type and colors. */
 const hint = (button) => {
   const shown = button.interestForElement;
   shown.showPopover({ source: button });
@@ -172,7 +157,6 @@ const hint = (button) => {
   return out;
 };
 
-/** A dialog opened modally, as its opener opens it: its box, its header row's, and its parts'. */
 const dialog = (root, name) => {
   const element = find(root, name);
   element.showModal();
@@ -191,8 +175,6 @@ const dialog = (root, name) => {
     centers: middle(heading) - middle(close),
     below: round(body.getBoundingClientRect().top - head.getBoundingClientRect().bottom),
     margins: [style.marginBlockStart, style.marginBlockEnd],
-    // As it opens, focus goes to the heading where it takes it, else to Close: the focused
-    // element's part, whether it matches :focus-visible, and its outline.
     focus: root.activeElement?.dataset.part ?? null,
     outline: [
       root.activeElement?.matches(":focus-visible"),
@@ -246,7 +228,6 @@ export async function shadow(base) {
   return root;
 }
 
-/** Every rule of the list, depth first, into grouping rules. */
 function* rules(list) {
   for (const rule of list) {
     yield rule;
@@ -254,10 +235,7 @@ function* rules(list) {
   }
 }
 
-/**
- * Drops each declaration of the linked sheets under test, in turn, and reports whether the light
- * DOM's measure() then differs from the reference.
- */
+/** Drops each declaration of the sheets under test in turn, reporting whether measure() differs. */
 export function drops(reference) {
   const tried = [];
   for (const name of SHEETS) {

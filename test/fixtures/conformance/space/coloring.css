@@ -1,5 +1,4 @@
 /* From spike-html-apps-foundation (07ba39a): test/fixtures/conformance/space/coloring.css. */
-/* A space profile that also sets a color token and a type token. It fails space-only alone. */
 
 @layer foundation.tokens.space {
   :where([data-space="coloring"]) {

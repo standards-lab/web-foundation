@@ -1,10 +1,4 @@
-// Adapted from spike-html-apps-foundation (07ba39a): test/browser/conformance.test.ts, importing
-// the tooling and the package as @standards-lab/web-tooling and @standards-lab/web-foundation.
-// The conformance module from the package's dist/, as an extension's author runs it: every
-// built-in profile of the full entry conforms, in light and in dark, and with the entry's sheets
-// from another origin, whose rules chromium hides; each fixture profile in
-// test/fixtures/conformance/ fails the one rule it breaks, by name; and the check rejects what it
-// can't check, and leaves the page as it found it.
+// Adapted from spike-html-apps-foundation (07ba39a): test/browser/conformance.test.ts, importing the tooling and the package by name.
 // Adapted from spike-html-design (fe75220): test/conformance.test.js, in TypeScript.
 
 import assert from "node:assert/strict";
@@ -17,24 +11,19 @@ import type { Browser, Page } from "@standards-lab/web-tooling/browser.js";
 import type { Server } from "@standards-lab/web-tooling/server.js";
 import type { Failure } from "@standards-lab/web-foundation/conformance.js";
 
-/** The repository root, which the server serves. */
 const root = join(import.meta.dirname, "../..");
 
 const CONFORMANCE = "/dist/conformance.js";
 
-/** Profile names, facet to list. */
 type Names = Record<string, string[]>;
-/** check()'s failures for each facet's names, facet to name to list. */
 type Results = Record<string, Record<string, Failure[]>>;
 
-/** The full entry's profiles, per facet. */
 const BUILT_IN: Names = {
   color: ["zen", "github", "catppuccin", "everforest"],
   space: ["regular", "compact"],
   type: ["mono", "sans"],
 };
 
-/** The fixture profiles, per facet, each to the one rule it breaks. */
 const BROKEN: Record<string, Record<string, string>> = {
   color: {
     missing: "tokens",
@@ -73,7 +62,6 @@ const fixture = (name: string) => `${server.origin}/test/fixtures/${name}`;
 
 before(async () => {
   server = await serve({ root });
-  // A second origin for the cross-origin case: the same tree on another port.
   other = await serve({ root });
   browser = await launch();
 });
@@ -86,17 +74,12 @@ after(async () => {
   await other?.stop();
 });
 
-/** Opens the URL, closing it after the test. */
 async function open(url: string): Promise<Page> {
   const page = await browser.open(url);
   pages.push(page);
   return page;
 }
 
-/**
- * The failures check() returns for each facet's names on the page, facet to name to list, with the
- * conformance module imported from dist/.
- */
 const checked = (page: Page, names: Names): Promise<Results> =>
   page.evaluate(`import(${JSON.stringify(CONFORMANCE)}).then(async ({ check }) => {
     const results = {};
@@ -107,7 +90,6 @@ const checked = (page: Page, names: Names): Promise<Results> =>
     return results;
   })`);
 
-/** The result checked() resolves to when every one of names conforms. */
 const conforming = (names: Names) =>
   Object.fromEntries(
     Object.entries(names).map(([facet, list]) => [
@@ -116,7 +98,6 @@ const conforming = (names: Names) =>
     ]),
   );
 
-/** Each fixture's rule names, facet to name to list, from checked()'s results. */
 const rules = (results: Results) =>
   Object.fromEntries(
     Object.entries(results).map(([facet, byName]) => [
@@ -139,14 +120,13 @@ describe("conformance", () => {
   }
 
   test("the built-in profiles conform with the entry's sheets from another origin", async () => {
-    // A cross-origin sheet served without CORS hides its rules: the check reads computed values
-    // alone.
     const page = await open(`${fixture("conformance-cross-origin.html")}?sheets=${other.origin}`);
     assert.deepEqual(
       await page.evaluate(`[document.styleSheets.length, [...document.styleSheets].every((sheet) => {
         try { return sheet.cssRules && false; } catch { return true; }
       })]`),
       [1, true],
+      "the entry's one sheet hides its rules, served from another origin without CORS",
     );
     assert.deepEqual(await checked(page, BUILT_IN), conforming(BUILT_IN));
   });
@@ -206,7 +186,6 @@ describe("conformance", () => {
     assert.deepEqual(messages("type", "unfamilied"), [
       "unfamilied: --font-code resolve to no font family",
     ]);
-    // A name no stylesheet applies sets no value, so the rules that read values are skipped.
     for (const facet of ["color", "space", "type"]) {
       assert.deepEqual(
         results[facet].absent.map(({ rule }) => rule),
@@ -217,8 +196,6 @@ describe("conformance", () => {
   });
 
   test("contrast compares --fg on --bg unrounded in each scheme, and names the scheme and ratio", async () => {
-    // Two profiles the page adds, each a passing profile's tokens on a white light --bg with a
-    // light --fg either side of 4.5:1: #6c7b67 at 4.49999...:1, and #797488 at 4.50000...:1.
     const page = await open(fixture("conformance.html"));
     await page.evaluate(`import("/dist/registry.js").then(({ register }) => {
       const profile = (name, fg) => \`:where([data-palette="\${name}"]) {
@@ -250,7 +227,6 @@ describe("conformance", () => {
   });
 
   test("a scope painted from other tokens by a consumer's rule fails paints", async () => {
-    // A consumer rule that repaints every github scope breaks paints for github alone.
     const page = await open(fixture("conformance.html"));
     await page.evaluate(`document.head.append(Object.assign(document.createElement("style"), {
       textContent: '[data-palette="github"] { background-color: var(--red); }',
@@ -286,8 +262,11 @@ describe("conformance", () => {
       performance.getEntriesByType("resource").length]`;
     const before = await page.evaluate(state);
     await checked(page, { color: ["zen"], space: ["regular"], type: ["mono"] });
-    // The module itself is the one resource the check adds.
     const [elements, sheets, resources] = await page.evaluate(state);
-    assert.deepEqual([elements, sheets, resources], [before[0], before[1], before[2] + 1]);
+    assert.deepEqual(
+      [elements, sheets, resources],
+      [before[0], before[1], before[2] + 1],
+      "the module itself is the one resource the check adds",
+    );
   });
 });

@@ -1,7 +1,6 @@
-// From spike-html-apps-foundation (07ba39a): test/unit/release.ts.
 // A release's shape: a pack of the build checked against the sources, package.json's files and
-// exports, which Node itself resolves, and the Apache 2.0 LICENSE its manifest declares.
-// test/unit/release.test.ts runs it on a pnpm pack.
+// exports as Node resolves them, and the Apache 2.0 LICENSE its manifest declares.
+// From spike-html-apps-foundation (07ba39a): test/unit/release.ts.
 // Adapted from spike-html-packages-foundation (5dd8a58): test/unit/release.js, in TypeScript.
 
 import { execFileSync } from "node:child_process";
@@ -18,21 +17,16 @@ export function listFiles(dir: string): string[] {
     .sort();
 }
 
-/** A key's or target's parts around its one *, or undefined when it holds none. */
 function star(pattern: string): { prefix: string; suffix: string } | undefined {
   const at = pattern.indexOf("*");
   return at < 0 ? undefined : { prefix: pattern.slice(0, at), suffix: pattern.slice(at + 1) };
 }
 
-// Node's condition sets: its defaults, and with types, the condition TypeScript adds.
 const conditionSets = [[], ["--conditions=types"]];
-// Each specifier in argv resolved as the package's own import, or null where Node refuses it.
 const resolveArgs = `console.log(JSON.stringify(process.argv.slice(1).map((specifier) => {
   try { return import.meta.resolve(specifier); } catch { return null; }
 })));`;
 
-/** The paths, relative to root, that Node resolves each subpath of the package at root to under
- * any condition set, by self-reference, as { subpath: Set }; none where Node refuses it. */
 function resolveSubpaths(
   root: string,
   name: string,
@@ -63,8 +57,7 @@ export function builtFrom(source: string): string[] {
   return [];
 }
 
-/** The fields of a package.json the checks read. An exports entry is what the release is judged
- * on, so its shape is unknown until judged. */
+/** The fields of a package.json the checks read, as JSON gives them. */
 export interface Manifest {
   name: string;
   license?: string;
@@ -72,15 +65,12 @@ export interface Manifest {
   exports?: Record<string, unknown>;
 }
 
-/** The files every pack carries whatever package.json's files lists. */
 const always = ["LICENSE", "README.md", "package.json"];
 
-/** The license every release declares, and the text its LICENSE opens with. */
 const license = "Apache-2.0";
 const licenseHeading = /^\s*Apache License\s+Version 2\.0, January 2004\s/;
 
-/** What keeps root, a pack's package/, from carrying the license its package.json declares, one
- * line each: the declaration and the LICENSE beside package.json. */
+/** What keeps root, a pack's package/, from carrying the license its package.json declares. */
 export function licenseProblems(root: string): string[] {
   const problems: string[] = [];
   const manifest: Manifest = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
@@ -98,22 +88,32 @@ export function licenseProblems(root: string): string[] {
 /** What keeps root, a pack's package/, from being the release its package.json declares for the
  * sources in `src`, one line each. */
 export function releaseProblems(root: string, src: string): string[] {
-  const problems = licenseProblems(root);
   const manifest: Manifest = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
-  const { exports = {}, files = [] } = manifest;
   const packed = listFiles(root);
   const built = packed.filter((path) => path.startsWith("dist/"));
-  const builtSet = new Set(built);
+  return [
+    ...licenseProblems(root),
+    ...packedProblems(packed),
+    ...buildProblems(src, built),
+    ...filesProblems(manifest.files ?? [], built),
+    ...exportsProblems(root, manifest, built),
+  ];
+}
 
-  // The pack is the build and the files every pack carries, and nothing else.
+function packedProblems(packed: string[]): string[] {
+  const problems: string[] = [];
   if (!packed.includes("README.md")) problems.push("the pack has no README.md");
   for (const path of packed) {
     if (!path.startsWith("dist/") && !always.includes(path)) {
       problems.push(`${path} is packed but isn't the build, ${always.join(", ")}`);
     }
   }
+  return problems;
+}
 
-  // The build against the sources: each source's emit or copy is there, and nothing else is.
+function buildProblems(src: string, built: string[]): string[] {
+  const problems: string[] = [];
+  const builtSet = new Set(built);
   const expected = new Set();
   for (const source of listFiles(src)) {
     const outputs = builtFrom(source);
@@ -126,21 +126,24 @@ export function releaseProblems(root: string, src: string): string[] {
   for (const path of built) {
     if (!expected.has(path)) problems.push(`${path} is built from no source`);
   }
+  return problems;
+}
 
-  // files ships the build: each built file lies under an entry of files.
+function filesProblems(files: string[], built: string[]): string[] {
   const shipped = (path: string) =>
     files.some(
       (entry) =>
         path === entry.replace(/\/$/, "") || path.startsWith(`${entry.replace(/\/$/, "")}/`),
     );
-  for (const path of built) {
-    if (!shipped(path)) problems.push(`${path} isn't under package.json's files`);
-  }
+  return built
+    .filter((path) => !shipped(path))
+    .map((path) => `${path} isn't under package.json's files`);
+}
 
-  // exports: every entry a target or a flat object of condition targets, or null, which excludes
-  // its subpath; every built file reached through an export as Node resolves it; every pattern key
-  // reaching a built file; and every target Node resolves an export to built. The subpaths judged
-  // are the exact keys and each built file's subpath through a pattern target that matches it.
+function exportsProblems(root: string, manifest: Manifest, built: string[]): string[] {
+  const problems: string[] = [];
+  const { exports = {} } = manifest;
+  const builtSet = new Set(built);
   const subpaths = new Set<string>();
   const origins: { key: string; subpath: string; path: string }[] = [];
   for (const [key, entry] of Object.entries(exports)) {

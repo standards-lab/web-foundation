@@ -1,45 +1,25 @@
-/*
- * Colors from ayu (MIT, Konstantin Pschera), https://github.com/ayu-theme/ayu-colors, at v6.0.0:
- * Light in light and Mirage in dark. The palette's src/light.ts and src/mirage.ts derive many
- * swatches from others with chroma-js; the values here are the resolved ones the repository's
- * colors.svg lists at the same tag, generated from those sources in the commit that last changed
- * them (faa653f).
- *
- * demo/backups/ayu.css, the backup the specimen page, demo/specimen.html, shows beside catppuccin:
- * one zero-specificity block in foundation.tokens.color, applied by data-palette="ayu" on any
- * element to its subtree, declaring the sixteen color tokens as light-dark() pairs, Light /
- * Mirage. It is a demo sheet, not a profile: not under src/, not in the package, and not
- * registered. Each value's comment names its upstream swatch, the one name both variants share.
- * The raised surfaces are the panel and the editor's selection; the panel's border is the border,
- * and the active indent guide the control boundary. ayu's panel is lighter than its base in Light,
- * pure white, so Light's surfaces do not step toward the text. The text ladder is the foreground,
- * the UI gray, and the comment. Fills: ayu has no magenta, so constant, its purple, fills
- * --magenta.
- */
+/* Colors from ayu (MIT, Konstantin Pschera): https://github.com/ayu-theme/ayu-colors at v6.0.0, colors.svg */
+/* demo/backups/ayu.css: the backup the specimen page shows beside catppuccin, data-palette="ayu"; a demo sheet, not a profile. */
 
 @layer foundation.tokens.color {
   :where([data-palette="ayu"]) {
-    /* Surfaces: the base, the first elevated surface, the element surface, the border and the
-       control boundary. */
-    --bg: light-dark(#fafafa, #212733); /* common.bg */
-    --bg-1: light-dark(#ffffff, #262c38); /* ui.panel.bg */
-    --bg-2: light-dark(#e9f2f8, #293847); /* editor.selection.bg */
-    --border: light-dark(#f0f0f0, #121824); /* ui.panel.border */
-    --border-2: light-dark(#b9bcbf, #515c69); /* editor.guide.active */
+    --bg: light-dark(#fafafa, #212733);
+    --bg-1: light-dark(#ffffff, #262c38);
+    --bg-2: light-dark(#e9f2f8, #293847);
+    --border: light-dark(#f0f0f0, #121824);
+    --border-2: light-dark(#b9bcbf, #515c69);
 
-    /* Text, from the strongest down. */
-    --fg: light-dark(#61676c, #ccc9c2); /* common.fg */
-    --fg-2: light-dark(#9da2a6, #667380); /* common.ui */
-    --fg-3: light-dark(#abb0b6, #5c6773); /* syntax.comment */
+    --fg: light-dark(#61676c, #ccc9c2);
+    --fg-2: light-dark(#9da2a6, #667380);
+    --fg-3: light-dark(#abb0b6, #5c6773);
 
-    /* Hues: one token per color, named for the color, never for a meaning. */
-    --red: light-dark(#f07171, #f28779); /* syntax.markup */
-    --orange: light-dark(#fa6e32, #ffa759); /* syntax.keyword */
-    --yellow: light-dark(#f29718, #ffd580); /* syntax.func */
-    --green: light-dark(#86b300, #bae67e); /* syntax.string */
-    --cyan: light-dark(#55b4d4, #5ccfe6); /* syntax.tag */
-    --blue: light-dark(#399ee6, #73d0ff); /* syntax.entity */
-    --purple: light-dark(#a37acc, #d4bfff); /* syntax.constant */
-    --magenta: light-dark(#a37acc, #d4bfff); /* syntax.constant */
+    --red: light-dark(#f07171, #f28779);
+    --orange: light-dark(#fa6e32, #ffa759);
+    --yellow: light-dark(#f29718, #ffd580);
+    --green: light-dark(#86b300, #bae67e);
+    --cyan: light-dark(#55b4d4, #5ccfe6);
+    --blue: light-dark(#399ee6, #73d0ff);
+    --purple: light-dark(#a37acc, #d4bfff);
+    --magenta: light-dark(#a37acc, #d4bfff);
   }
 }

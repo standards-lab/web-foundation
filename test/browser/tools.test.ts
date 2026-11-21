@@ -1,19 +1,4 @@
-// Adapted from spike-html-apps-foundation (07ba39a): test/browser/tools.test.ts, importing the
-// tooling and the package as @standards-lab/web-tooling and @standards-lab/web-foundation.
-// The tool sheets in the package's dist/ against v0.7.0's: every element of demo/tools.html
-// computes the same, at rest and hovered, and dropping any one declaration shows; what the
-// foundation adds to v0.7.0's elements and tokens, which controls.test.ts holds, computed-styles.js
-// leaves out of every reading, and the utility classes it adds, which utilities.test.ts holds,
-// neither the demo page nor this comparison reads. The page entry's
-// layer order and default profiles are read from the same page. The full page entry's space and
-// type profiles compute as v0.7.0's full entry's, in light and in dark, and dropping any one
-// declaration of one it adds shows. The color profiles are the package's own, not v0.7.0's: every
-// comparison with v0.7.0 pins the color tokens on both pages to v0.7.0's default's values, so it
-// holds which token each declaration reads and never a palette's values; the default, zen,
-// resolves to its own swatches, and dropping any one declaration of a color profile shows on its
-// scope. Each entry's registration module lists exactly the profiles it defines, and each
-// built-in unit's module registers its one profile and loads no CSS.
-// demo/profiles.html switches the tools page through every profile.
+// Adapted from spike-html-apps-foundation (07ba39a): test/browser/tools.test.ts, importing the tooling and the package by name.
 // Adapted from spike-html-packages-foundation (5dd8a58): test/browser/tools.test.js, in TypeScript.
 
 import assert from "node:assert/strict";
@@ -29,38 +14,29 @@ import type { Facet } from "@standards-lab/web-foundation/registry.js";
 import { concerns, differences } from "./support/computed-styles.js";
 import { ADDED_UTILITIES } from "./support/utilities.js";
 
-/** A page's computed styles, as computed-styles.js's reading() returns them: element to property
- * to value. */
 type Reading = Record<string, Record<string, string>>;
-/** One declaration computed-styles.js's drops() dropped, and the differences its absence made. */
 interface Drop {
   sheet: string;
   selector: string;
   declaration: string;
   differs: number;
 }
-/** One option of demo/profiles.html's switches, chosen: the frame root's attribute and the token
- * and scheme it then computes. */
 interface Switch {
   value: string;
   attribute: string | null;
   token: string;
   scheme: string;
 }
-/** A lateral-concern sheet adopted alone, as computed-styles.js's adopt() reports it: its
- * @import count, its top-level rules, and its sample's two properties. */
 interface Adopted {
   imports: number;
   rules: string[];
   [property: string]: number | string | string[];
 }
-/** A profile of a facet. */
 interface Profile {
   facet: Facet;
   name: string;
 }
 
-/** The repository root, which the server serves. */
 const root = join(import.meta.dirname, "../..");
 
 const reference = "/test/fixtures/v0.7.0/baseline.css";
@@ -69,7 +45,6 @@ const fullReference = "/test/fixtures/v0.7.0/full.css";
 const fullEntry = "/dist/page-full.css";
 const sheet = (concern: string) => `/dist/${concern}.css`;
 
-/** The foundation's layers, in the order the page entry states. */
 const LAYER_ORDER = [
   "foundation.tokens.color",
   "foundation.tokens.space",
@@ -86,7 +61,6 @@ const LAYER_ORDER = [
 ];
 
 const FACETS: Facet[] = ["color", "space", "type"];
-/** One token per facet that tells its profile apart, with its value under each profile. */
 const PROFILES: Record<Facet, Record<string, Record<string, string>>> = {
   color: { zen: { "--bg": "light-dark(#eeeeee, #191919)" } },
   space: { regular: { "--radius-base": "0.375rem" } },
@@ -101,13 +75,11 @@ const TOKENS = FACETS.flatMap((facet) =>
   Object.values(PROFILES[facet]).flatMap((tokens) => Object.keys(tokens)),
 );
 
-/** Each facet's profile attribute, as v0.7.0 names them. */
 const ATTRIBUTES: Record<Facet, string> = {
   color: "data-palette",
   space: "data-space",
   type: "data-type",
 };
-/** The profiles each entry ships, per facet, in the order it imports them. */
 const LEAN: Record<Facet, string[]> = { color: ["zen"], space: ["regular"], type: ["mono"] };
 const FULL: Record<Facet, string[]> = {
   color: ["zen", "github", "catppuccin", "everforest"],
@@ -115,19 +87,13 @@ const FULL: Record<Facet, string[]> = {
   type: ["mono", "sans"],
 };
 const SCHEMES = ["light", "dark"];
-/** Each profile of the full entry, as a facet and a name. */
 const FULL_PROFILES: Profile[] = FACETS.flatMap((facet) =>
   FULL[facet].map((name) => ({ facet, name })),
 );
-/** The profiles the full entry adds to the lean one. */
 const ADDED = FULL_PROFILES.filter(({ facet, name }) => !LEAN[facet].includes(name));
-/** The profiles held to v0.7.0's values: the space and type ones. */
 const UPSTREAM_HELD = FULL_PROFILES.filter(({ facet }) => facet !== "color");
-/** The color profiles, the package's own, each held to its own reading. */
 const COLORS = FULL_PROFILES.filter(({ facet }) => facet === "color");
 
-/** zen's sixteen tokens, light / dark: the upstream values zen.css credits, zenbones.nvim
- * v4.12.0's generated colorscheme for its light and dark backgrounds. */
 const ZEN: Record<string, [string, string]> = {
   "--bg": ["#eeeeee", "#191919"],
   "--bg-1": ["#e5e5e5", "#222222"],
@@ -146,22 +112,17 @@ const ZEN: Record<string, [string, string]> = {
   "--purple": ["#88507d", "#b279a7"],
   "--magenta": ["#88507d", "#b279a7"],
 };
-/** A #rrggbb color as getComputedStyle gives it. */
 const rgb = (hex: string) =>
   `rgb(${[1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(", ")})`;
 
-/** A file of the repository, by its path on the server, without its CSS comments. */
 const source = (path: string) =>
   readFileSync(join(root, path), "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
 
-/** The class names a stylesheet's selectors name, sorted. */
 function classes(css: string): string[] {
-  // A dot after a digit is a number's decimal point, not a class.
   const names = [...css.matchAll(/(?<![\w-])\.(-?[A-Za-z_][\w-]*)/g)].map((match) => match[1]);
   return [...new Set(names)].sort();
 }
 
-/** Forces :hover on the page's body and every element in it, through the DevTools Protocol. */
 async function forceHover(page: Page) {
   await page.cdp("DOM.enable");
   await page.cdp("CSS.enable");
@@ -175,11 +136,9 @@ async function forceHover(page: Page) {
   await Promise.all(nodeIds.map(hover));
 }
 
-/** The custom properties a stylesheet declares, sorted. */
 const declared = (css: string) =>
   [...new Set([...css.matchAll(/(--[\w-]+)\s*:/g)].map((m) => m[1]))].sort();
 
-/** Each facet's default profile's sheet in v0.7.0, the one its lean entry imports. */
 const UPSTREAM_DEFAULTS = Object.fromEntries(
   FACETS.map((facet) => {
     const match = source(reference).match(new RegExp(`\\./layers/tokens/${facet}/[\\w-]+\\.css`));
@@ -188,21 +147,12 @@ const UPSTREAM_DEFAULTS = Object.fromEntries(
   }),
 ) as Record<Facet, string>;
 
-/**
- * Each facet's tokens, the ones its default profile declares in v0.7.0's sheet: a scoped reading
- * sets them all on the root to a sentinel, so a profile's scope shows only what it declares.
- */
 const SENTINELS = Object.fromEntries(
   FACETS.map((facet) => [facet, declared(UPSTREAM_DEFAULTS[facet])]),
 );
 
-/**
- * The color tokens as v0.7.0's default declares them, which every reading compared with v0.7.0
- * pins on its root: the comparison then holds which token each declaration reads, and no palette.
- */
 const PIN = (UPSTREAM_DEFAULTS.color.match(/--[\w-]+\s*:[^;]+;/g) ?? []).join(" ");
 
-/** The setup scope() takes for a profile in a scheme, on the root or scoped under sentinels. */
 const setup = ({ facet, name }: Profile, scheme: string, scoped: boolean) => ({
   attribute: ATTRIBUTES[facet],
   name,
@@ -210,17 +160,12 @@ const setup = ({ facet, name }: Profile, scheme: string, scoped: boolean) => ({
   sentinels: scoped ? SENTINELS[facet] : undefined,
 });
 
-/** At most 40 lines of a failure's list. */
 const head = (lines: string[]) => lines.slice(0, 40).join("\n") + (lines.length > 40 ? "\n…" : "");
 
 describe("foundation tools", () => {
   let server: Server;
   let browser: Browser;
 
-  /**
-   * demo/tools.html on the stack of sheets, with computed-styles.js bound as window.m; pinned, its
-   * color tokens are v0.7.0's default's, PIN.
-   */
   async function toolsPage(sheets: string, pinned = false): Promise<Page> {
     const page = await browser.open(`${server.origin}/demo/tools.html`);
     await page.evaluate(`import("/test/browser/support/computed-styles.js")
@@ -229,7 +174,6 @@ describe("foundation tools", () => {
     return page;
   }
 
-  /** The page's reading on the stack of sheets, pinned, at rest and hovered. */
   async function snapshot(sheets: string): Promise<{ rest: Reading; hover: Reading }> {
     const page = await toolsPage(sheets, true);
     const rest = await page.evaluate("m.reading()");
@@ -239,8 +183,6 @@ describe("foundation tools", () => {
     return { rest, hover };
   }
 
-  /** The page's reading at rest on the stack of sheets, with scope() applied first; pinned unless
-   * told otherwise. */
   async function scoped(sheets: string, options: object, pinned = true): Promise<Reading> {
     const page = await toolsPage(sheets, pinned);
     await page.evaluate(`m.scope(${JSON.stringify(options)})`);
@@ -249,9 +191,6 @@ describe("foundation tools", () => {
     return rest;
   }
 
-  // v0.7.0's reading, which every comparison is against, and its lean reading in each scheme
-  // forced on the root, which an added profile's must differ from, so a profile that applied
-  // nothing can't pass; each pinned.
   let upstream: { rest: Reading; hover: Reading };
   const defaults: Record<string, Reading> = {};
   before(async () => {
@@ -299,8 +238,6 @@ describe("foundation tools", () => {
     });
   }
 
-  // The registry must hold no profile whose sheet the page didn't load: each entry, with its
-  // registration module imported, registers exactly the profiles its sheets define, in order.
   const registrations: [string, string, Record<Facet, string[]>][] = [
     [entry, "/dist/register.js", LEAN],
     [fullEntry, "/dist/register-full.js", FULL],
@@ -320,8 +257,6 @@ describe("foundation tools", () => {
     });
   }
 
-  // Each built-in unit's module, imported alone on a page whose registry is otherwise empty,
-  // registers its own name under its facet, nothing else, and fetches no stylesheet.
   for (const { facet, name } of FULL_PROFILES) {
     const module = `/dist/profiles/${facet}/${name}.js`;
     test(`${module} registers ${name} under ${facet} alone and loads no CSS`, async () => {
@@ -346,7 +281,6 @@ describe("foundation tools", () => {
 
   test("with no profile attribute, the page entry applies DEFAULTS' profiles", async () => {
     const page = await toolsPage(entry);
-    // A custom property keeps its source's line breaks.
     const read = `import("/dist/registry.js").then(({ DEFAULTS }) => {
       const style = getComputedStyle(document.documentElement);
       const token = (name) => style.getPropertyValue(name).trim().replace(/\\s+/g, " ");
@@ -399,8 +333,6 @@ describe("foundation tools", () => {
     assert.deepEqual(lines, [], head(lines));
   });
 
-  // The lean entry's defaults with no profile attribute, in each scheme forced on the root,
-  // pinned.
   for (const scheme of SCHEMES) {
     test(`the page entry computes as v0.7.0's lean entry, ${scheme}`, async () => {
       const lines = differences(defaults[scheme], await scoped(entry, { scheme }));
@@ -412,9 +344,6 @@ describe("foundation tools", () => {
     assert.notEqual(differences(defaults.light, defaults.dark).length, 0, "light and dark agree");
   });
 
-  // Every space and type profile of the full entry, named on the root, where its block follows
-  // the default's in its sub-layer, and scoped on the body under sentinels, where it shows every
-  // token it declares; pinned.
   for (const profile of UPSTREAM_HELD) {
     for (const scheme of SCHEMES) {
       test(`${ATTRIBUTES[profile.facet]}="${profile.name}" computes as v0.7.0's, ${scheme}`, async () => {
@@ -435,10 +364,6 @@ describe("foundation tools", () => {
     }
   }
 
-  // Each added space and type profile's declarations, and each color profile's, dropped one at a
-  // time on its scope under sentinels: every one must show, as the scope inherits no token its
-  // profile fails to declare. A space or type profile's are against v0.7.0's reading, pinned; a
-  // color profile's against its own, unpinned, so each of its tokens is its own value there.
   for (const profile of [...ADDED.filter((added) => UPSTREAM_HELD.includes(added)), ...COLORS]) {
     const file = `/profiles/${profile.facet}/${profile.name}.css`;
     const held = UPSTREAM_HELD.includes(profile);
@@ -465,15 +390,12 @@ describe("foundation tools", () => {
     await forceHover(page);
     const hover: Drop[] = await page.evaluate(`m.drops(${JSON.stringify(upstream.hover)})`);
     await page.close();
-    // One declaration per `property: value;` line, as each of the three sheets writes them.
     const written = concerns
       .map((c) => source(sheet(c)))
       .join("\n")
       .match(/^\s*-*[a-z][\w-]*\s*:[^;{]*;/gm);
     assert.ok(written, "the three sheets write no declaration");
     assert.equal(rest.length, written.length, "every declaration written is tried");
-    // The added utilities' declarations, which no element of the page carries, utilities.test.ts
-    // drops on its own cases.
     const added = new RegExp(`\\.(${ADDED_UTILITIES.join("|")})(?![\\w-])`);
     const missed = rest
       .filter((drop, i) => drop.differs + hover[i].differs === 0 && !added.test(drop.selector))
@@ -483,11 +405,8 @@ describe("foundation tools", () => {
 
   test("demo/profiles.html switches the tools page through every profile and scheme", async () => {
     const page = await browser.open(`${server.origin}/demo/profiles.html`);
-    // Each switch's options, and per option the frame root's attribute and a token it then reads,
-    // once the frame's link has moved to the full entry and loaded.
     const seen: Record<string, Switch[]> = await page.evaluate(`(async () => {
       const frame = document.querySelector("iframe");
-      // The page sets the attributes only once the frame's full entry has loaded.
       const ready = () => frame.contentDocument?.documentElement.hasAttribute("data-palette");
       while (!ready()) await new Promise((resolve) => setTimeout(resolve, 10));
       const root = frame.contentDocument.documentElement;
@@ -524,7 +443,6 @@ describe("foundation tools", () => {
         FULL[facet].map((name) => [name, name]),
         attribute,
       );
-      // Each profile's token differs from every other's, so each switch took effect.
       assert.equal(new Set(options.map(({ token }) => token)).size, options.length, attribute);
     }
     assert.deepEqual(
@@ -547,7 +465,6 @@ describe("foundation tools", () => {
       assert.equal(adopted[concern].imports, 0, `${concern}.css holds an @import`);
       assert.deepEqual(adopted[concern].rules, [`@layer foundation.${concern}`], concern);
     }
-    // A var() that found no token through the shadow boundary would leave a length 0px.
     assert.equal(adopted.meta.display, "inline-block");
     assert.notEqual(adopted.meta["padding-left"], "0px");
     assert.equal(adopted.structure.display, "grid");

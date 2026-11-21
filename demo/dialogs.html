@@ -1,20 +1,11 @@
 <!doctype html>
 <!-- After spike-html-go-wasm (f026de3): index.html's header actions and shortcut dialogs. -->
-<!-- From spike-html-hosting-icons (8b8d955): dist/octicon/question-16.js, gear-16.js and x-16.js;
-     Octicons, primer/octicons, MIT. -->
+<!-- From spike-html-hosting-icons (8b8d955): dist/octicon/question-16.js, gear-16.js and x-16.js; Octicons, primer/octicons, MIT. -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>foundation dialogs</title>
-    <!-- The glyph-button and dialog sheets from dist/, linked after the full page entry: a header
-         of two glyph buttons, Help on ? and Settings on S, each showing its name in a hint on hover
-         and keyboard focus, and opening its dialog by the invoker command; Help is a .dialog-fit,
-         as wide as its list, and Settings a .dialog-wide, whose selects are the theme demo's,
-         choice.js. Each dialog opens on a header row with a Close glyph button, which closes it, as
-         Escape does, with no script. keys.js clicks a button on its data-keys key. The glyphs are
-         inline svgs, as the icons layer draws them: Octicons' question-16, gear-16 and x-16. Its
-         modules run served only: mise run demo. -->
     <link rel="stylesheet" href="../dist/page-full.css" />
     <link rel="stylesheet" href="../dist/glyph-button.css" />
     <link rel="stylesheet" href="../dist/dialog.css" />
@@ -25,7 +16,6 @@
     <script type="module" src="../dist/keys.js"></script>
     <style>
       @layer demo {
-        /* The page's header: its name at the start and the glyph buttons at the end. */
         body > header {
           display: flex;
           flex-wrap: wrap;

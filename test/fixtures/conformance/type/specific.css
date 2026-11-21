@@ -1,6 +1,4 @@
 /* From spike-html-apps-foundation (07ba39a): test/fixtures/conformance/type/specific.css. */
-/* A type profile whose selector has specificity (0,1,0), with no :where(). It fails specificity
-   alone. */
 
 @layer foundation.tokens.type {
   [data-type="specific"] {

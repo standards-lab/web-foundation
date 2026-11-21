@@ -104,3 +104,9 @@ layout properties it changes to an explicit list.
 - A data-scheme scope works because the tokens hold `light-dark()` unresolved: a custom
   property's value resolves where a property reads it, against that element's `color-scheme`.
 - Line widths stay in px: a hairline should not grow with the display.
+
+## The browser tier's copy
+
+`test/fixtures/v0.7.0/` holds spike-html-design v0.7.0's own sheets, each below a provenance
+line, its rules unchanged, as the browser tier's reference. They keep upstream's formatting,
+which is Biome's, so `.prettierignore` leaves them out of Prettier's check.

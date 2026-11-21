@@ -1,6 +1,4 @@
 /* From spike-html-apps-foundation (07ba39a): test/fixtures/conformance/type/unfamilied.css. */
-/* A type profile whose --font-code is a font shorthand, a size before the family, which is no
-   font-family value. It fails scale alone. */
 
 @layer foundation.tokens.type {
   :where([data-type="unfamilied"]) {

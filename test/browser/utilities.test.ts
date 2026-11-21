@@ -1,13 +1,3 @@
-// The utility classes and the motion sheet the foundation adds, from the package's dist/, on
-// test/fixtures/utilities.html: the lean page entry, motion.css linked after it. Each utility's
-// case, from support/utilities.js, lays out as the class promises, and lays out the same in a
-// shadow root that adopts the reset, elements, utilities and motion sheets alone; dropping any one
-// declaration of the added classes changes a case. The visually hidden label stays in the
-// accessibility tree and a hidden alternative leaves it. .motion-pulse and .motion-ring run their
-// keyframes under prefers-reduced-motion: no-preference and nothing animates under reduce, emulated
-// through the protocol, in the page and in the shadow root; the durations are declared on the root
-// and on the adopting host. A page's own later layer wins over both sheets.
-
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { after, before, describe, test } from "node:test";
@@ -19,17 +9,14 @@ import type { Server } from "@standards-lab/web-tooling/server.js";
 
 import { ADDED_UTILITIES } from "./support/utilities.js";
 
-/** The repository root, which the server serves. */
 const root = join(import.meta.dirname, "../..");
 
-/** A box relative to its case's, in px. */
 interface Box {
   left: number;
   top: number;
   width: number;
   height: number;
 }
-/** A computed font size and color. */
 interface Type {
   size: string;
   color: string;
@@ -68,7 +55,6 @@ interface Hidden {
   labelLines?: number;
   hitLabel?: string;
 }
-/** support/utilities.js's measure(), case by case. */
 interface Measured {
   list: { indent: number; step: number; marker: string; blockStep: number };
   nowrap: Wrapping;
@@ -99,25 +85,20 @@ interface Measured {
   hidden: Hidden;
   hiddenControl: Hidden;
 }
-/** One declaration support/utilities.js's drops() dropped. */
 interface Drop {
   selector: string;
   declaration: string;
   differs: boolean;
 }
-/** An accessibility tree node, with the fields the cases read. */
 interface AXNode {
   ignored: boolean;
   role?: { value: string };
   name?: { value: string };
 }
 
-/** The in-page module, imported as m. */
 const WITH_MODULE = (body: string) =>
   `import("/test/browser/support/utilities.js").then(async (m) => ${body})`;
 
-/** Each element of the selector in the page and in the shadow root, its running animations'
- * names, and its opacity at the middle of the first one's loop, or 1 with none. */
 const ANIMATIONS = (selector: string) => `(() => {
   const host = document.querySelector("#shadow-host");
   const elements = [document, host.shadowRoot].flatMap((root) => [...root.querySelectorAll("${selector}")]);
@@ -144,7 +125,6 @@ describe("foundation utilities and motion", () => {
     ({ light, shadow } = await page.evaluate(
       WITH_MODULE(`({ light: m.measure(m.light()), shadow: m.measure(await m.shadow("/dist")) })`),
     ));
-    // The motion cases, copied into the shadow root beside the utilities'.
     await page.evaluate(`document.querySelector("#shadow-host").shadowRoot
       .append(document.querySelector("#motion").cloneNode(true))`);
   });
@@ -154,7 +134,6 @@ describe("foundation utilities and motion", () => {
     await server?.stop();
   });
 
-  /** Emulates the reader's prefers-reduced-motion. */
   const motion = (value: "reduce" | "no-preference") =>
     page.cdp("Emulation.setEmulatedMedia", {
       features: [{ name: "prefers-reduced-motion", value }],
@@ -183,8 +162,6 @@ describe("foundation utilities and motion", () => {
 
   test(".text-break moves to the next line whole, and breaks inside only when wider than the line", () => {
     const short = light["break-short"];
-    // Narrower than the line but not than what "Type " leaves of it: one box, at the next line's
-    // start, rather than broken at a hyphen.
     assert.ok(short.width < short.lineWidth, "the short value is no narrower than the line");
     assert.deepEqual(
       { fragments: short.fragments, left: short.left, top: short.top, lines: short.lines },
@@ -242,11 +219,8 @@ describe("foundation utilities and motion", () => {
       assert.ok(end.top < text.top + text.height, `${name}: the label wrapped`);
       assert.equal(end.left + end.width, row.width, `${name}: the label isn't at the end`);
     }
-    // A short name at its own width, under the 16ch the name keeps before the label wraps.
     assert.equal(light["head-short"].name.width, light["head-short"].nameText);
-    // A name grows to its own width and no further.
     assert.equal(light["head-wide"].name.width, light["head-wide"].nameText);
-    // A long name shrinks and wraps, from 16ch, before the label leaves its line.
     const basis = light["head-basis"];
     assert.ok(basis.name.width < basis.nameText, "the long name didn't shrink");
   });
@@ -289,7 +263,6 @@ describe("foundation utilities and motion", () => {
       nodes.filter(
         (node) => !node.ignored && node.role?.value === "StaticText" && node.name?.value === text,
       ).length;
-    // Each once in the page and once in the shadow root.
     assert.equal(named("a hidden label of several words"), 2);
     assert.equal(named("Stop generating"), 0);
     assert.equal(named("Send"), 2);

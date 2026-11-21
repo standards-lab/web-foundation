@@ -5,10 +5,6 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>foundation formatters</title>
-    <!-- Each Intl formatter from dist/format.js, called on sample values in the browser's own
-         locale and time zone, with what it printed; then tryFormatJson on minified JSON, on text
-         that doesn't parse, and on text nested past JSON_MAX_DEPTH. Its module runs served only:
-         mise run demo. -->
     <link rel="stylesheet" href="../dist/page.css" />
     <link rel="stylesheet" href="demo.css" />
     <script type="module">
@@ -22,10 +18,8 @@
         tryFormatJson,
       } from "../dist/format.js";
 
-      // One now for every call, so formatRelative's offsets land on their units exactly.
       const now = Date.now();
       const day = 86_400_000;
-      // Each call as the page shows it, and the formatter's output for it.
       const calls = [
         ["formatBytes(999)", formatBytes(999)],
         ["formatBytes(1000)", formatBytes(1000)],
@@ -55,9 +49,6 @@
         row.insertCell().textContent = output;
       }
 
-      // Each JSON sample, in a section of its own after the JSON section: its text as given, then
-      // what tryFormatJson made of it, the formatted text or the parser's reason. The nested
-      // sample shows only its lines around depth JSON_MAX_DEPTH, where the formatting stops.
       const nested = "[".repeat(JSON_MAX_DEPTH + 2) + "1" + "]".repeat(JSON_MAX_DEPTH + 2);
       const samples = [
         ["Minified: keys in their order, duplicates and literals as written", '{"id":"run-1","10":2,"2":3,"n":1.50E+3,"stages":[{"name":"classify","ok":true,"err":null},{}],"id":"again"}'],
@@ -65,8 +56,6 @@
         [`Nested ${JSON_MAX_DEPTH + 2} deep: the levels past ${JSON_MAX_DEPTH} kept as written`, nested, JSON_MAX_DEPTH - 3],
       ];
       const main = document.querySelector("main");
-      // A pre that scrolls sideways itself, as elements.css asks, so a long line never widens the
-      // page, under a quiet label.
       const block = (label, text) => {
         const caption = document.createElement("p");
         caption.className = "text-quiet-s";
@@ -87,7 +76,6 @@
         } else if (from === undefined) {
           section.append(...block("tryFormatJson", result.text));
         } else {
-          // The excerpt's common indent comes off, so its lines show without scrolling.
           const lines = result.text.split("\n");
           const excerpt = lines.slice(from, lines.length - from);
           const cut = Math.min(...excerpt.map((line) => line.length - line.trimStart().length));
