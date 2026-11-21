@@ -1,8 +1,8 @@
 /* From spike-html-apps-foundation (07ba39a): test/fixtures/v0.7.0/layers/tokens/type.css. */
+/* From spike-html-packages-foundation (5dd8a58): test/fixtures/v0.7.0/layers/tokens/type.css. */
 /* layers/tokens/type.css: the type facet's contract and the text scale. */
 
 :where(:root) {
-  /* biome-ignore lint/correctness/noUnknownFunction: biome does not know progress(), which chromium ships. */
   --type-fluid: progress(min(100vi, 100svb * 16 / 9), 22.5rem, 80rem);
 
   --text-xs: 0.7901rem;

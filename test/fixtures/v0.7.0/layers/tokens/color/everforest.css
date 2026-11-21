@@ -1,5 +1,6 @@
 /* From spike-html-apps-foundation (07ba39a): test/fixtures/v0.7.0/layers/tokens/color/everforest.css. */
-/* Colors from Everforest (MIT, sainnhe): https://github.com/sainnhe/everforest */
+/* From spike-html-design (fe75220): layers/tokens/color/everforest.css. */
+/* From sainnhe/everforest (v0.3.0): autoload/everforest.vim, hard in light and in dark; MIT, sainnhe. */
 /* layers/tokens/color/everforest.css: the Everforest color profile. */
 
 :where([data-palette="everforest"]) {

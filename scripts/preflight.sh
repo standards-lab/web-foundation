@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Fails naming mise run install when a tool a task needs is missing: the node_modules tooling, and
-# with `browser`, the pinned chrome-headless-shell.
 # From spike-html-apps-foundation (07ba39a): scripts/preflight.sh.
 # From spike-html-packages-foundation (5dd8a58): scripts/preflight.sh.
+# Fails naming mise run install when a tool a task needs is missing: the node_modules tooling, and
+# with `browser`, the pinned chrome-headless-shell.
 set -euo pipefail
 
 fail() {

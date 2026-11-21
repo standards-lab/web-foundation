@@ -74,7 +74,7 @@ copied from spike-html-packages-foundation at 5dd8a58 with profiles, registratio
 preferences module, the theme menu, the conformance check, and the full entry ported from
 spike-html-design at fe75220, its v0.7.0. v0.4.0 removed the theme menu and the keys help, which
 web-components' `sl-settings` and `sl-shortcuts` replace. Each copied file that takes comments
-names its source in a provenance line.
+names each of its sources in a provenance line.
 
 ## License
 

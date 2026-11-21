@@ -71,6 +71,7 @@ export default defineConfig([
           "ts-nocheck": "allow-with-description",
         },
       ],
+      "no-empty": ["error", { allowEmptyCatch: true }],
     },
   },
   { files: code, languageOptions: { globals: globals.browser } },

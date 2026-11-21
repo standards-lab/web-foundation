@@ -1,5 +1,6 @@
 /* From spike-html-apps-foundation (07ba39a): test/fixtures/v0.7.0/layers/tokens/color/catppuccin.css. */
-/* Colors from Catppuccin (MIT, Catppuccin): https://github.com/catppuccin/palette */
+/* From spike-html-design (fe75220): layers/tokens/color/catppuccin.css. */
+/* From catppuccin/palette (v1.8.0): palette.json, latte in light and mocha in dark; MIT, Catppuccin. */
 /* layers/tokens/color/catppuccin.css: the Catppuccin color profile. */
 
 :where([data-palette="catppuccin"]) {

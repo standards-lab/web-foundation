@@ -82,10 +82,11 @@ The architecture pages that apply, in the architecture repository:
 - A module header documents the public contract, what the module provides and promises, with no
   reasoning; each export carries a one-line doc comment. A sheet's CSS custom properties, classes,
   and layers are its exports, and their comments stay.
-- A copied file names each source in one provenance line, which reads
-  `From|Adapted from <repo> (<commit>): <path>`, with at most a short clause naming what changed.
-  It names the immediate source alone; that source keeps the earlier lines. A JSON file, which takes
-  no comment, has its line in `context/README.md`.
+- A copied file names each source repository and commit in one provenance line per source, which
+  reads `From|Adapted from <repo> (<commit>): <path>`, plus at most a short clause naming what
+  changed, never why, and a third-party source's licence after a semicolon. The lines its immediate
+  source carried for earlier sources stay beside that source's own. A JSON file, which takes no
+  comment, has its line in `context/README.md`.
 - Sources use `.ts` relative specifiers, which tsc rewrites; handwritten `.d.ts` keep `.js`.
 - Tests are TypeScript run under Node's type stripping, erasable syntax only, type-checked by
   `tsconfig.test.json`; browser-served fixtures stay `.js`.

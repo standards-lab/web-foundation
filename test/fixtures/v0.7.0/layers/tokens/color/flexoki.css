@@ -1,5 +1,6 @@
 /* From spike-html-apps-foundation (07ba39a): test/fixtures/v0.7.0/layers/tokens/color/flexoki.css. */
-/* Colors from Flexoki (MIT, Steph Ango): https://stephango.com/flexoki */
+/* From spike-html-packages-foundation (5dd8a58): test/fixtures/v0.7.0/layers/tokens/color/flexoki.css. */
+/* From Flexoki (stephango.com/flexoki): the 600 steps in light and 400 in dark, green adjusted; MIT, Steph Ango. */
 /* layers/tokens/color/flexoki.css: the Flexoki color profile, the default. */
 
 :where(:root, [data-palette="flexoki"]) {

@@ -1,4 +1,5 @@
 /* From spike-html-apps-foundation (07ba39a): test/fixtures/conformance/color/unlayered.css. */
+/* Adapted from spike-html-design (fe75220): test/fixtures/conformance/unlayered.css. */
 
 :where([data-palette="unlayered"]) {
   --bg: light-dark(#fffcf0, #100f0f);

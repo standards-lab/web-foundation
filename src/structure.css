@@ -12,7 +12,6 @@
     gap: var(--space-3xs);
   }
 
-  /* field-sizing is Baseline newly available; without it the control keeps its native size. */
   .field-grow {
     field-sizing: content;
     min-inline-size: 8ch;

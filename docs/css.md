@@ -41,6 +41,8 @@
 - **`.scroll-x` reserves no gutter**: `scrollbar-gutter` only reserves a vertical scrollbar's
   space. `.scroll-frame`'s one column is `minmax(0, 1fr)`, zero under a min-content constraint and
   its content's widest line under a max-content one.
+- **`.field-grow` sizes by `field-sizing: content`**, Baseline newly available; without it the
+  control keeps its native size.
 - **The page entries' layer order** puts meta before structure and utilities, so a `.button` that
   is also `.scroll-y` or `.field` computes as in v0.7.0.
 - **GitHub's `--bg-2`** is the opaque color `neutral.muted`, translucent upstream

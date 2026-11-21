@@ -1,10 +1,10 @@
+// Adapted from spike-html-apps-foundation (07ba39a): scripts/screenshots.config.ts, on web-tooling's web-screenshots bin, the registry's key renamed.
+// Adapted from spike-html-apps-foundation (9c15b8d): scripts/screenshots.js, its states, profiles, and open steps as a Description.
 // mise run screenshots' capture description, which web-tooling's web-screenshots bin runs: the
 // tools, hooks, utilities (motion running and reduced), dialogs (hint and each dialog, 390px and
 // 1280px), application and reading (390px at 200% text and 1280px), formatters, and color
 // specimen pages, each with page-full.css and its registration module, and the profile's
 // attributes on the root. The bin's flags choose the profiles, pages, schemes, and output.
-// Adapted from spike-html-apps-foundation (07ba39a): scripts/screenshots.config.ts, on web-tooling's web-screenshots bin, the registry's key renamed.
-// Adapted from spike-html-apps-foundation (9c15b8d): scripts/screenshots.js, its states, profiles, and open steps as a Description.
 
 import { SETTLED, until } from "@standards-lab/web-tooling/browser.js";
 import type { Description, DescribedState, Step } from "@standards-lab/web-tooling/screenshots.js";

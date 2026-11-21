@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Prints `<where>: <item> <pin> -> <latest>` for each mise tool, package.json dependency, GitHub
-# Actions pin, and github: devDependency's tag behind its latest, and exits 1 if any; prints
-# nothing when all are current. Reads the network.
 # Adapted from spike-html-apps-foundation (07ba39a): scripts/currency.sh, its action pins checked only when a workflow exists.
 # Adapted from spike-html-packages-foundation (5dd8a58): scripts/currency.sh, with a github: branch.
 # Adapted from spike-html-apps-components (2fded6d): scripts/currency.sh, its github: branch without the peer range check.
+# Prints `<where>: <item> <pin> -> <latest>` for each mise tool, package.json dependency, GitHub
+# Actions pin, and github: devDependency's tag behind its latest, and exits 1 if any; prints
+# nothing when all are current. Reads the network.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 

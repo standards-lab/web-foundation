@@ -1,8 +1,8 @@
 # Testing
 
 Why the tests measure as they do, where a test's name and its assertions don't say.
-[css.md](css.md) and [modules.md](modules.md) document what the sheets and modules promise; the
-tests name the behavior each one holds to.
+[use.md](use.md) documents what the sheets and modules promise, and [css.md](css.md) and
+[modules.md](modules.md) why they are built as they are; the tests name the behavior each holds to.
 
 ## The tiers
 

@@ -1,7 +1,7 @@
 // The utilities cases' in-page half, imported into test/fixtures/utilities.html: it lays out one
 // case per utility class, in the light DOM or a shadow root, and measures each case's geometry, as
 // plain JSON for evaluate(); the constants are also read on node.
-// See docs/testing.md.
+// See docs/testing.md
 
 import { declarations } from "./computed-styles.js";
 

@@ -1,5 +1,5 @@
-/* From primer/github-vscode-theme (v6.3.5, MIT, GitHub Inc.): Light and Dark Default, with src/colors.js's overrides. */
-/* From primer/primitives (7.10.0, MIT, GitHub Inc.): the values the theme's build resolves. */
+/* From primer/github-vscode-theme (v6.3.5): src/colors.js's overrides to Light and Dark Default; MIT, GitHub Inc. */
+/* From primer/primitives (7.10.0): the values the theme's build resolves; MIT, GitHub Inc. */
 /*
  * profiles/color/github.css, the GitHub profile of the color facet: one zero-specificity block,
  * applied by data-palette="github" on any element to its subtree, declaring the sixteen color

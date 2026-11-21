@@ -1,4 +1,4 @@
-/* Colors from Nightfox (MIT, James Simpson): https://github.com/EdenEast/nightfox.nvim at v3.10.0, lua/nightfox/palette */
+/* From EdenEast/nightfox.nvim (v3.10.0): lua/nightfox/palette/dayfox.lua and nightfox.lua; MIT, James Simpson. */
 /* demo/backups/nightfox.css: the backup the specimen page shows beside everforest, data-palette="nightfox"; a demo sheet, not a profile. */
 
 @layer foundation.tokens.color {

@@ -1,5 +1,6 @@
 /* From spike-html-apps-foundation (07ba39a): src/baseline/tokens/space.css. */
-/* From spike-html-packages-foundation (5dd8a58): src/baseline/tokens/space.css */
+/* From spike-html-packages-foundation (5dd8a58): src/baseline/tokens/space.css. */
+/* Adapted from spike-html-design (fe75220): layers/tokens/space.css, in the foundation.tokens.space layer. */
 
 /*
  * The baseline's space facet, foundation.tokens.space: its contract, and what derives from a
@@ -57,7 +58,6 @@
 
 @layer foundation.tokens.space {
   :where(:root) {
-    /* biome-ignore lint/correctness/noUnknownFunction: biome does not know progress(), which chromium ships. */
     --space-fluid: progress(min(100vi, 100svb * 16 / 9), 22.5rem, 80rem);
 
     --radius-full: 9999px;
