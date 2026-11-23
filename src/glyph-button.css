@@ -1,4 +1,3 @@
-/* Adapted from spike-html-hosting-components (9fa5850): src/glyph-button.css, layered. */
 /*
  * The foundation's glyph-button sheet, opt-in: neither page entry imports it. A page links it after
  * its entry, whose layer statement names foundation.glyph after the utilities, so the sheet orders

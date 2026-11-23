@@ -1,4 +1,3 @@
-/* Adapted from spike-html-hosting-sdk (f49087e): src/site.css's .dialog-header and dialog widths. */
 /*
  * The foundation's dialog sheet, opt-in: neither page entry imports it. A page links it after its
  * entry, whose layer statement names foundation.dialog after foundation.glyph, so the sheet orders

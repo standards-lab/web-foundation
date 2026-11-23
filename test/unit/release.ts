@@ -1,5 +1,3 @@
-// From spike-html-apps-foundation (07ba39a): test/unit/release.ts.
-// Adapted from spike-html-packages-foundation (5dd8a58): test/unit/release.js, in TypeScript.
 // A release's shape: a pack of the build checked against the sources, package.json's files and
 // exports as Node resolves them, and the Apache 2.0 LICENSE its manifest declares.
 

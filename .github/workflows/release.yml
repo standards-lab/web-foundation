@@ -1,6 +1,3 @@
-# From web-tooling (1ff49e4): .github/workflows/release.yml.
-# Adapted from spike-html-apps-tooling (d77877b): .github/workflows/release.yml, dispatched by hand with a pushed tag held to a pack commit on main's merge commit.
-# Adapted from spike-html-apps-foundation (9c15b8d): .github/workflows/release.yml, renamed.
 # Publishes the release a pushed vX.Y.Z tag cuts, dispatched by hand with the tag.
 # See README.md
 name: Release

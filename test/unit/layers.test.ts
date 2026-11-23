@@ -1,6 +1,3 @@
-// From spike-html-apps-foundation (07ba39a): test/unit/layers.test.ts.
-// Adapted from spike-html-packages-foundation (5dd8a58): test/unit/layers.test.js, in TypeScript.
-
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { mkdtempSync, rmSync } from "node:fs";

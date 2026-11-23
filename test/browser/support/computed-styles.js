@@ -1,5 +1,3 @@
-// From spike-html-apps-foundation (07ba39a): test/browser/support/computed-styles.js.
-// Adapted from spike-html-packages-foundation (5dd8a58): test/browser/support/computed-styles.js.
 // The tools cases' in-page half, imported into demo/tools.html: readings of every element's computed
 // style, as plain JSON for evaluate(); differences() also runs on node.
 // See docs/testing.md

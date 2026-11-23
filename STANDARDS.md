@@ -37,8 +37,7 @@ The architecture pages that apply, in the architecture repository:
 - What v0.7.0 lacks has no reference there, so it departs from nothing: the success, warning and
   danger hooks, the control, focus and tint tokens, the classes `utilities.css` holds beyond
   v0.7.0's, and the opt-in `glyph-button.css`, `dialog.css`, `layout.css` and `motion.css`.
-  Each follows the source its provenance line names, and the architect's design review holds its
-  look.
+  The architect's design review holds its look.
 - A sheet is finished in every profile the baseline carries, light and dark.
 - Focus is always visible, motion is brief and honours reduced motion, and nothing shifts layout.
 - Density, alignment, and spacing in the tool sheets come from the tokens, never a literal.

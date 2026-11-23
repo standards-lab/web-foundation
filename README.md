@@ -1,6 +1,3 @@
-<!-- Adapted from spike-html-apps-foundation (07ba39a): README.md, for
-@standards-lab/web-foundation. -->
-
 # web-foundation
 
 The native foundation of the standards-lab web client stack: the baseline stylesheets (tokens,
@@ -71,11 +68,7 @@ tarball attached.
 
 ## Provenance
 
-The package is seeded by copy from spike-html-apps-foundation at 07ba39a, its v0.3.1, itself
-copied from spike-html-packages-foundation at 5dd8a58 with profiles, registration modules, the
-preferences module, the theme menu, the conformance check, and the full entry ported from
-spike-html-design at fe75220, its v0.7.0. Each copied file that takes comments names each of its
-sources in a provenance line.
+The package's lineage is in the workspace's [references catalog](https://github.com/standards-lab/org/blob/main/references.md).
 
 ## License
 

@@ -1,5 +1,3 @@
-/* From spike-html-apps-foundation (07ba39a): test/fixtures/conformance/type/missing.css. */
-
 @layer foundation.tokens.type {
   :where([data-type="missing"]) {
     --font-body: system-ui, sans-serif;

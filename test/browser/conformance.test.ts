@@ -1,6 +1,3 @@
-// Adapted from spike-html-apps-foundation (07ba39a): test/browser/conformance.test.ts, importing the tooling and the package by name.
-// Adapted from spike-html-design (fe75220): test/conformance.test.js, in TypeScript.
-
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { after, afterEach, before, describe, test } from "node:test";

@@ -1,6 +1,3 @@
-// Adapted from spike-html-apps-foundation (07ba39a): test/unit/format.test.ts, importing the package as @standards-lab/web-foundation.
-// Adapted from web-components (a659353): test/browser/json.test.ts, its cases run in node, its time bounds a per-test timeout.
-
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
 import { Worker } from "node:worker_threads";

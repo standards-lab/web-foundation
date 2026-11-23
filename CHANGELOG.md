@@ -1,6 +1,3 @@
-<!-- Adapted from web-tooling (1ff49e4): CHANGELOG.md, for @standards-lab/web-foundation, with none
-of spike-html-apps-foundation's versions. -->
-
 # Changelog
 
 All notable changes to `@standards-lab/web-foundation` are documented here. The format follows

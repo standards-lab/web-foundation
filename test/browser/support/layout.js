@@ -1,4 +1,4 @@
-// From spike-html-hosting-icons (8b8d955): dist/octicon/x-16.js; Octicons, primer/octicons, MIT.
+// From primer/octicons (@primer/octicons@19.42.0): icons/x-16.svg; MIT, GitHub Inc.
 // The page layout cases' in-page half, imported into test/fixtures/layout.html: it fills the body
 // with a header and main and measures the page's geometry under each page type, as plain JSON for
 // evaluate(); the constants are also read on node.

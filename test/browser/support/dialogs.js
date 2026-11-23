@@ -1,4 +1,4 @@
-// From spike-html-hosting-icons (8b8d955): dist/octicon/question-16.js and x-16.js; Octicons, primer/octicons, MIT.
+// From primer/octicons (@primer/octicons@19.42.0): icons/question-16.svg and x-16.svg; MIT, GitHub Inc.
 // The glyph button and dialog cases' in-page half, imported into test/fixtures/dialogs.html: it lays
 // out glyph buttons with their hints and three dialogs, in the light DOM or a shadow root, and
 // measures each case's geometry and colors, as plain JSON for evaluate(); the constants are also

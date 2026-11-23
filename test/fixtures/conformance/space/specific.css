@@ -1,5 +1,3 @@
-/* From spike-html-apps-foundation (07ba39a): test/fixtures/conformance/space/specific.css. */
-
 @layer foundation.tokens.space {
   [data-space="specific"] {
     --space-base: 1rem;

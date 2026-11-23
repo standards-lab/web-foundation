@@ -1,6 +1,3 @@
-// From spike-html-apps-foundation (07ba39a): test/unit/keys-grammar.test.ts.
-// Adapted from spike-html-packages-foundation (5dd8a58): test/unit/keys-grammar.test.js, in TypeScript.
-
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
 import {

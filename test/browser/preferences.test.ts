@@ -1,6 +1,3 @@
-// Adapted from spike-html-apps-foundation (07ba39a): test/browser/preferences.test.ts, importing the tooling by name, its key renamed web-foundation.preferences, without the theme menu.
-// Adapted from spike-html-design (fe75220): test/preferences.test.js, in TypeScript.
-
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { after, afterEach, before, describe, test } from "node:test";

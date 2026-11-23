@@ -1,5 +1,3 @@
-// Adapted from spike-html-apps-foundation (07ba39a): src/conformance.ts, its registry key renamed web-foundation.registry.
-// Adapted from spike-html-design (fe75220): modules/conformance.js.
 // The conformance check: whether a profile an extension adds keeps its facet's contract, in a live
 // page. It imports nothing at runtime and reads computed values only, never a sheet's rules, so it
 // runs alike from file://, a CDN, a local server, and node_modules.

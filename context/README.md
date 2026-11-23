@@ -16,16 +16,9 @@ README.md's "Release" section gives the steps and what the workflow verifies.
 
 ## Provenance
 
-The package is seeded by copy from spike-html-apps-foundation at 07ba39a, and spike-html-design
-v0.7.0 stays its frozen visual reference, except for the color profiles' values, which follow their
-upstream themes (STANDARDS.md, "Design"). The spikes are archived and never a dependency. Each
-copied file that takes comments names each of its sources in a provenance line. The JSON files take
-no comment, so their provenance is here:
-
-- `package.json` is adapted from spike-html-apps-foundation (07ba39a): package.json: renamed
-  `@standards-lab/web-foundation`, on web-tooling in place of the spike's tooling.
-- `.prettierrc.json` is from spike-html-apps-foundation (07ba39a): .prettierrc.json.
-- `pnpm-lock.yaml` is generated, not copied.
+spike-html-design v0.7.0 stays the package's frozen visual reference, except for the color
+profiles' values, which follow their upstream themes (STANDARDS.md, "Design"). The package's
+lineage is in the workspace's [references catalog](https://github.com/standards-lab/org/blob/main/references.md).
 
 ## Capability map
 

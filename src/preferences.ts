@@ -1,5 +1,3 @@
-// Adapted from spike-html-apps-foundation (07ba39a): src/preferences.ts, its storage key renamed web-foundation.preferences.
-// Adapted from spike-html-design (fe75220): modules/preferences.js.
 // The reader's theme choice, applied to the root before first paint, kept in localStorage, and
 // followed across tabs, where a cleared choice restores the defaults. A page loads it with
 // blocking="render" after its registration module, so the registry is full when it runs and no

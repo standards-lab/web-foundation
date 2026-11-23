@@ -1,5 +1,3 @@
-// From spike-html-apps-foundation (07ba39a): eslint.config.js.
-// Adapted from spike-html-packages-foundation (5dd8a58): eslint.config.js.
 // The lint the check runs: the recommended rules, the layer's imports in src/, and every .css
 // import a CSS module script.
 // See docs/lint.md
