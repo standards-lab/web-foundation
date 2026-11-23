@@ -30,8 +30,9 @@ modules by their `.js` subpaths. The lean entry, `page.css`, carries the default
 - `./preferences.js`: applies the reader's stored theme choice to the root before first paint and
   applies each save another tab makes. `read()`, `apply(choice, el)`, and `save(choice)` are a
   settings UI's to call. A page loads it with `blocking="render"` after its registration modules.
-- `./keys.js`: the page's keyboard shortcuts. An element with `data-keys` is clicked or focused by
-  its keys, and `register(keys, label, handler)` binds a handler and returns its removal.
+- `./keys.js`: the page's keyboard shortcuts. An element with `data-keys` is focused by its keys
+  and, unless it is a field, then clicked, and `register(keys, label, handler)` binds a handler and
+  returns its removal.
   `bindings(dialog)` lists the bindings active were the dialog closed, for a page's own help;
   `settings()` and `changeSettings(change)` read and store the reader's settings, the off switch
   for character keys and the wait between presses, one of `WAITS`.

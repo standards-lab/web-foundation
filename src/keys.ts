@@ -1,5 +1,5 @@
-// The page's keyboard shortcuts: an element with data-keys is clicked or focused by its keys, and
-// register() binds a handler. One store at the well-known global key
+// The page's keyboard shortcuts: an element with data-keys is focused by its keys and, unless it is
+// a field, then clicked, and register() binds a handler. One store at the well-known global key
 // Symbol.for("web-foundation.keys") is shared by every copy, and the first copy to load installs
 // the one listener, so a key never fires twice; the modals focus has entered, at
 // Symbol.for("web-foundation.keys.modals"), are shared alike.
@@ -343,7 +343,10 @@ function fireEvent(binding: Active, sequence: Sequence): CustomEvent<FireDetail>
 function act(binding: Active, event: CustomEvent<FireDetail>): void {
   if (binding.entry) binding.entry.handler(event);
   else if (isField(binding.el)) binding.el.focus();
-  else binding.el.click();
+  else {
+    binding.el.focus({ preventScroll: true });
+    binding.el.click();
+  }
 }
 
 function fire({ binding, sequence }: Match): void {

@@ -162,6 +162,18 @@ describe("keys: element bindings", () => {
     assert.equal(await active(page), "search");
   });
 
+  test("O focuses its opener before clicking it, and closing the modal returns focus there", async () => {
+    const page = await open();
+    await page.evaluate(`document.getElementById("opener").addEventListener("click",
+      () => (window.focusedAtClick = document.activeElement.id))`);
+    await press(page, "o");
+    assert.equal(await isModal(page, "modal"), true);
+    assert.equal(await page.evaluate("window.focusedAtClick"), "opener");
+    await pressEscape(page);
+    assert.equal(await isOpen(page, "modal"), false);
+    assert.equal(await active(page), "opener");
+  });
+
   test("keys reads the page at each press: an added element binds, a removed one unbinds", async () => {
     const page = await open();
     await page.evaluate(`document.body.insertAdjacentHTML("beforeend",
