@@ -33,8 +33,8 @@ The rules are upstream's, but for these differences:
 - The space facet adds the control, focus and tint tokens; the color facet names this package's
   default profile; each profile's header says how a page takes its unit.
 - Five rules in `elements.css` are the foundation's own, five of STANDARDS.md's six design
-  exceptions: progress's accent, the modal-only backdrop, the disabled field, the progress and
-  meter track, and the one-line select's block size.
+  exceptions: progress's accent, the dialog's modal-only backdrop, the disabled field, the
+  progress and meter track, and the one-line select's block size.
 
 The port is this repository's own code: Prettier formats it, no test holds its text to upstream,
 and the browser tier holds what the space and type profiles compute to upstream's values.
@@ -109,6 +109,6 @@ layout properties it changes to an explicit list.
 
 ## The browser tier's copy
 
-`test/fixtures/v0.7.0/` holds spike-html-design v0.7.0's own sheets, its rules unchanged, as the
-browser tier's reference. They keep upstream's formatting, which is Biome's, so `.prettierignore`
-leaves them out of Prettier's check.
+`test/fixtures/v0.7.0/` holds spike-html-design v0.7.0's own sheets, with their rules unchanged,
+as the browser tier's reference. They keep upstream's formatting, which is Biome's, so
+`.prettierignore` leaves them out of Prettier's check.
