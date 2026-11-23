@@ -68,13 +68,12 @@ and each push to it.
   version bumped without its own sha256 installs the old build, and the preflight fails naming the
   pin.
 - **pnpm's settings** are in `pnpm-workspace.yaml`; the repository is one package, so it lists no
-  packages. unrs-resolver, under eslint-plugin-import-x and eslint-import-resolver-typescript, has
-  a postinstall that fetches its native binding when the optional dependency holding it is
-  missing; pnpm installs that dependency, so the script isn't run. `minimumReleaseAge: 0` turns off
-  pnpm's one-day wait before it installs a release. The currency task moves each pin to its latest
-  release, and that release's notes are read before the bump lands, a review that stands in for
-  the wait. With the wait on, a frozen install of a lockfile that pins a release under a day old
-  fails.
+  packages. unrs-resolver, under eslint-plugin-import-x and eslint-import-resolver-typescript, has a
+  postinstall that fetches its native binding when the optional dependency holding it is missing;
+  pnpm installs that dependency, so the script isn't run. `minimumReleaseAge: 0` is Web Elemental's
+  [narrowing](../../architecture/standards/web-elemental/principles/packages-and-releases.md#pins)
+  of rolling currency's [Why a release installs the day it
+  ships](../../architecture/principles/rolling-currency.md#why-a-release-installs-the-day-it-ships).
 - **`tsconfig.json` is the build**, src/ into dist/: tsc emits each module's `.js` and `.d.ts`,
   and `mise run types` checks the same sources with `--noEmit`. `lib` is es2025 for
   `Intl.DurationFormat`'s types, which `src/format.ts` uses.

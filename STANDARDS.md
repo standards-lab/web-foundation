@@ -1,12 +1,8 @@
-<!-- Adapted from spike-html-apps-foundation (07ba39a): STANDARDS.md, for
-@standards-lab/web-foundation and its hand-cut releases. -->
-
 # web-foundation standards
 
 The judgement calls the standards-reviewer applies to web-foundation, beyond what `mise run check`
-enforces: each one line, with a pointer to the architecture page that applies where one does. The
-`standard` task points them at the Web Elemental standard once it is founded
-(`standards-lab/context/web-client.md`, "Toward Web Elemental").
+enforces: each one line, with a pointer to the architecture page that applies where one does.
+web-foundation is a Web Elemental member (`architecture/standards/web-elemental/README.md`).
 
 The architecture pages that apply, in the architecture repository:
 
@@ -68,23 +64,14 @@ The architecture pages that apply, in the architecture repository:
 - It declares no runtime dependency: the foundation is the platform alone
   (`architecture/principles/minimal-footprint.md`).
 - The keys family gives the app the means to bind; the foundation binds no key itself.
-- `dist/` lives only in a release tag's tree, the pack, never on a branch.
-- Releases are plain `vX.Y.Z` annotated tags on a pack commit whose one parent is main's merge
-  commit, cut by hand on a green check from `package.json`'s version, each with its `CHANGELOG.md`
-  section, and never changed or re-cut; the release workflow, dispatched by hand with the pushed
-  tag and never on a push, only verifies and publishes it (`standards-lab/context/web-client.md`,
-  "Packaging and release").
+- Its releases, `dist/`, and pins follow
+  `architecture/standards/web-elemental/principles/packages-and-releases.md`.
 
 ## Code
 
 - A module header documents the public contract, what the module provides and promises, with no
   reasoning; each export carries a one-line doc comment. A sheet's CSS custom properties, classes,
   and layers are its exports, and each carries its comment.
-- A copied file names each source repository and commit in one provenance line per source, which
-  reads `From|Adapted from <repo> (<commit>): <path>`, plus at most a short clause naming what
-  changed, never why, and a third-party source's licence after a semicolon. The lines its immediate
-  source carried for earlier sources stay beside that source's own. A JSON file, which takes no
-  comment, has its line in `context/README.md`.
 - Sources use `.ts` relative specifiers, which tsc rewrites; handwritten `.d.ts` keep `.js`.
 - Tests are TypeScript run under Node's type stripping, erasable syntax only, type-checked by
   `tsconfig.test.json`; browser-served fixtures stay `.js`.
