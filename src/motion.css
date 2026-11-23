@@ -1,4 +1,3 @@
-/* Adapted from web-components (a659353): src/chat-thread.css's pulse, src/stage-timeline.css's ring, src/upload-dropzone.css's and src/drawer.css's durations. */
 /*
  * The foundation's motion sheet, opt-in: neither page entry imports it. A page links it after its
  * entry, whose layer statement names foundation.motion last, so the sheet orders after the

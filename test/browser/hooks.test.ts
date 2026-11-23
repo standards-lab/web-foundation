@@ -1,5 +1,3 @@
-// Adapted from spike-html-apps-foundation (07ba39a): test/browser/hooks.test.ts, importing the tooling as @standards-lab/web-tooling.
-
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { after, before, describe, test } from "node:test";

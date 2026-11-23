@@ -1,5 +1,3 @@
-// From spike-html-apps-foundation (07ba39a): src/keys-grammar.ts.
-// From spike-html-packages-foundation (5dd8a58): src/keys-grammar.ts.
 // The keys family's binding grammar, with no DOM: @github/hotkey's, with a letter matching either
 // case unless Shift is written and a symbol written as the character typed, Shift ignored.
 

@@ -1,6 +1,3 @@
-// From spike-html-apps-foundation (07ba39a): test/fixtures/flash-recorder.js.
-// Adapted from spike-html-design (fe75220): test/fixtures/flash-blocking.html, its inline script.
-
 window.flash = { paint: null, applied: null };
 new PerformanceObserver((list) => {
   for (const entry of list.getEntries()) {

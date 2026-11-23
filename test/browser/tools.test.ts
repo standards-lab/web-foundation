@@ -1,6 +1,3 @@
-// Adapted from spike-html-apps-foundation (07ba39a): test/browser/tools.test.ts, importing the tooling and the package by name.
-// Adapted from spike-html-packages-foundation (5dd8a58): test/browser/tools.test.js, in TypeScript.
-
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";

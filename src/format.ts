@@ -1,6 +1,3 @@
-// Adapted from spike-html-apps-foundation (07ba39a): src/format.ts, its header trimmed.
-// Adapted from spike-html-packages-foundation (5dd8a58): src/format.d.ts, its declarations given a runtime.
-// Adapted from web-components (a659353): src/json.ts, its MAX_DEPTH renamed JSON_MAX_DEPTH, and artifact-viewer.ts' pretty as tryFormatJson.
 // The foundation's formatters: byte counts, dates, relative times, and durations, on the
 // platform's Intl alone, and JSON text re-indented from its own tokens; no package and no other
 // layer, and none touches the DOM.

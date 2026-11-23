@@ -1,6 +1,3 @@
-// Adapted from spike-html-apps-foundation (07ba39a): test/unit/declarations.test.ts, without the format.d.ts comparison.
-// Adapted from spike-html-packages-foundation (5dd8a58): test/unit/declarations.test.js, in TypeScript.
-
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";

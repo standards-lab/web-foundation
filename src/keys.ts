@@ -1,5 +1,3 @@
-// Adapted from spike-html-apps-foundation (07ba39a): src/keys.ts, its global and storage keys renamed web-foundation.keys*.
-// Adapted from spike-html-packages-foundation (5dd8a58): src/keys.ts.
 // The page's keyboard shortcuts: an element with data-keys is clicked or focused by its keys, and
 // register() binds a handler. One store at the well-known global key
 // Symbol.for("web-foundation.keys") is shared by every copy, and the first copy to load installs
